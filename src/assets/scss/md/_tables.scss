@@ -1,0 +1,144 @@
+.md-table-cell-container{
+  padding: 0;
+  .md-table-cell:last-child &{
+    padding-right: 0;
+    text-align: right;
+    display: flex;
+  }
+}
+.md-table-head-container{
+  height: auto;
+  padding: 0;
+}
+.md-tabs-content table thead{
+  display: none;
+}
+
+.md-tabs-container tbody .md-table-row:first-child td{
+  border: 0;
+}
+
+.md-table-cell{
+  padding: 12px 8px;
+  font-size: $font-size-base;
+}
+
+.md-table-head-label{
+  font-size: $font-size-h5;
+  padding-left: 8px;
+  font-weight: 600;
+}
+
+.md-table .md-table-row:hover .md-table-cell{
+  background-color: transparent !important;
+}
+
+.md-table .md-table-row:hover{
+  background: $table-bg-hover !important;
+}
+
+.md-card-plain .md-card-content > div .md-table .md-table-content,
+.md-card-plain .md-card-content > div .md-table {
+  background-color: transparent !important;
+}
+
+.md-table{
+  &[table-header-color="orange"] .md-table-head{
+    color: $brand-warning !important;
+  }
+  &[table-header-color="purple"] .md-table-head{
+    color: $brand-primary !important;
+  }
+  &[table-header-color="blue"] .md-table-head{
+    color: $brand-info !important;
+  }
+  &[table-header-color="red"] .md-table-head{
+    color: $brand-danger !important;
+  }
+  &[table-header-color="green"] .md-table-head{
+    color: $brand-success !important;
+  }
+
+  .md-table-row td{
+    border-top-color: rgba(0,0,0,.06) !important;
+  }
+}
+
+.Searchbar {
+  display: flex;
+  align-items: center;
+  margin: 0px -29px 30px;
+}
+
+.Searchbar input[type="text"] {
+  padding: 8px 12px;
+  border-radius: 13px;
+  border: 1px solid orange;
+  font-size: 15px;
+  width: 190px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.search-container {
+    flex: 1;
+}
+
+
+.filter-container {
+    position: relative;
+    z-index: 8 ; 
+}
+
+.filter-button {
+    padding: 10px 30px;
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 13px;
+    cursor: pointer;
+    margin: 0px 0px 30px;
+}
+
+
+.filter-buttons {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(54%);
+    right: -2px;
+    background-color: #f1f1f1;
+}
+
+.filter-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+
+.filter-buttons button:hover {
+    background-color: #ddd;
+}
+
+
+.titleHeader {
+
+  margin-top: 5px;
+  font-weight: 600;
+  color: orange;
+
+}
+
+
+.transparentButton {
+  margin-right: 10px;
+  background-color: white;
+  border: none;
+}
