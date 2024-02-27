@@ -1,18 +1,9 @@
-import DashboardLayout from "@/presentation/pages/Layout/DashboardLayout.vue";
-
-import Dashboard from "@/presentation/pages/Dashboard.vue";
-import UserProfile from "@/presentation/pages/UserProfile.vue";
-import TableList from "@/presentation/pages/TableList.vue";
-import Typography from "@/presentation/pages/Typography.vue";
-import Icons from "@/presentation/pages/Icons.vue";
-
-import Notifications from "@/presentation/pages/Notifications.vue";
-
-
-import Login from "@/presentation/pages/Login.vue";
-import SummaryComparison from "@/presentation/pages/SummaryComparison.vue";
-import Comparison from "@/presentation/pages/Comparison.vue";
-
+import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
+import UserProfile from "@/pages/UserProfile.vue";
+import Login from "@/pages/Login.vue";
+import SummaryComparison from "@/pages/SummaryComparison.vue";
+import Comparison from "@/pages/Comparison.vue";
+import Trade from "@/pages/Trade.vue";
 
 
 
@@ -23,29 +14,9 @@ const routes = [
     redirect: "/summarycomparison",
     children: [
       {
-        path: "dashboard",
-        name: "Dashboard",
-        component: Dashboard,
-      },
-      {
         path: "user",
         name: "User Profile",
         component: UserProfile,
-      },
-      {
-        path: "table",
-        name: "Table List",
-        component: TableList,
-      },
-      {
-        path: "typography",
-        name: "Typography",
-        component: Typography,
-      },
-      {
-        path: "notifications",
-        name: "Notifications",
-        component: Notifications,
       },
       {
         path: "summarycomparison",
@@ -56,6 +27,11 @@ const routes = [
         path: "comparison",
         name: "Comparison",
         component: Comparison,
+      },
+      {
+        path: "trade",
+        name: "Trade List",
+        component: Trade,
       },
     ],
   },

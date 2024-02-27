@@ -7,9 +7,24 @@
   }
 }
 .md-table-head-container{
-  height: auto;
-  padding: 0;
+  height: 130px !important;
+  border: 1px solid #ddd !important; 
+  padding: 8px 0 !important;
 }
+
+.md-table-head-label{
+  font-size: $font-size-h5;
+  padding-left: 8px;
+  font-weight: 600;
+  height: 130px !important;
+}
+
+.md-table-head-container, .md-table-head-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal  !important;
+}
+
 .md-tabs-content table thead{
   display: none;
 }
@@ -21,12 +36,12 @@
 .md-table-cell{
   padding: 12px 8px;
   font-size: $font-size-base;
+  padding: 10px;
+  border: 1px solid #ddd !important; 
 }
 
-.md-table-head-label{
-  font-size: $font-size-h5;
-  padding-left: 8px;
-  font-weight: 600;
+.md-table table {
+  border-collapse: unset !important; 
 }
 
 .md-table .md-table-row:hover .md-table-cell{
@@ -67,7 +82,7 @@
 .Searchbar {
   display: flex;
   align-items: center;
-  margin: 0px -29px 30px;
+  margin: 0px -1px 30px;
 }
 
 .Searchbar input[type="text"] {
@@ -90,55 +105,92 @@
 }
 
 
-.filter-container {
-    position: relative;
-    z-index: 8 ; 
+.approval-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
-.filter-button {
-    padding: 10px 30px;
-    background-color: orange;
-    color: white;
-    border: none;
-    border-radius: 13px;
-    cursor: pointer;
-    margin: 0px 0px 30px;
+.approval-table th,
+.approval-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
 }
 
-
-.filter-buttons {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: calc(54%);
-    right: -2px;
-    background-color: #f1f1f1;
+.approval-table th {
+  background-color: #f2f2f2;
 }
 
-.filter-buttons button {
-    padding: 10px 20px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
+.approval-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
-
-.filter-buttons button:hover {
-    background-color: #ddd;
+.approval-table tbody tr:hover {
+  background-color: #ddd;
 }
 
+.comparison-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-.titleHeader {
-
-  margin-top: 5px;
-  font-weight: 600;
-  color: orange;
-
+.comparison-table th,
+.comparison-table td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 13px;
+  overflow: visible; /* Allow overflow for full text visibility */
+  white-space: nowrap;
 }
 
 
-.transparentButton {
-  margin-right: 10px;
-  background-color: white;
-  border: none;
+.comparison-table th {
+  background-color: #f2f2f2;
+  font-size: 16px;
+  font-weight: bold;
 }
+
+.comparison-table td {
+  font-size: 14px;
+}
+
+
+.table-container {
+  overflow-x: auto;
+}
+
+.finalTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.finalTable th, .finalTable td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.finalTable th {
+  background-color: #f2f2f2;
+  font-size: 18px;
+  color: #333;
+}
+
+.finalTable .table-heading {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.finalTable .description {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.finalTable .value {
+  font-size: 16px;
+  color: #007bff;
+}
+

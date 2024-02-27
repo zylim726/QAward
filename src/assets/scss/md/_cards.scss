@@ -4,6 +4,7 @@
     width: 100%;
     margin: 25px 0;
     overflow: unset;
+    z-index: 0 !important;
 
     box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
     border-radius: $border-radius-base;
@@ -51,7 +52,7 @@
     }
 
     .category:not([class*="text-"]){
-        color: $gray-color;
+        color: $gray-light;
     }
     .md-card-content{
         padding: 20px 26px;
@@ -68,15 +69,15 @@
         
 
         .title{
-            color: $white-color;
+            color: $white;
         }
         .category{
             margin: 0;
-            color: rgba($white-color, .62);
+            color: rgba($white, .62);
         }
 
         a{
-          color: $white-color !important;
+          color: $white !important;
         }
 
         &.card-chart{
@@ -91,7 +92,7 @@
         }
 
         .ct-label{
-            color: rgba($white-color, .7);
+            color: rgba($white, .7);
         }
         .ct-grid{
             stroke: rgba(255, 255, 255, 0.2);
@@ -117,7 +118,7 @@
 
         h3{
             margin: 0;
-            color: $white-color;
+            color: $white;
         }
 
         h6{
@@ -140,11 +141,11 @@
             display: inline-block;
         }
         .author{
-            color: $gray-color;
+            color: $gray-light;
         }
         .stats{
             line-height: 22px;
-            color: $gray-color;
+            color: $gray-light;
             font-size: $font-size-small;
 
             .md-icon.md-theme-default.md-icon-font{
@@ -156,7 +157,7 @@
         }
 
         h6{
-            color: $gray-color;
+            color: $gray-light;
         }
 
     }
@@ -194,7 +195,7 @@
         }
 
         a{
-            color: $black-color;
+            color: $black;
             text-decoration: none;
 
             .ripple-container{
@@ -209,12 +210,6 @@
         tr:first-child td{
             border-top: none;
         }
-    }
-
-    [data-background-color="purple"],
-    .md-tabs.md-primary .md-tabs-navigation{
-        background: linear-gradient(60deg, $purple-400, $purple-600);
-        @include shadow-big-color($brand-primary);
     }
 
     [data-background-color="blue"],
@@ -242,10 +237,10 @@
     }
 
     [data-background-color]{
-        color: $white-color;
+        color: $white;
 
         a{
-            color: $white-color;
+            color: $white;
         }
     }
 }
@@ -255,7 +250,7 @@
         margin: 0;
 
         small{
-          color: $gray-color;
+          color: $gray-light;
           font-size: 65%;
           line-height: 1;
           font-weight: 400;
@@ -270,7 +265,7 @@
             line-height: 56px;
             width: 56px;
             height: 56px;
-            color: $white-color !important;
+            color: $white !important;
         }
     }
     .md-card-content{
@@ -280,20 +275,6 @@
 
 }
 
-.card-nav-tabs{
-    .header-raised{
-        margin-top: -$margin-base * 2;
-    }
-    .nav-tabs{
-        background: transparent;
-        padding: 0;
-    }
-    .nav-tabs-title{
-        float: left;
-        padding: 10px 10px 10px 0;
-        line-height: 24px;
-    }
-}
 
 .md-card-plain{
     background: transparent !important;
@@ -315,17 +296,6 @@
         img{
             border-radius: $border-radius-base;
         }
-    }
-}
-
-.iframe-container{
-    margin: 0 -20px 0;
-
-    iframe{
-        width: 100%;
-        height: 500px;
-        border: 0;
-        @include shadow-big();
     }
 }
 
@@ -357,5 +327,45 @@
         .card-avatar{
             margin-top: 0;
         }
+    }
+}
+
+.card-nav-tabs{
+    .header-raised{
+        margin-top: -$margin-base * 2;
+    }
+    .nav-tabs{
+        background: transparent;
+        padding: 0;
+    }
+    .nav-tabs-title{
+        float: left;
+        padding: 10px 10px 10px 0;
+        line-height: 24px;
+    }
+}
+
+.card{
+    form{
+        [class*="col-"]{
+            padding: 6px;
+        }
+        [class*="col-"]:first-child{
+            padding-left: 15px;
+        }
+        [class*="col-"]:last-child{
+            padding-right: 15px;
+        }
+    }
+}
+
+.iframe-container{
+    margin: 0 -20px 0;
+
+    iframe{
+        width: 100%;
+        height: 500px;
+        border: 0;
+        @include shadow-big();
     }
 }

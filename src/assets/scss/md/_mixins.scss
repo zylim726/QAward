@@ -1,8 +1,527 @@
-//Utilities
+// chartist
+@use "sass:math";
 
-@import "mixins/transparency";
-@import "mixins/vendor-prefixes";
-@import "mixins/chartist";
+
+@mixin input-size($parent, $mdb-input-height, $padding-vertical, $padding-horizontal, $font-size, $line-height, $border-radius){
+
+  #{$parent} {
+    height: $mdb-input-height;
+    padding: $padding-vertical $padding-horizontal;
+    font-size: $font-size;
+    line-height: $line-height;
+    border-radius: $border-radius;
+  }
+
+  select#{$parent} {
+    height: $mdb-input-height;
+    line-height: $mdb-input-height;
+  }
+
+  textarea#{$parent},
+  select[multiple]#{$parent} {
+    height: auto;
+  }
+}
+
+
+// must be broken out for reuse - webkit selector breaks firefox
+@mixin label-static($label-top, $static-font-size, $static-line-height){
+  label.control-label {
+    top: $label-top;
+    left: 0;
+    // must repeat because the selector above is more specific than the general label sizing
+    font-size: $static-font-size;
+    line-height: $static-line-height;
+  }
+}
+
+@mixin label-size-variant($placeholder-font-size, $vertical-padding, $line-height, $static-font-size, $static-line-height, $help-block-font-size){
+  .form-control {
+    @include material-placeholder {
+      font-size: $placeholder-font-size;
+      line-height: $line-height;
+      color: $mdb-input-placeholder-color;
+      font-weight: 400;
+
+    }
+  }
+
+  // generic labels used anywhere in the form (not control-label)
+  .checkbox label,
+  .radio label,
+  label {
+    font-size: $placeholder-font-size;
+    line-height: $line-height;
+    color: $mdb-input-placeholder-color;
+    font-weight: 400;
+  }
+
+  // smaller focused or static size
+  label.control-label {
+    font-size: $static-font-size;
+    line-height: $static-line-height;
+    color: $mdb-input-placeholder-color;
+    font-weight: 400;
+    margin: 16px 0 0 0; // std and lg
+  }
+
+  .help-block {
+    margin-top: 0; // allow the input margin to set-off the top of the help-block
+    font-size: $help-block-font-size;
+  }
+}
+
+@mixin form-group-validation-state($name, $color){
+  &.#{$name} { // e.g. has-error
+    .form-control {
+      box-shadow: none;
+    }
+    &.is-focused .form-control {
+      background-image: linear-gradient($color, $color), linear-gradient($mdb-input-underline-color, $mdb-input-underline-color);
+    }
+    label.control-label,
+    .help-block {
+      color: $color;
+    }
+  }
+}
+
+@mixin form-group-size-variant($parent, $placeholder-font-size, $label-top-margin, $vertical-padding, $line-height, $label-as-placeholder-shim){
+  $static-font-size: ceil(($mdb-label-static-size-ratio * $placeholder-font-size)) !default;
+  $static-line-height: ($mdb-label-static-size-ratio * $line-height) !default;
+
+  $label-as-placeholder-top: -1 * ($vertical-padding + $label-as-placeholder-shim) !default;
+  $label-top: $label-as-placeholder-top - ($placeholder-font-size + $vertical-padding) !default;
+
+  $help-block-font-size: ceil(($mdb-help-block-size-ratio * $placeholder-font-size)) !default;
+  $help-block-line-height: ($mdb-help-block-size-ratio * $line-height) !default;
+
+  @if not $parent {
+    @include label-size-variant($placeholder-font-size, $vertical-padding, $line-height, $static-font-size, $static-line-height, $help-block-font-size);
+  }
+
+  @else {
+    #{$parent} {
+      @include label-size-variant($placeholder-font-size, $vertical-padding, $line-height, $static-font-size, $static-line-height, $help-block-font-size);      
+      padding-bottom: $padding-large-vertical;
+      margin: ($label-top-margin + $static-font-size) 0 0 0;
+
+      // larger labels as placeholders
+      &.label-floating,
+      &.label-placeholder {
+        label.control-label {
+          top: $label-as-placeholder-top; // place the floating label to look like a placeholder with input padding
+          font-size: $placeholder-font-size;
+          line-height: $line-height;
+        }
+      }
+
+      // static, focused, or autofill floating labels
+      &.label-static,
+      &.label-floating.is-focused,
+      &.label-floating:not(.is-empty) {
+        @include label-static($label-top, $static-font-size, $static-line-height);
+      }
+      // #559 Fix for webkit/chrome autofill - rule must be separate because it breaks firefox otherwise #731
+      &.label-floating input.form-control:-webkit-autofill ~ label.control-label {
+        @include label-static($label-top, $static-font-size, $static-line-height);
+      }
+    }
+  }
+}
+
+
+@mixin button-shadow-color($color){
+  box-shadow: 0 14px 26px -12px rgba($color, $mdb-shadow-key-penumbra-opacity * 3),
+  0  4px 23px 0px rgba(0,0,0, $mdb-shadow-ambient-shadow-opacity),
+  0  8px 10px -5px rgba($color, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin input-group-button-variation($vertical-padding){
+  .input-group-btn {
+    .btn {
+      margin: 0 0 $vertical-padding 0;
+    }
+  }
+}
+
+@mixin btn-styles($btn-color) {
+    @include shadow-2dp-color($btn-color);
+
+    &.md-raised{
+        @include shadow-2dp-color($btn-color);
+    }
+
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active,
+    &:active:focus,
+    &:active:hover,
+    &.active:focus,
+    &.active:hover,
+    .open > &.dropdown-toggle,
+    .open > &.dropdown-toggle:focus,
+    .open > &.dropdown-toggle:hover {
+      background-color: $btn-color !important;
+      color: $white-color !important;
+
+      i{
+        color: $white-color !important;
+      }
+    }
+
+    &:focus,
+    &:active,
+    &:hover{
+      // remove this line if you want black shadows
+      @include button-shadow-color($btn-color);
+      background-color: darken($btn-color, 3%) !important;
+    }
+
+  &.disabled,
+  &:disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active {
+      opacity: .65;
+      pointer-events: none;
+    }
+  }
+
+  &.md-simple{
+      &,
+      &:hover,
+      &:focus,
+      &:active,
+      &.active,
+      &:active:focus,
+      &:active:hover,
+      &.active:focus,
+      &.active:hover{
+        background-color: transparent !important;
+        color: $btn-color !important;
+        box-shadow: none;
+
+        i{
+          color: $btn-color !important;
+        }
+      }
+  }
+
+}
+
+@mixin set-background-color-button ($color){
+    .nav{
+        .md-list-item-container.active {
+            background-color: $color !important;
+            @include shadow-big-color($color);
+        }
+    }
+}
+
+
+@mixin social-buttons-color ($color){
+    background-color: $color !important;
+    color: #fff;
+    @include shadow-2dp-color($color);
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active,
+    &:active:focus,
+    &:active:hover,
+    &.active:focus,
+    &.active:hover{
+        background-color: $color !important;
+        color: #fff;
+        @include button-shadow-color($color);
+    }
+
+    &.btn-simple{
+        color: $color;
+        background-color: transparent;
+        box-shadow: none;
+    }
+}
+
+@mixin social-buttons(){
+  &.md-facebook {
+    @include social-buttons-color($social-facebook);
+  }
+  &.md-twitter {
+    @include social-buttons-color($social-twitter);
+  }
+}
+
+
+// User select
+// For selecting text on the page
+
+@mixin user-select($select) {
+  -webkit-user-select: $select;
+     -moz-user-select: $select;
+      -ms-user-select: $select; // IE10+
+          user-select: $select;
+}
+
+
+// Box sizing
+@mixin box-sizing($boxmodel) {
+  -webkit-box-sizing: $boxmodel;
+     -moz-box-sizing: $boxmodel;
+          box-sizing: $boxmodel;
+}
+
+
+@mixin transition($time, $type){
+    -webkit-transition: all $time $type;
+    -moz-transition: all $time $type;
+    -o-transition: all $time $type;
+    -ms-transition: all $time $type;
+    transition: all $time $type;
+}
+
+@mixin transform-scale($value){
+     -webkit-transform: scale($value);
+        -moz-transform: scale($value);
+        -o-transform: scale($value);
+        -ms-transform: scale($value);
+        transform: scale($value);
+}
+
+@mixin transform-translate-x($value){
+     -webkit-transform:  translate3d($value, 0, 0);
+        -moz-transform: translate3d($value, 0, 0);
+        -o-transform: translate3d($value, 0, 0);
+        -ms-transform: translate3d($value, 0, 0);
+        transform: translate3d($value, 0, 0);
+}
+
+@mixin transform-origin($coordinates){
+      -webkit-transform-origin: $coordinates;
+        -moz-transform-origin: $coordinates;
+        -o-transform-origin: $coordinates;
+        -ms-transform-origin: $coordinates;
+        transform-origin: $coordinates;
+}
+
+@mixin radial-gradient($extern-color, $center-color){
+    background: $extern-color;
+    background: -moz-radial-gradient(center, ellipse cover, $center-color 0%, $extern-color 100%); /* FF3.6+ */
+    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,$center-color), color-stop(100%,$extern-color)); /* Chrome,Safari4+ */
+    background: -webkit-radial-gradient(center, ellipse cover, $center-color 0%,$extern-color 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, ellipse cover, $center-color 0%,$extern-color 100%); /* Opera 12+ */
+    background: -ms-radial-gradient(center, ellipse cover, $center-color 0%,$extern-color 100%); /* IE10+ */
+    background: radial-gradient(ellipse at center, $center-color 0%,$extern-color 100%); /* W3C */
+    background-size: 550% 450%;
+}
+
+@mixin vertical-align {
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+@mixin rotate-180(){
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+@mixin bar-animation($type){
+     -webkit-animation: $type 500ms linear 0s;
+     -moz-animation: $type 500ms linear 0s;
+     animation: $type 500ms 0s;
+     -webkit-animation-fill-mode: forwards;
+     -moz-animation-fill-mode: forwards;
+     animation-fill-mode: forwards;
+}
+
+@mixin topbar-x-rotation(){
+    @keyframes topbar-x {
+      0% {top: 0px; transform: rotate(0deg); }
+      45% {top: 6px; transform: rotate(145deg); }
+      75% {transform: rotate(130deg); }
+      100% {transform: rotate(135deg); }
+    }
+    @-webkit-keyframes topbar-x {
+      0% {top: 0px; -webkit-transform: rotate(0deg); }
+      45% {top: 6px; -webkit-transform: rotate(145deg); }
+      75% {-webkit-transform: rotate(130deg); }
+      100% { -webkit-transform: rotate(135deg); }
+    }
+    @-moz-keyframes topbar-x {
+      0% {top: 0px; -moz-transform: rotate(0deg); }
+      45% {top: 6px; -moz-transform: rotate(145deg); }
+      75% {-moz-transform: rotate(130deg); }
+      100% { -moz-transform: rotate(135deg); }
+    }
+}
+
+@mixin topbar-back-rotation(){
+    @keyframes topbar-back {
+      0% { top: 6px; transform: rotate(135deg); }
+      45% { transform: rotate(-10deg); }
+      75% { transform: rotate(5deg); }
+      100% { top: 0px; transform: rotate(0); }
+    }
+
+    @-webkit-keyframes topbar-back {
+      0% { top: 6px; -webkit-transform: rotate(135deg); }
+      45% { -webkit-transform: rotate(-10deg); }
+      75% { -webkit-transform: rotate(5deg); }
+      100% { top: 0px; -webkit-transform: rotate(0); }
+    }
+
+    @-moz-keyframes topbar-back {
+      0% { top: 6px; -moz-transform: rotate(135deg); }
+      45% { -moz-transform: rotate(-10deg); }
+      75% { -moz-transform: rotate(5deg); }
+      100% { top: 0px; -moz-transform: rotate(0); }
+    }
+}
+
+@mixin bottombar-x-rotation(){
+    @keyframes bottombar-x {
+      0% {bottom: 0px; transform: rotate(0deg);}
+      45% {bottom: 6px; transform: rotate(-145deg);}
+      75% {transform: rotate(-130deg);}
+      100% {transform: rotate(-135deg);}
+    }
+    @-webkit-keyframes bottombar-x {
+      0% {bottom: 0px; -webkit-transform: rotate(0deg);}
+      45% {bottom: 6px; -webkit-transform: rotate(-145deg);}
+      75% {-webkit-transform: rotate(-130deg);}
+      100% {-webkit-transform: rotate(-135deg);}
+    }
+    @-moz-keyframes bottombar-x {
+      0% {bottom: 0px; -moz-transform: rotate(0deg);}
+      45% {bottom: 6px; -moz-transform: rotate(-145deg);}
+      75% {-moz-transform: rotate(-130deg);}
+      100% {-moz-transform: rotate(-135deg);}
+    }
+}
+
+@mixin bottombar-back-rotation{
+    @keyframes bottombar-back {
+      0% { bottom: 6px;transform: rotate(-135deg);}
+      45% { transform: rotate(10deg);}
+      75% { transform: rotate(-5deg);}
+      100% { bottom: 0px;transform: rotate(0);}
+    }
+    @-webkit-keyframes bottombar-back {
+      0% {bottom: 6px;-webkit-transform: rotate(-135deg);}
+      45% {-webkit-transform: rotate(10deg);}
+      75% {-webkit-transform: rotate(-5deg);}
+      100% {bottom: 0px;-webkit-transform: rotate(0);}
+    }
+    @-moz-keyframes bottombar-back {
+      0% {bottom: 6px;-moz-transform: rotate(-135deg);}
+      45% {-moz-transform: rotate(10deg);}
+      75% {-moz-transform: rotate(-5deg);}
+      100% {bottom: 0px;-moz-transform: rotate(0);}
+    }
+
+}
+
+// Opacity
+@mixin opacity($opacity) {
+  opacity: $opacity;
+  // IE8 filter
+  $opacity-ie: ($opacity * 100);
+  filter: #{alpha(opacity=$opacity-ie)};
+}
+
+@mixin black-filter($opacity){
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    background-color: rgba(17,17,17,$opacity);
+    display: block;
+    content: "";
+    z-index: 1; 
+}
+
+$ct-scales: ((1), math.div(15, 16), math.div(8, 9), math.div(5, 6), (4*0.2), (3*0.25), math.div(2, 3), (5*0.125), math.div(1, 1.618), (3*0.2), math.div(9, 16), math.div(8, 15), (1*0.5), (2*0.2), (3*0.125), math.div(1, 3), (1*0.25)) !default;
+$ct-scales-names: (ct-square, ct-minor-second, ct-major-second, ct-minor-third, ct-major-third, ct-perfect-fourth, ct-perfect-fifth, ct-minor-sixth, ct-golden-section, ct-major-sixth, ct-minor-seventh, ct-major-seventh, ct-octave, ct-major-tenth, ct-major-eleventh, ct-major-twelfth, ct-double-octave) !default;
+
+// Class names to be used when generating CSS
+$ct-class-chart: ct-chart !default;
+$ct-class-chart-line: ct-chart-line !default;
+$ct-class-chart-bar: ct-chart-bar !default;
+$ct-class-horizontal-bars: ct-horizontal-bars !default;
+$ct-class-chart-pie: ct-chart-pie !default;
+$ct-class-chart-donut: ct-chart-donut !default;
+$ct-class-label: ct-label !default;
+$ct-class-series: ct-series !default;
+$ct-class-line: ct-line !default;
+$ct-class-point: ct-point !default;
+$ct-class-area: ct-area !default;
+$ct-class-bar: ct-bar !default;
+$ct-class-slice-pie: ct-slice-pie !default;
+$ct-class-slice-donut: ct-slice-donut !default;
+$ct-class-grid: ct-grid !default;
+$ct-class-vertical: ct-vertical !default;
+$ct-class-horizontal: ct-horizontal !default;
+$ct-class-start: ct-start !default;
+$ct-class-end: ct-end !default;
+
+// Container ratio
+$ct-container-ratio: math.div(1, 1.618) !default;
+
+// Text styles for labels
+$ct-text-color: rgba(0, 0, 0, 0.4) !default;
+$ct-text-size: 0.875rem !default;
+$ct-text-align: flex-start !default;
+$ct-text-justify: flex-start !default;
+$ct-text-line-height: 1;
+
+.ct-big-chart-white{
+    $ct-grid-color: rgba(250, 250, 250, 0.7) !default;
+}
+// Grid styles
+$ct-grid-color: rgba(0, 0, 0, 0.2) !default;
+$ct-grid-dasharray: 2px !default;
+$ct-grid-width: 1px !default;
+
+// Line chart properties
+$ct-line-width: 3px !default;
+$ct-line-dasharray: false !default;
+$ct-point-size: 8px !default;
+// Line chart point, can be either round or square
+$ct-point-shape: round !default;
+// Area fill transparency between 0 and 1
+$ct-area-opacity: 0.8 !default;
+
+// Bar chart bar width
+$ct-bar-width: 10px !default;
+
+// Donut width (If donut width is to big it can cause issues where the shape gets distorted)
+$ct-donut-width: 60px !default;
+
+// If set to true it will include the default classes and generate CSS output. If you're planning to use the mixins you
+// should set this property to false
+$ct-include-classes: true !default;
+
+// If this is set to true the CSS will contain colored series. You can extend or change the color with the
+// properties below
+$ct-include-colored-series: $ct-include-classes !default;
+
+// If set to true this will include all responsive container variations using the scales defined at the top of the script
+$ct-include-alternative-responsive-containers: $ct-include-classes !default;
 
 // Placeholder text
 @mixin material-placeholder() {
@@ -21,10 +540,9 @@
   &,
   &:hover,
   &:focus{
-    color: $white-color !important;
+    color: $white !important;
   }
 }
-
 
 @mixin dropdown-colors($variation-color) {
   .dropdown-menu {
@@ -32,7 +550,7 @@
     li > a {
       &:hover,
       &:focus {
-        color: $white-color !important;
+        color: $white !important;
         background-color: $variation-color !important;
         @include shadow-big-color($variation-color);
       }
@@ -41,10 +559,10 @@
     .active > a {
       &:hover,
       &:focus {
-        color: $white-color !important;
+        color: $white !important;
       }
       background-color: $variation-color !important;
-      color: $white-color !important;
+      color: $white !important;
       @include shadow-big-color($variation-color);
     }
   }
@@ -52,7 +570,7 @@
 
 @mixin alert-color($color) {
   background-color: $color;
-  color: $white-color;
+  color: $white;
   border-radius: $border-radius-base;
   @include shadow-big-color($color)
 }
@@ -138,9 +656,9 @@
 @mixin tag-color ($color){
     .tag{
          background-color: $color;
-         color: $white-color;
+         color: $white;
          .tagsinput-remove-link{
-             color: $white-color;
+             color: $white;
          }
      }
      .tagsinput-add{
@@ -191,124 +709,130 @@
     background: linear-gradient(60deg, $color1 , $color2); /* Standard syntax */
 }
 
-
-
-// Mixins for buttons
-
-@mixin btn-styles($btn-color) {
-
-    // remove this line if you want black shadows
-    @include shadow-2dp-color($btn-color);
-
-    &.md-raised{
-        @include shadow-2dp-color($btn-color);
-    }
-
-    &,
-    &:hover,
-    &:focus,
-    &:active,
-    &.active,
-    &:active:focus,
-    &:active:hover,
-    &.active:focus,
-    &.active:hover,
-    .open > &.dropdown-toggle,
-    .open > &.dropdown-toggle:focus,
-    .open > &.dropdown-toggle:hover {
-      background-color: $btn-color !important;
-      color: $white-color !important;
-
-      i{
-        color: $white-color !important;
-      }
-    }
-
-    &:focus,
-    &:active,
-    &:hover{
-      // remove this line if you want black shadows
-      @include button-shadow-color($btn-color);
-      background-color: darken($btn-color, 3%) !important;
-    }
-
-  &.disabled,
-  &:disabled,
-  &[disabled],
-  fieldset[disabled] & {
-    &,
-    &:hover,
-    &:focus,
-    &.focus,
-    &:active,
-    &.active {
-      opacity: .65;
-      pointer-events: none;
-    }
-  }
-
-  &.md-simple{
-      &,
-      &:hover,
-      &:focus,
-      &:active,
-      &.active,
-      &:active:focus,
-      &:active:hover,
-      &.active:focus,
-      &.active:hover{
-        background-color: transparent !important;
-        color: $btn-color !important;
-        box-shadow: none;
-
-        i{
-          color: $btn-color !important;
-        }
-      }
-  }
-
+// This file has been autogenerated by grunt task lessToSass. Any changes will be overwritten.
+@mixin box-shadow($shadow...) {
+  -webkit-box-shadow: $shadow; // iOS <4.3 & Android <4.1
+          box-shadow: $shadow;
+}
+ 
+@mixin shadow-z-1(){
+  box-shadow:
+    0 1px 6px 0 rgba(0, 0, 0, 0.12),
+    0 1px  6px 0 rgba(0, 0, 0, 0.12);
 }
 
-@mixin set-background-color-button ($color){
-    .nav{
-        .md-list-item-container.active {
-            background-color: $color !important;
-            @include shadow-big-color($color);
-        }
-    }
+@mixin shadow-z-1-hover(){
+  box-shadow:
+    0 5px 11px 0 rgba(0, 0, 0, 0.18),
+    0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
-// for social buttons
-@mixin social-buttons-color ($color){
-    background-color: $color !important;
-    color: #fff;
-    @include shadow-2dp-color($color);
-
-    &:hover,
-    &:focus,
-    &:active,
-    &.active,
-    &:active:focus,
-    &:active:hover,
-    &.active:focus,
-    &.active:hover{
-        background-color: $color !important;
-        color: #fff;
-        @include button-shadow-color($color);
-    }
-
-    &.btn-simple{
-        color: $color;
-        background-color: transparent;
-        box-shadow: none;
-    }
+@mixin shadow-z-2(){
+  box-shadow:
+    0 8px 17px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-@mixin social-buttons(){
-  &.md-facebook {
-    @include social-buttons-color($social-facebook);
-  }
-  &.md-twitter {
-    @include social-buttons-color($social-twitter);
-  }
+@mixin shadow-z-3(){
+  box-shadow:
+    0 12px 15px 0 rgba(0, 0, 0, 0.24),
+    0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+@mixin shadow-z-4(){
+  box-shadow:
+    0 16px 28px 0 rgba(0, 0, 0, 0.22),
+    0 25px 55px 0 rgba(0, 0, 0, 0.21);
+}
+
+@mixin shadow-z-5(){
+  box-shadow:
+    0 27px 24px 0 rgba(0, 0, 0, 0.2),
+    0 40px 77px 0 rgba(0, 0, 0, 0.22);
+}
+
+// Focus shadow mixin.
+@mixin big-shadow(){
+  box-shadow: 0 0 8px rgba(0, 0, 0,.18),
+  0 8px 16px rgba(0, 0, 0,.36);
+}
+
+
+@mixin shadow-2dp(){
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0 3px 1px -2px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity),
+  0 1px 5px 0 rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity);
+}
+@mixin shadow-2dp-color($color){
+  box-shadow: 0 2px 2px 0 rgba($color, $mdb-shadow-key-penumbra-opacity),
+  0 3px 1px -2px rgba($color, $mdb-shadow-key-umbra-opacity),
+  0 1px 5px 0 rgba($color, $mdb-shadow-ambient-shadow-opacity);
+}
+
+@mixin shadow-3dp(){
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0 3px 3px -2px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity),
+  0 1px 8px 0 rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity);
+}
+@mixin shadow-4dp(){
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0 1px 10px 0 rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0 2px 4px -1px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+@mixin shadow-4dp-color($color){
+  box-shadow: 0 4px 5px 0 rgba($color, $mdb-shadow-key-penumbra-opacity),
+  0 1px 10px 0 rgba($color, $mdb-shadow-ambient-shadow-opacity),
+  0 2px 4px -1px rgba($color, $mdb-shadow-key-umbra-opacity);
+}
+@mixin shadow-6dp(){
+  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0 1px 18px 0 rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0 3px 5px -1px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+@mixin shadow-8dp(){
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0 3px 14px 2px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0 5px 5px -3px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+@mixin shadow-8dp-color($color){
+  box-shadow: 0 8px 10px 1px rgba($color, $mdb-shadow-key-penumbra-opacity),
+  0 3px 14px 2px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0 5px 5px -3px rgba($color, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin shadow-16dp(){
+  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0  6px 30px 5px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0  8px 10px -5px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin shadow-16dp-color($color){
+  box-shadow: 0 16px 24px 2px rgba($color, $mdb-shadow-key-penumbra-opacity),
+  0  6px 30px 5px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0  8px 10px -5px rgba($color, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin shadow-24dp(){
+  box-shadow: 0  9px 46px  8px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity),
+  0 11px 15px -7px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+  0 24px 38px  3px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin shadow-big(){
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity * 3),
+    0  4px 25px 0px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+    0  8px 10px -5px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin shadow-big-navbar(){
+    box-shadow: 0 10px 20px -12px rgba(0, 0, 0, $mdb-shadow-key-penumbra-opacity * 3),
+    0  3px 20px 0px rgba(0, 0, 0, $mdb-shadow-ambient-shadow-opacity),
+    0  8px 10px -5px rgba(0, 0, 0, $mdb-shadow-key-umbra-opacity);
+}
+
+@mixin shadow-big-color($color){
+    box-shadow: 0 12px 20px -10px rgba($color, $mdb-shadow-key-penumbra-opacity * 2),
+    0  4px 20px 0px rgba(0,0,0, $mdb-shadow-ambient-shadow-opacity),
+    0  7px 8px -5px rgba($color, $mdb-shadow-key-umbra-opacity);
+
 }

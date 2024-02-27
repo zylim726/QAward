@@ -1,0 +1,97 @@
+.view-container {
+    display: unset;
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: left;
+    background-color: orange;
+}
+
+.view-item {
+    margin: 10px 15px;
+    margin-top: 0px;
+}
+
+.view-toggle {
+    display: block;
+}
+
+.view-checkbox {
+    display: none;
+}
+
+.view-checkbox:checked + .view-toggle .view-card .view-content {
+    display: block;
+}
+
+.view-card {
+    background-color: #fff;
+    border: 1px solid orange;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.view-title {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.view-content {
+    display: none;
+}
+.model-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px; 
+}
+
+
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999; 
+}
+
+.model-td {
+    width: 50% !important;
+}
+
+.modal-content {
+    background-color: #fff; 
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 850px; 
+    max-height: 80vh; 
+    overflow-y: auto;
+}
+
+.modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-content th,
+.modal-content td {
+    padding: 12px; 
+    text-align: left;
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    background-color: white; 
+}
+
+
+.modal-content tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.modal-content tr:hover {
+    background-color: #f1f1f1;
+}

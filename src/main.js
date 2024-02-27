@@ -5,15 +5,8 @@ import App from "./App";
 // router setup
 import routes from "./routes/routes";
 
-// Plugins
-import GlobalComponents from "./globalComponents";
-import GlobalDirectives from "./globalDirectives";
-import Notifications from "./presentation/components/NotificationPlugin";
-
-// MaterialDashboard plugin
-import MaterialDashboard from "./material-dashboard";
-
-import Chartist from "chartist";
+// Subcon plugin
+import Subcon from "./subcon";
 
 // configure router
 const router = new VueRouter({
@@ -21,20 +14,12 @@ const router = new VueRouter({
   linkExactActiveClass: "nav-item active",
 });
 
-Vue.prototype.$Chartist = Chartist;
-
 Vue.use(VueRouter);
-Vue.use(MaterialDashboard);
-Vue.use(GlobalComponents);
-Vue.use(GlobalDirectives);
-Vue.use(Notifications);
+Vue.use(Subcon);
 
 /* eslint-disable no-new */
 new Vue({
   el: "#app",
   render: (h) => h(App),
   router,
-  data: {
-    Chartist: Chartist,
-  },
 });
