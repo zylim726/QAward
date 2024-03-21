@@ -95,3 +95,67 @@
 .modal-content tr:hover {
     background-color: #f1f1f1;
 }
+
+
+  
+  .Inforrmodal-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .Inforrmodal-content {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px; 
+    margin-top: 80px;
+  }
+  
+  .Inforrmodal-content .Inforbox {
+    padding: 40px;
+  }
+  
+  .Inforrtitle {
+    font-size: 24px;
+    margin-bottom: 60px;
+    text-align: left;
+    margin-top: -18px;
+  }
+  
+  .Inforrsubtitle {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+
+  .closeIcon {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    background-color: white;
+    margin-left: -54px;
+    margin-top: 91px;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    padding: 20px;
+  }
+
+  .is-active {
+    display: flex;
+    align-items: flex-start; 
+    justify-content: center;
+  }

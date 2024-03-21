@@ -116,7 +116,6 @@
 
 
     .nav{
-        margin-top: 20px;
 
         &.nav-mobile-menu{
           li a {
@@ -136,11 +135,6 @@
             cursor: pointer;
             width: auto;
           }
-
-            &:first-child > a{
-                margin: 0 15px;
-            }
-
             &:hover > a,
             .dropdown:hover > a{
                 background: rgba(200, 200, 200, 0.2);
@@ -205,7 +199,7 @@
       line-height: 30px;
       text-decoration: none;
       margin-left: 20px;
-      width: 235px;
+      width: 185px;
       position: relative;
       padding: $padding-base 0;
       z-index: 4;
@@ -238,7 +232,7 @@
           float: left;
           font-size: 20px;
           margin: 10px 10px;
-          color: $white;
+          color: $white; 
           line-height: 20px;
           font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
@@ -297,3 +291,52 @@
 }
 
 
+.sidebar {
+  width: 4% !important;
+  position: absolute !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  transition: width 0.2s linear !important;
+  z-index: 10; /* Set a default z-index */
+}
+
+.nav-item {
+  position: relative;
+}
+
+
+.sidebar:hover {
+   width: 13.5% !important;
+   transition: all 0.5s ease !important;
+  z-index: 5; /* Increase the z-index on hover */
+
+}
+
+
+.sidebar:not(:hover) .menutitle, 
+.sidebar:not(:hover) .sidebar-divider {
+  display: none !important;
+}
+
+@media screen and (min-width: 991px) {
+  .nav-mobile-menu {
+    display: none;
+  }
+}
+
+.sidebar:not(:hover) .logo-image {
+  display: none !important;
+}
+
+.sidebar:hover .logo-mini {
+  display: none !important;
+  
+}
+
+@media (min-width: 1200px){
+.container, .container-sm, .container-md, .container-lg, .container-xl {
+    max-width: 100%  !important;
+}
+}

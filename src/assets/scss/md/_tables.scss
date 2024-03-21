@@ -6,6 +6,9 @@
     display: flex;
   }
 }
+.md-table-head{
+  background-color: $background-lighter-grey !important;
+}
 .md-table-head-container{
   height: 130px !important;
   border: 1px solid #ddd !important; 
@@ -58,22 +61,6 @@
 }
 
 .md-table{
-  &[table-header-color="orange"] .md-table-head{
-    color: $brand-warning !important;
-  }
-  &[table-header-color="purple"] .md-table-head{
-    color: $brand-primary !important;
-  }
-  &[table-header-color="blue"] .md-table-head{
-    color: $brand-info !important;
-  }
-  &[table-header-color="red"] .md-table-head{
-    color: $brand-danger !important;
-  }
-  &[table-header-color="green"] .md-table-head{
-    color: $brand-success !important;
-  }
-
   .md-table-row td{
     border-top-color: rgba(0,0,0,.06) !important;
   }
@@ -192,5 +179,62 @@
 .finalTable .value {
   font-size: 16px;
   color: #007bff;
+}
+
+.projectTable-container {
+  overflow-x: auto;
+  width: 100%;
+  height: 486px;
+  overflow-y: auto;
+}
+
+unittype-container {
+  overflow-x: auto;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.project-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.project-table th,
+.project-table td {
+  border: 1px solid #fef4e4;
+  padding: 12px;
+  text-align: left;
+}
+
+.project-table th {
+  background-color: #fef4e4;
+  font-weight: bold;
+}
+
+
+.nested-table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+.nested-table th, .nested-table td {
+  border: none;
+  padding: 5px;
+  text-align: left;
+}
+.nested-table th {
+  background-color: #fef4e4;
+  border:none
+}
+
+.unityQuantityClass{
+  text-align: center !important;
+}
+
+
+label {
+  display: block;
 }
 

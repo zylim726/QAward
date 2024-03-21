@@ -6,7 +6,7 @@
   )); 
 
 @include md-register-theme("default", (
-  primary: md-get-palette-color(purple, 500), // The primary color of your application
+  primary: md-get-palette-color(black, 500), // The primary color of your application
 ));
 
 @import "~vue-material/dist/theme/all"; // Apply the theme
@@ -58,7 +58,7 @@ $font-hover-background-light-grey: #5E5E5C !default;
 
 
 // Typography elements
-$font-family-sans-serif: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
+$font-family-sans-serif: "Poppins", sans-serif !default;
 $font-family-serif: 'Roboto Slab', 'Times New Roman', serif !default;
 $icon-color: $orange !default;
 $mdb-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !default;
@@ -101,7 +101,7 @@ $font-size-h1:                 3.3125rem;
 $font-size-h2:                 2.25rem !default;
 $font-size-h3:                 1.5625rem;
 $font-size-h4:                 1.125rem !default;
-$font-size-h5:                 0.97rem !default;
+$font-size-h5:                 0.95rem !default;
 $font-size-h6:                 0.75rem !default;
 $font-paragraph:               14px !default;
 $font-size-navbar:             16px !default;

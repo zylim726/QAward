@@ -1,0 +1,35 @@
+
+  .summary-content {
+    text-align: left;
+    border-radius: 0px !important;
+    background-color: #fff; 
+    overflow-y: auto;
+  }
+  .create-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #fef4e4;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .create-title {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  
+
+.form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  

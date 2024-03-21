@@ -534,3 +534,41 @@ form .form-row .input-data{
   margin: 0 20px;
   position: relative;
 }
+
+.file-label {
+  position: relative;
+  display: inline;
+  background-color: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  float: right;
+}
+
+.file-label input[type="file"] {
+  position: fixed;
+    opacity: 0;
+    cursor: pointer;
+} 
+
+.overlap {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.shape {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 56%;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background-color: rgba(0, 0, 0, 0.7); 
+}

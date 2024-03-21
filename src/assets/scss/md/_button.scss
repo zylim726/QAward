@@ -107,32 +107,12 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
     font-size: 16px;
 }
   
-.login button:hover {
-    background-color: orange;
-}
 
-.wrapper .sidebar,
-.wrapper .off-canvas-sidebar{
-    &[data-color="blue"]{
-        @include set-background-color-button($brand-info);
-    }
-    &[data-color="green"]{
-        @include set-background-color-button($brand-success);
-    }
-    &[data-color="orange"]{
-        @include set-background-color-button($brand-warning);
-    }
-    &[data-color="red"]{
-        @include set-background-color-button($brand-danger);
-    }
-    &[data-color="purple"]{
-        @include set-background-color-button($brand-primary);
-    }
-}
+
 
 .transparentButton {
     margin-right: 10px;
-    background-color: white;
+    background-color: transparent;
     border: none;
 }
 
@@ -145,11 +125,11 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
     font-size: 14px;
     cursor: pointer;
     border-radius: 4px;
+    bottom: 10px;
+    right: 23px;
+
 }
   
-.save-button:hover {
-    background-color: orange;
-}
 
 .close-button {
     border: none;
@@ -158,4 +138,74 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
     float: right;
     background-color: white;
     margin-right: -25px;
+}
+
+.mdIcon {
+    margin:6px;
+    color: orange !important; 
+    font-size: 28px !important;
+    cursor: pointer;
+    float: right;
+    vertical-align: middle;
+}
+
+.PostmdIcon{
+  color: orange !important;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+
+.selected-row {
+  background-color: #fef4e4;
+}
+
+.btn-save {
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  float: right;
+  margin-top: 3px;
+  margin-right: 10px;
+}
+
+  
+.doneAll{
+  color: orange !important;
+}
+  
+  
+.btnList {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnList button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: 70px;
+  margin-right: 50px;
+}
+
+.btn-rejected {
+  background-color: #FF6347; /* Tomato */
+  color: white;
+}
+
+.btn-approval {
+  background-color: #32CD32; /* Lime Green */
+  color: white;
 }

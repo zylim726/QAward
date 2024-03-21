@@ -6,10 +6,10 @@
     :style="sidebarStyle"
   >
     <div class="logo-image">
-      <a href="#"  ><img :src="imgLogo" alt="" /></a> 
+      <a href="#"><img :src="imgLogo" alt="" /></a>
     </div>
     <div class="logo-mini">
-      <a href="#"  ><img :src="imgLogoMinimized" alt="" /></a> 
+      <a href="#"><img :src="imgLogoMinimized" alt="" /></a>
     </div>
     <div class="sidebar-wrapper">
       <slot name="content"></slot>
@@ -78,21 +78,4 @@ export default {
   },
 };
 </script>
-<style>
-@media screen and (min-width: 991px) {
-  .nav-mobile-menu {
-    display: none;
-  }
-}
-
-.sidebar:not(:hover) .logo-image {
-  display: none !important;
-}
-
-.sidebar:hover .logo-mini {
-  display: none !important;
-  
-}
-
-</style>
-
+<style></style>

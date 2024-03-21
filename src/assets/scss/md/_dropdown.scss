@@ -57,35 +57,6 @@
     }
   }
 
-
-  // default color for dropdown
-  @include dropdown-colors($brand-primary);
-  @include toolbar-colors($gray-light);
-  .md-toolbar-toggle .icon-bar{
-    color: inherit !important;
-  }
-
-  &.md-primary{
-    @include dropdown-colors($brand-primary);
-    @include toolbar-colors($brand-primary);
-  }
-  &.md-danger{
-    @include dropdown-colors($brand-danger);
-    @include toolbar-colors($brand-danger);
-  }
-  &.md-warning{
-    @include dropdown-colors($brand-warning);
-    @include toolbar-colors($brand-warning);
-  }
-  &.md-info{
-    @include dropdown-colors($brand-info);
-    @include toolbar-colors($brand-info);
-  }
-  &.md-success{
-    @include dropdown-colors($brand-success);
-    @include toolbar-colors($brand-success);
-  }
-
   &.navbar-transparent{
       background-color: transparent;
       box-shadow: none;
@@ -115,11 +86,11 @@
     height: 50px;
     display: flex;
     align-items: center;
-    font-size: 18px;
+    font-size: 22px;
     margin-left: 0;
     margin-right: 15px;
     padding: 10px 0;
-    font-weight: 300;
+    font-weight: 500;
     letter-spacing: normal;
   }
 
@@ -210,17 +181,13 @@
   color: inherit !important;
   padding-top: 15px;
   padding-bottom: 15px;
-
   font-weight: $font-weight-default;
-  font-size: $mdb-btn-font-size-base;
-  text-transform: uppercase;
   overflow: visible;
-
   border-radius: $border-radius-base;
   position: relative;
   display: block;
   padding: 0;
-  text-decoration: none;
+ 
 
   &:hover,
   &:focus {
@@ -254,7 +221,7 @@
   position: absolute;
     top: 100%;
     left: 0;
-    z-index: 1000;
+    z-index: 3000;
     display: none;
     float: left;
     min-width: 160px;
@@ -271,6 +238,12 @@
     border-radius: 4px;
     -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
+
+    li {
+      padding: 10px;
+      cursor: pointer;
+    }
+    
 }
 .dropdown-menu {
     border: 0;
@@ -281,21 +254,7 @@
     }
 
 
-    li > a{
-        font-size: $mdb-dropdown-font-size;
-        padding: 10px 20px;
-        margin: 0 5px;
-        text-transform: none;
-        color: $gray-dark !important;
-        border-radius: $border-radius-small;
-        @include transition($fast-transition-time, $transition-linear);
-
-        &:hover,
-        &:focus {
-          @include shadow-8dp();
-
-        }
-    }
+  
 
     &.dropdown-with-icons{
         li > a{
@@ -315,7 +274,6 @@
 
     li {
         position: relative;
-        a:hover,
         a:focus,
         a:active {
             background-color: $brand-primary !important;
@@ -330,7 +288,6 @@
     .navbar &,
     .navbar.navbar-default &{
         li{
-            a:hover,
             a:focus,
             a:active {
                 background-color: $brand-primary;
@@ -491,13 +448,7 @@
         display: block;
       }
 
-      .dropdown{
-        li:hover a{
-          background-color: $brand-primary;
-          @include shadow-8dp();
-          color: $white !important;
-        }
-      }
+  
   }
 
   html,
@@ -647,9 +598,7 @@
       @include transform-translate-x(-260px);
   }
 
-  .nav-open .sidebar{
-      @include shadow-big();
-  }
+
 
   .nav-open{
       .off-canvas-sidebar,
@@ -953,5 +902,4 @@
   }
 }
 }
-
 
