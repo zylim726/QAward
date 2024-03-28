@@ -14,22 +14,21 @@
 
       <!-- Filter -->
       <div class="filter-container">
-        <a href="#/revision"
+        <a href="revision"
           ><button type="button" class="btn-save" style="margin-right: 10px">
             Revision
           </button></a
         >
-        <a href="#/quotation"
+        <a href="quotation"
           ><button type="button" class="btn-save" style="margin-right: 10px">
             Add Quotation
           </button></a
         >
-        <a href="#/description"
+        <a href="description"
           ><button type="button" class="btn-save" style="margin-right: 10px">
             Add Description
           </button></a
         >
-    
 
         <button
           @click="toggleFilter"
@@ -451,73 +450,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.table-container {
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.addQuotationBtn {
-  color: white;
-  font-size: 10px;
-  cursor: pointer;
-  background-color: orange;
-  border: none;
-  height: 20px;
-}
-/* Style the container */
-.container {
-  margin-top: 20px;
-}
-
-/* Style the search bar */
-.search-container {
-  margin-bottom: 10px;
-}
-
-.Searchbar input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-/* Style the filter buttons */
-.filter-container {
-  margin-bottom: 10px;
-}
-
-.transparentButton {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.mdIcon {
-  vertical-align: middle;
-}
-
-/* Table styles */
-.nested-table {
-  border-collapse: collapse;
-  width: 100%;
-  border: 1px solid #ddd;
-  padding: 10px;
-}
-.nested-table th,
-.nested-table td {
-  border: none;
-  padding: 5px;
-  text-align: left;
-}
-.nested-table th {
-  background-color: #fef4e4;
-  border: none;
-}
-
-.unityQuantityClass {
-  text-align: center !important;
-}
-</style>

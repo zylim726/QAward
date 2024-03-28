@@ -1,22 +1,27 @@
 // Error.js
 const Error = {
-    getMessage(status) {
-      switch (status) {
-        case 400:
-          return 'Please enter both username and password.';
-        case 401:
-          return 'You do not have the necessary access level to login.';
-        case 403:
-          return 'Sorry, your username or password is incorrect.';
-        case 500:
-          return 'Internal server error. Please try again later.';
-        case 501:
-            return "You don't have any projects";
-        default:
-          return 'An unknown error occurred. Please try again.';
-      }
-    },
-  };
-  
-  export default Error;
-  
+  getMessage(status) {
+    switch (status) {
+      case 400:
+        return "Please enter both username and password.";
+      case 500:
+        return "Internal server error. Please try again later.";
+      case 501:
+        return "Sorry, You don't have any projects";
+      case 502:
+        return "Access level or username not found in Website.";
+      case 503:
+        return "Failed to fetch project list:";
+      case 504:
+        return "An error occurred while fetching projects.";
+      case 505:
+        return "No users found";
+      case 506:
+        return "Failed to fetch users";
+      default:
+        return "An unknown error occurred. Please try again.";
+    }
+  },
+};
+
+export default Error;

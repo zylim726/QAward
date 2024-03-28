@@ -28,6 +28,14 @@
         <md-icon>person</md-icon>
         <p class="nav-item">Admin</p>
       </sidebar-link>
+      <sidebar-link class="navbar-link" to="/userconfig">
+        <md-icon>manage_accounts</md-icon>
+        <p class="nav-item">User Config</p>
+      </sidebar-link>
+      <sidebar-link class="navbar-link" to="/accesspermission">
+        <md-icon>settings_applications</md-icon>
+        <p class="nav-item">Access Permission</p>
+      </sidebar-link>
     </side-bar>
 
     <div class="main-panel">

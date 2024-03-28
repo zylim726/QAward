@@ -1,49 +1,55 @@
 <template>
-  <div>
-    <h1>Sitelist</h1>
-    <ul>
-      <li v-for="site in sites" :key="site.id">{{ site.name }}</li>
-    </ul>
+  <div class="content">
+    <div v-if="error">
+      <!-- Display error message if there's an error -->
+      <h3 style="text-align: center">{{ error }}</h3>
+    </div>
+    <div v-else-if="projectData.length > 0">
+      <div class="projectContent">
+        <a
+          v-for="(project, index) in projectData"
+          :key="index"
+          class="project-card"
+          href="/callquotation"
+        >
+          <img :src="require(`@/assets/img/project1.jpg`)" />
+          <h3 style="text-align: center">{{ project.title }}</h3>
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import ProjectController from "@/services/controllers/ProjectController.js";
+import Error from "@/models/error";
 
 export default {
   data() {
     return {
-      sites: []
+      projectData: [],
+      error: null,
     };
   },
   mounted() {
-    this.fetchSiteList(); // Ensure that you're calling the method here
+    this.projectList();
   },
   methods: {
-  async fetchSiteList() {
-    try {
+    async projectList() {
+      try {
+        const response = await ProjectController.projectList();
 
-      const response = await axios.get(`https://subconbackend.tribit.com.my/sitelist/zylim/SSA`, {
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Inp5bGltIiwiaWF0IjoxNzEwOTIxNTIzLCJleHAiOjE3NDI0NTc1MjN9.PUhEtnO-i0kKu_N6WW6I_WK0KQyOEhe6Na98H43Rpiw"
+        if (response.data.length === 0) {
+          this.error = Error.getMessage(501);
+        } else {
+          this.projectData = response.data.map((project) => ({
+            title: project.name,
+          }));
         }
-      });
-      
-      if (!response || !response.data) {
-        console.error('Invalid response:', response);
-        return;
+      } catch (error) {
+        this.error = Error.getMessage(504);
       }
-      
-      this.sites = response.data;
-      console.log('Response data:', this.sites);
-    } catch (error) {
-      console.error('Error:', error.response ? error.response.data : error.message);
-    }
-  }
-}
-
-
-
+    },
+  },
 };
 </script>

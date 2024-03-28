@@ -16,31 +16,29 @@
         </md-button>
 
         <div class="md-collapse">
-          
           <md-list>
             <md-list-item href="projectList">
               <i class="material-icons">dashboard</i>
               <p class="hidden-lg hidden-md">Project List</p>
             </md-list-item>
 
-
             <li class="md-list-item">
-                <div class="md-list-item-content">
-                  <drop-down>
-                    <md-button
-                      slot="title"
-                      class="md-button md-just-icon md-simple"
-                      data-toggle="dropdown"
-                    >
-                      <md-icon>notifications</md-icon>
-                      <span class="notification">5</span>
-                      <p class="hidden-lg hidden-md">ProjectList</p>
-                    </md-button>
-                    <ul class="dropdown-menu dropdown-menu-right">
-                      <li><a href="#">Notification</a></li>
-                    </ul>
-                  </drop-down>
-                </div>
+              <div class="md-list-item-content">
+                <drop-down>
+                  <md-button
+                    slot="title"
+                    class="md-button md-just-icon md-simple"
+                    data-toggle="dropdown"
+                  >
+                    <md-icon>notifications</md-icon>
+                    <span class="notification">5</span>
+                    <p class="hidden-lg hidden-md">ProjectList</p>
+                  </md-button>
+                  <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#">Notification</a></li>
+                  </ul>
+                </drop-down>
+              </div>
             </li>
 
             <md-list-item href="user">
@@ -60,7 +58,7 @@
 </template>
 
 <script>
-import store from '@/store';
+import store from "@/services/axios/store";
 
 export default {
   data() {
@@ -84,12 +82,11 @@ export default {
     },
     logout() {
       // Dispatch the clearToken action to clear token and access level
-      store.dispatch('clearToken');
-      
+      store.dispatch("clearToken");
+
       // Optionally, redirect the user to another route upon successful logout
-      this.$router.push('/logout');
+      this.$router.push("/logout");
     },
   },
 };
 </script>
-

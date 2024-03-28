@@ -1,14 +1,13 @@
-
-
 // Import your components
 import Login from "@/pages/Login.vue";
 import Logout from "@/pages/Logout.vue";
 import ProjectList from "@/pages/ProjectList.vue";
 import Callquotation from "@/pages/Callquotation.vue";
 import Comparison from "@/pages/Comparison.vue";
-import UserProfile from "@/pages/UserProfile.vue";
+import UserConfig from "@/pages/UserConfig.vue";
+import AccessPermission from "@/pages/AccessPermission.vue";
 import Description from "@/pages/Description.vue";
-import LATrade from "@/pages/Layout/LATrade.vue";
+import Createcq from "@/pages/Layout/Createcq.vue";
 import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
 import ProjectControl from "@/pages/Layout/ProjectControl.vue";
 import Revision from "@/pages/Layout/Revision.vue";
@@ -21,75 +20,74 @@ const routes = [
     component: DashboardLayout,
     redirect: "/projectlist",
     children: [
-      { path: "projectlist", 
-        name: "Project List", 
+      {
+        path: "projectlist",
+        name: "Project List",
         component: ProjectList,
         meta: { requiresAuth: true },
       },
 
-      { path: "callquotation", 
-        name: "Call For Quotation", 
+      {
+        path: "callquotation",
+        name: "Call For Quotation",
         component: Callquotation,
         meta: { requiresAuth: true },
-       },
+      },
 
-      { path: "comparison", 
-        name: "Subcon Comparison", 
+      {
+        path: "comparison",
+        name: "Subcon Comparison",
         component: Comparison,
         meta: { requiresAuth: true },
       },
 
-      { path: "latrade", 
-        component: LATrade,
-        meta: { requiresAuth: true },
-      },
+      { path: "createcq", component: Createcq, meta: { requiresAuth: true } },
 
-      { path: "description", 
+      {
+        path: "description",
         name: "Create / Import Description",
         component: Description,
         meta: { requiresAuth: true },
       },
 
-      { path: "revision", 
-        name: "Revision", 
+      {
+        path: "revision",
+        name: "Revision",
         component: Revision,
         meta: { requiresAuth: true },
       },
-      
-      { path: "user", 
-        name: "User Profile", 
-        component: UserProfile,
+
+      {
+        path: "userconfig",
+        name: "User Config",
+        component: UserConfig,
         meta: { requiresAuth: true },
       },
 
-      { path: "projectcontrol", 
-        name: "Project Control", 
+      {
+        path: "accesspermission",
+        name: "Access Permission",
+        component: AccessPermission,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "projectcontrol",
+        name: "Project Control",
         component: ProjectControl,
         meta: { requiresAuth: true },
       },
 
-      { path: "quotation", 
-        name: "Create / Import Quotation", 
+      {
+        path: "quotation",
+        name: "Create / Import Quotation",
         component: Quotation,
         meta: { requiresAuth: true },
       },
-
     ],
   },
-  { path: "/login", 
-    name: "Login", 
-    component: Login,
-  },
-  { path: "/logout", 
-    name: "Logout", 
-    component: Logout,
-  },
+  { path: "/login", name: "Login", component: Login },
+  { path: "/logout", name: "Logout", component: Logout },
 ];
-
-
-
-
-
-
 
 export default routes;
