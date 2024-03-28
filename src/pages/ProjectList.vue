@@ -1,7 +1,6 @@
 <template>
   <div class="content">
-    <div v-if="error">
-      <!-- Display error message if there's an error -->
+    <div v-if="error" class="message">
       <h3 style="text-align: center">{{ error }}</h3>
     </div>
     <div v-else-if="projectData.length > 0">
@@ -22,7 +21,6 @@
 
 <script>
 import ProjectController from "@/services/controllers/ProjectController.js";
-import Error from "@/models/error";
 
 export default {
   data() {
@@ -37,19 +35,14 @@ export default {
   methods: {
     async projectList() {
       try {
-        const response = await ProjectController.projectList();
-
-        if (response.data.length === 0) {
-          this.error = Error.getMessage(501);
-        } else {
-          this.projectData = response.data.map((project) => ({
-            title: project.name,
-          }));
-        }
+        const { data, message } = await ProjectController.projectList();
+        this.error = message;
+        this.projectData = data;
       } catch (error) {
-        this.error = Error.getMessage(504);
+        this.error = error.message;
       }
     },
   },
 };
 </script>
+

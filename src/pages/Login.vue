@@ -51,8 +51,7 @@
 <script>
 import Modal from "@/components/Modal/Modal.vue";
 import LoginController from "@/services/controllers/LoginController";
-// import store from "@/services/axios/store";
-
+import store from "@/store";
 export default {
   data() {
     return {
@@ -63,26 +62,16 @@ export default {
   },
   methods: {
     async LoginSubmit() {
-      try {
-        const { data, message } = await LoginController.login(
-          this.username,
-          this.password
-        );
+      const { token, username, accesslevel, message, success } = await LoginController.login(this.username, this.password);
 
-        // Handle successful login
-        console.log("Login successful");
-        console.log("Received data:", data);
-        console.log("Received message:", message);
+      if (success) {
 
-        // Reset error message
-        this.errorMessage = message;
-      } catch (error) {
-        // Handle login error
-        console.error("Login failed:", error.message);
-        this.errorMessage = error.message;
+        store.dispatch('setToken', { token, username, accesslevel });
+        this.$router.push("/projectlist");
+      } else {
+       this.$refs.errorModal.openModal('Error Message',message);
       }
     },
   },
 };
 </script>
-<!--    this.$refs.errorModal.openModal('Error Message',message); -->

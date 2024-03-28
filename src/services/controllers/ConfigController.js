@@ -12,36 +12,36 @@ const AccessUserController = {
       });
 
       const processedData = ConfigModels.processResponseData(response.data);
-
+  
       return processedData;
+
     } catch (error) {
-      throw error;
+      const errorMessage = error.response.data.message;
+      throw { errorMessage };
     }
   },
   async updateUserLoginAllowed(user) {
     try {
+      
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
 
-      // Construct the API endpoint with the username included
-      const endpoint = `${apiHost}/user_configuration/edit/${user.username}`;
-
-      // Send a PUT request to update the user's configuration
       const response = await axios.put(
-        endpoint,
+        `${apiHost}/user_configuration/edit/${user.id}`,
         {
+          access_level:user.accesslevel,
           login_allowed: user.loginAllowed,
         },
         { headers }
       );
-
-      const formattedData = ConfigModels.processResponseData(response.data);
-
-      return formattedData;
+      
+      return response.data.message;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response.data.message;
+      throw { errorMessage };
     }
   },
 };
 
 export default AccessUserController;
+

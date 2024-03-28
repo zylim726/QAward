@@ -82,6 +82,11 @@
   transition: border-color 0.3s ease;
 }
 
+.filter-container {
+  margin-bottom: 10px;
+}
+
+
 .container {
     display: flex;
     justify-content: space-between;
@@ -89,6 +94,7 @@
 
 .search-container {
     flex: 1;
+    margin-bottom: 10px;
 }
 
 
@@ -147,6 +153,7 @@
 
 .table-container {
   overflow-x: auto;
+  white-space: nowrap;
 }
 
 .finalTable {

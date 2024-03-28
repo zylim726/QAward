@@ -1,4 +1,5 @@
-import { axios, Error, config } from "@/services";
+import { axios, config } from "@/services";
+import ProjectModels from "@/models/ProjectModels.js";
 
 const ProjectController = {
   async projectList() {
@@ -7,9 +8,24 @@ const ProjectController = {
       const headers = config.getHeadersWithToken();
       const response = await axios.get(`${apiHost}/sitelist`, { headers });
 
-      return response.data;
+      const processedData = ProjectModels.processResponseData(response.data);
+
+      console.log(processedData);
+
+      return {
+        data: processedData,
+        message: null, 
+      };
     } catch (error) {
-      return { message: Error.getMessage(503) + error.message };
+      let errorMessage;
+
+      if (error.response && error.response.status === 403) {
+        errorMessage = error.response.data.message;
+      } 
+      return {
+        data: null,
+        message: errorMessage,
+      };
     }
   },
 };

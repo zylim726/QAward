@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import AccessUserController from "@/services/controllers/AccessUserController.js";
+import AccessUserController from "@/services/controllers/ConfigController.js";
 
 export default {
   data() {
