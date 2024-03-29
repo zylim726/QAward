@@ -13,7 +13,7 @@ import PermissionTable from "./Tables/PermissionTable.vue";
 // MODAL
 import Modal from "./Modal/Modal.vue";
 import SubmitModal from "./Modal/SubmitModal.vue";
-import CreatePermission from "./Modal/CreatePermission.vue";
+import Createpermission from "./Modal/Createpermission.vue";
 
 // IMPORT
 import UnittypeImport from "./Import/UnittypeImport.vue";
@@ -38,5 +38,5 @@ export {
   ProjectcontrolTable,
   AccessuserTable,
   PermissionTable,
-  CreatePermission,
+  Createpermission,
 };

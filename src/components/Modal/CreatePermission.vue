@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': showModal }">
     <div class="modal-background" @click="closeModal"></div>
-    <div class="modal-content" style="height: 50%; width: 25%">
+    <div class="modal-content" style="height: 40%; width: 25%">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import PermissionController from "@/services/controllers/PermissionController.js";
 export default {
   props: {
     showModal: Boolean,
@@ -57,14 +58,23 @@ export default {
   methods: {
     closeModal() {
       this.$emit("close");
+      this.module = "";
+      this.permission = "";
     },
     saveAndCloseModal() {
-      this.$emit("save", { module: this.module, permission: this.permission });
+      this.addPermissionToServer(this.module, this.permission);
       this.closeModal();
     },
     onInputFocus(input) {
-      // Handle focus event for inputs
       console.log("Input focused:", input);
+    },
+    async addPermissionToServer(module, permission) {
+      try {
+        const successMessage  = await PermissionController.addPermission(module, permission);
+        this.$emit('success-message', successMessage );
+      } catch (error) {
+        //console.error("Error adding permission:", error.errorMessage);
+      }
     },
   },
 };

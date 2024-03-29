@@ -1,18 +1,17 @@
-const ConfigModels = {
+const PermissionModels = {
   processResponseData(response) {
     const dataArray = response.data;
-    const filteredData = dataArray.filter(
-      (config) => config.access_level !== "SSA" && config.access_level !== "PA"
-    );
 
-    // Map over the filtered data to transform it
-    const processedData = filteredData.map((config) => ({
-      username: config.username,
-      accesslevel: config.access_level,
-      loginAllowed: config.login_allowed,
+    console.log(response.data);
+
+    const processedData = dataArray.map((config) => ({
+      accesslevel: config.access_level, 
+      module: config.module,
+      permission: config.permission,
+      message: response.message
     }));
     return processedData;
   },
 };
 
-export default ConfigModels;
+export default PermissionModels;

@@ -1,47 +1,64 @@
-import { axios, Error, config } from "@/services";
-import ConfigModels from "@/models/ConfigModels.js";
+import { axios, config } from "@/services";
+import PermissionModels from "@/models/PermissionModels.js";
 
-const AccessUserController = {
-  async accessUser() {
+const PermissionController = {
+  async permissionAccess() {
     try {
       const apiHost = config.getHost();
-      const headers = config.getHeadersWithToken(); // Correct usage of headers
+      const headers = config.getHeadersWithToken(); 
 
-      const response = await axios.get(`${apiHost}/user_configuration`, {
+      const response = await axios.get(`${apiHost}/access_permission`, {
         headers,
       });
 
-      const processedData = ConfigModels.processResponseData(response.data);
-
+      const processedData = PermissionModels.processResponseData(response.data);
       return processedData;
+
     } catch (error) {
-      throw error;
+      const errorMessage = error.response.data.message;
+      throw { errorMessage };
     }
   },
-  async updateUserLoginAllowed(user) {
+  async addPermission(module, permission) {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
 
-      // Construct the API endpoint with the username included
-      const endpoint = `${apiHost}/user_configuration/edit/${user.username}`;
+      const response = await axios.post(
+        `${apiHost}/access_permission/add`,
+        { access_level: 'MasterPermission',
+          module: module,
+          permission: permission, },
+        { headers }
+      );
+      return response.data.message;
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+      throw { errorMessage };
+    }
+  },
+  async updatepermission(user) {
+    try {
+      
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
 
-      // Send a PUT request to update the user's configuration
       const response = await axios.put(
-        endpoint,
+        `${apiHost}/user_configuration/edit/${user.id}`,
         {
+          access_level:user.accesslevel,
           login_allowed: user.loginAllowed,
         },
         { headers }
       );
-
-      const formattedData = ConfigModels.processResponseData(response.data);
-
-      return formattedData;
+      
+      return response.data.message;
     } catch (error) {
-      throw error;
+      const errorMessage = error.response.data.message;
+      throw { errorMessage };
     }
   },
 };
 
-export default AccessUserController;
+export default PermissionController;
+

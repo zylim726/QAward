@@ -22,6 +22,7 @@ const ProjectController = {
       if (error.response && error.response.status === 403) {
         errorMessage = error.response.data.message;
       } 
+
       return {
         data: null,
         message: errorMessage,

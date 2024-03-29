@@ -5,7 +5,7 @@ const AccessUserController = {
   async accessUser() {
     try {
       const apiHost = config.getHost();
-      const headers = config.getHeadersWithToken(); // Correct usage of headers
+      const headers = config.getHeadersWithToken(); 
 
       const response = await axios.get(`${apiHost}/user_configuration`, {
         headers,
