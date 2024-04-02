@@ -5,8 +5,7 @@ const CallQuotationModels = {
 
 
     const filteredData = dataArray.filter(item => {
-      //console.log('Comparing projectId:', item.project_id, 'with', projectId);
-
+      
       if (String(item.project_id) === projectId) {
         return true;
       } else {

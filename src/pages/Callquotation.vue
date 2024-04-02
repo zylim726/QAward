@@ -83,8 +83,8 @@
                               <li>
                                 <a href="comparison">Subcon Comparison</a>
                               </li>
-                              <li><a href="">Edit</a></li>
-                              <li><a href="">Delete</a></li>
+                              <li><button class="transparentButton" @click="editModal = true" style="margin-left: -6px;">Edit</button></li>
+                              <li><button class="transparentButton" @click="showModal = true" style="margin-left: -6px;">Delete</button></li>
                             </ul>
                           </drop-down>
                         </li>
@@ -117,6 +117,8 @@
         </md-card>
       </div>
     </div>
+    <EditCQ :edit-modal="editModal" @close="closeEditModal" title="Edit Call of Quotation"></EditCQ>
+    <DeleteCQ :show-modal="showModal" @close="closeModal" title="Delete Call of Quotation"></DeleteCQ>
     <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
   </div>
 </template>
@@ -124,8 +126,13 @@
 <script>
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+import { EditCQ,DeleteCQ }  from "@/components";
 
 export default {
+  components: {
+    EditCQ,
+    DeleteCQ
+  },
   props: {
     tableHeaderColor: {
       type: String,
@@ -140,6 +147,8 @@ export default {
       projectName: "",
       errorMessage: "",
       callQuotation: [],
+      editModal: false,
+      showModal: false,
     };
   },
   computed: {
@@ -188,6 +197,18 @@ export default {
       }
       this.openedDropdown = clickedItem;
     },
+    openEditModal() {
+      this.editModal = true;
+    },
+    closeEditModal() {
+      this.editModal = false;
+    },
+    openModal() {
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
   },
 };
 </script>
@@ -198,7 +219,7 @@ table {
   border-collapse: collapse;
   font-family: Arial, sans-serif;
   color: #333;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-x: auto; 
 }
 
 thead th {
@@ -206,13 +227,13 @@ thead th {
   border-bottom: none;
   padding: 12px;
   text-align: left;
-  white-space: nowrap; /* Prevent text wrapping */
+  white-space: nowrap; 
 }
 
 tbody td {
   padding: 12px;
   text-align: left;
-  white-space: nowrap; /* Prevent text wrapping */
+  white-space: nowrap; 
   border: 1px solid #ddd;
 }
 </style>

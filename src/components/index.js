@@ -15,6 +15,8 @@ import Modal from "./Modal/Modal.vue";
 import SubmitModal from "./Modal/SubmitModal.vue";
 import Createpermission from "./Modal/Createpermission.vue";
 import Editpermission from "./Modal/Editpermission.vue";
+import DeleteCQ from "./Modal/DeleteCQ.vue";
+import EditCQ from "./Modal/EditCQ.vue";
 
 // IMPORT
 import UnittypeImport from "./Import/UnittypeImport.vue";
@@ -41,4 +43,6 @@ export {
   PermissionTable,
   Createpermission,
   Editpermission,
+  DeleteCQ,
+  EditCQ
 };

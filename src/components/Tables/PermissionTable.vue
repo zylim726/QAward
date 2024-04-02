@@ -45,39 +45,33 @@
               <td style="text-align: center">
                 <input
                   type="checkbox"
-                  :name="`${permission}[${module.accesslevel}][${module.module}]`"
-                  :id="`${module.module}_${permission}`"
                   :checked="isPermissionChecked(permission, module.module, 'QS')"
                   @change="updatePermission(permission, module.module, 'QS')">
               </td>
               <td style="text-align: center">
                 <input
                   type="checkbox"
-                  :name="'' + permission + '[CM][' + module.module + ']'"
-                  :value="permission"
-                  :id="module.module + '_' + permission"
-                /></td>
+                  :checked="isPermissionChecked(permission, module.module, 'CM')"
+                  @change="updatePermission(permission, module.module, 'CM')">
+              </td>
               <td style="text-align: center">
                 <input
                   type="checkbox"
-                  :name="'' + permission + '[SSA][' + module.module + ']'"
-                  :value="permission"
-                  :id="module.module + '_' + permission"
-                /></td>
+                  :checked="isPermissionChecked(permission, module.module, 'SSA')"
+                  @change="updatePermission(permission, module.module, 'SSA')">
+              </td>
               <td style="text-align: center">
                 <input
                   type="checkbox"
-                  :name="'' + permission + '[PM][' + module.module + ']'"
-                  :value="permission"
-                  :id="module.module + '_' + permission"
-                /></td>
+                  :checked="isPermissionChecked(permission, module.module, 'PM')"
+                  @change="updatePermission(permission, module.module, 'PM')">
+              </td>
               <td style="text-align: center">
                 <input
                   type="checkbox"
-                  :name="'' + permission + '[PD][' + module.module + ']'"
-                  :value="permission"
-                  :id="module.module + '_' + permission"
-                /></td>
+                  :checked="isPermissionChecked(permission, module.module, 'PD')"
+                  @change="updatePermission(permission, module.module, 'PD')">
+              </td>
             </tr>
           </template>
         </tbody>

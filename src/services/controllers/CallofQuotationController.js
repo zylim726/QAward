@@ -12,9 +12,7 @@ const CallofQuotationController = {
       });
 
       const processedData = CallQuotationModels.processResponseData(response.data);
-
-      console.log(processedData);
-
+      
       return processedData;
     } catch (error) {
       const errorMessage = error.response.data.message;
