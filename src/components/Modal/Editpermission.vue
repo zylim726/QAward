@@ -1,22 +1,22 @@
 <template>
-  <div class="modal" :class="{ 'is-active': showModal }">
-    <div class="modal-background" @click="closeModal"></div>
+  <div class="modal" :class="{ 'is-active': editModal }">
+    <div class="modal-background" @click="closeEditModal"></div>
     <div class="modal-content" style="height: 40%; width: 25%">
       <div class="box">
-        <h1 class="titleHeader">{{ title }}</h1>
+        <h1 class="titleHeader">Edit Permission</h1>
         <br />
         <hr style="margin-top: -10px" />
         <br />
         <input
           type="text"
-          v-model="module"
+          v-model="editedModule"
           placeholder="module"
           class="typeInput"
           @focus="onInputFocus('Module')"
-        />
+        /><br>
         <input
           type="text"
-          v-model="permission"
+          v-model="editedPermission"
           placeholder="permission"
           class="typeInput"
           @focus="onInputFocus('Permission')"
@@ -26,7 +26,7 @@
     <button
       class="btn-save"
       aria-label="close"
-      @click.stop="saveAndCloseModal"
+      @click.stop="saveAndCloseEditModal"
       style="margin-top: 228px; margin-left: -164px"
     >
       Save
@@ -34,7 +34,7 @@
     <button
       class="btn-save"
       aria-label="close"
-      @click.stop="closeModal"
+      @click.stop="closeEditModal"
       style="margin-top: 228px"
     >
       Close
@@ -46,31 +46,34 @@
 import PermissionController from "@/services/controllers/PermissionController.js";
 export default {
   props: {
-    showModal: Boolean,
-    title: String,
+    editModal: Boolean,
+    module: String,
+    permission: String,
   },
   data() {
     return {
-      module: "",
-      permission: "",
+      editedModule: this.module,
+      editedPermission: this.permission,
     };
   },
+  mounted(){
+    console.log('Edit Pages permission:', this.module);
+    console.log('Edit Pages module:', this.permission);
+  },
   methods: {
-    closeModal() {
+    closeEditModal() {
       this.$emit("close");
-      this.module = "";
-      this.permission = "";
     },
-    saveAndCloseModal() {
-      this.addPermissionToServer(this.module, this.permission);
-      this.closeModal();
+    saveAndCloseEditModal() {
+      this.addPermissionToServer(this.editedModule, this.editedPermission);
+      this.closeEditModal();
     },
     onInputFocus(input) {},
     async addPermissionToServer(module, permission) {
       try {
         const UpdateMessage = await PermissionController.addPermission(module, permission);
         this.$emit('message', UpdateMessage);
-        setTimeout(function() {
+        setTimeout(() => {
             window.location.reload();
         }, 500); 
       } catch (error) {
@@ -81,4 +84,3 @@ export default {
   },
 };
 </script>
-

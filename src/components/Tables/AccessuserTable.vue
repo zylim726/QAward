@@ -13,12 +13,6 @@
           />
         </form>
       </div>
-      
-      <div class="filter-container" style="margin-right: -15px">
-        <button class="btn-save" @click="updateSelectedUsers">
-          Updated
-        </button>
-      </div>
     </div>
     <div class="table-container" style="max-height: 700px; overflow-y: auto">
       <table class="nested-table">
@@ -26,8 +20,8 @@
           <tr>
             <th>No</th>
             <th>Username</th>
+            <th>Name</th>
             <th>Access Level</th>
-            <th>Update Date</th>
             <th style="text-align: center">Login Access</th>
           </tr>
         </thead>
@@ -35,8 +29,8 @@
           <tr v-for="(user, index) in filteredUsers" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ user.username }}</td>
+            <td>{{ user.name }}</td>
             <td>{{ user.accesslevel }}</td>
-            <td>{{ user.updatedAt }}</td>
             <td style="text-align: center">
               <input
                 type="checkbox"
@@ -44,7 +38,7 @@
                 v-model="user.loginAllowed"
                 true-value="1"
                 false-value="0"
-                @change="toggleUserSelection(user.id)"
+                @change="updateLoginAccess(user)"
               />
             </td>
           </tr>
@@ -66,7 +60,6 @@ export default {
       users: [],
       searchText: "",
       errorMessage: null,
-      selectedUserIds: [],
       UpdateMessage: null,
       FailMessage: null,
     };
@@ -97,24 +90,6 @@ export default {
         this.UpdateMessage = message;
       } catch (error) {
         this.FailMessage = "Error updating login access: " + error.errorMessage;
-      }
-    },
-    updateSelectedUsers() {
-      // Iterate over selectedUserIds and update login access for each
-      this.selectedUserIds.forEach(async (userId) => {
-        const user = this.users.find(u => u.id === userId);
-        if (user) {
-          await this.updateLoginAccess(user);
-        }
-      });
-      
-    },
-    toggleUserSelection(userId) {
-      const index = this.selectedUserIds.indexOf(userId);
-      if (index !== -1) {
-        this.selectedUserIds.splice(index, 1); // User deselected, remove from the array
-      } else {
-        this.selectedUserIds.push(userId); // User selected, add to the array
       }
     },
     filterUsers() {},

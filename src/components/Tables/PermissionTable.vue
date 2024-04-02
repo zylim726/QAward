@@ -8,56 +8,78 @@
           <input
             type="text"
             v-model="searchText"
-            @input="filterpermissions"
+            @input="filterUsers"
             placeholder="Search by username"
           />
         </form>
       </div>
+      
       <div class="filter-container" style="margin-right: -15px">
-        <button class="btn-save" @click="updateSelectedpermissions">
-          Updated
-        </button>
         <button class="btn-save" @click="showModal = true">
-          Add
+        Add
         </button>
-        <Createpermission :show-modal="showModal" @success-message="handleSuccessMessage"  @close="closeModal" title="Create Permission"></Createpermission>
+        <Createpermission :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage"  @close="closeModal" title="Create Permission"></Createpermission>
       </div>
     </div>
-    
     <div class="table-container" style="max-height: 700px; overflow-y: auto">
       <table class="nested-table">
         <thead>
           <tr>
-            <th>No</th>
             <th>Permission</th>
-            <th style="text-align: center">CM</th>
-            <th style="text-align: center">PD</th>
-            <th style="text-align: center">PM</th>
             <th style="text-align: center">QS</th>
+            <th style="text-align: center">CM</th>
             <th style="text-align: center">SSA</th>
+            <th style="text-align: center">PM</th>
+            <th style="text-align: center">PD</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(permission, index) in searchPermission" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ permission.permission }}</td>
-            <td style="text-align: center">
-              <input type="checkbox" v-model="permission.loginAllowed" true-value="1" false-value="0" @change="togglePermissionSelection(permission.id)" />
-            </td>
-            <td style="text-align: center">
-              <input type="checkbox" v-model="permission.loginAllowed" true-value="1" false-value="0" @change="togglePermissionSelection(permission.id)" />
-            </td>
-            <td style="text-align: center">
-              <input type="checkbox" v-model="permission.loginAllowed" true-value="1" false-value="0" @change="togglePermissionSelection(permission.id)" />
-            </td>
-            <td style="text-align: center">
-              <input type="checkbox" v-model="permission.loginAllowed" true-value="1" false-value="0" @change="togglePermissionSelection(permission.id)" />
-            </td>
-            <td style="text-align: center">
-              <input type="checkbox" v-model="permission.loginAllowed" true-value="1" false-value="0" @change="togglePermissionSelection(permission.id)"/>
-            </td>
-          </tr>
-         
+          <template v-for="(module, index) in uniqueModules">
+            <tr :key="'module_' + index" >
+              <td><b>{{ module.module }}</b></td>
+              <td colspan="5"></td>
+            </tr>
+            
+            <tr v-for="(permission, pIndex) in module.permissions" :key="'permission_' + pIndex">
+              <td>{{ permission }}</td>
+              <td style="text-align: center">
+                <input
+                  type="checkbox"
+                  :name="`${permission}[${module.accesslevel}][${module.module}]`"
+                  :id="`${module.module}_${permission}`"
+                  :checked="isPermissionChecked(permission, module.module, 'QS')"
+                  @change="updatePermission(permission, module.module, 'QS')">
+              </td>
+              <td style="text-align: center">
+                <input
+                  type="checkbox"
+                  :name="'' + permission + '[CM][' + module.module + ']'"
+                  :value="permission"
+                  :id="module.module + '_' + permission"
+                /></td>
+              <td style="text-align: center">
+                <input
+                  type="checkbox"
+                  :name="'' + permission + '[SSA][' + module.module + ']'"
+                  :value="permission"
+                  :id="module.module + '_' + permission"
+                /></td>
+              <td style="text-align: center">
+                <input
+                  type="checkbox"
+                  :name="'' + permission + '[PM][' + module.module + ']'"
+                  :value="permission"
+                  :id="module.module + '_' + permission"
+                /></td>
+              <td style="text-align: center">
+                <input
+                  type="checkbox"
+                  :name="'' + permission + '[PD][' + module.module + ']'"
+                  :value="permission"
+                  :id="module.module + '_' + permission"
+                /></td>
+            </tr>
+          </template>
         </tbody>
       </table>
       <br />
@@ -68,75 +90,103 @@
 
 <script>
 import PermissionController from "@/services/controllers/PermissionController.js";
-import Createpermission from "@/components/Modal/Createpermission.vue";
+import Createpermission  from "@/components/Modal/Createpermission.vue";
+
 
 export default {
   components: {
-    Createpermission
+    Createpermission,
   },
   data() {
     return {
-      permissions: [],
+      accesss: [],
       searchText: "",
       errorMessage: null,
-      selectedUserIds: [],
       UpdateMessage: null,
       FailMessage: null,
       showModal: false,
+      permissions: [],
+      access: {
+        accesslevel: '' 
+      }
     };
   },
   mounted() {
-    this.permissionAccess();
+    this.accessPermission();
   },
   computed: {
-    searchPermission() {
-      return this.permissions.filter((permission) => {
-        return permission.permission
+    filteredUsers() {
+      return this.accesss.filter((access) => {
+        return access.permission
           .toLowerCase()
           .includes(this.searchText.toLowerCase());
       });
     },
+    uniqueModules() {
+      const uniqueModules = {};
+      this.accesss.forEach(module => {
+        if (!uniqueModules[module.module]) {
+          uniqueModules[module.module] = {
+            module: module.module,
+            accesslevel: module.accesslevel,
+            permissions: [module.permission]
+          };
+        } else {
+          if (!uniqueModules[module.module].permissions.includes(module.permission)) {
+            uniqueModules[module.module].permissions.push(module.permission);
+          }
+        }
+      });
+      return Object.values(uniqueModules);
+    },
+    isPermissionChecked() {
+      return (permission, module, accesslevel) => {
+        const isChecked = this.accesss.some(item =>
+          item.permission === permission &&
+          item.accesslevel === accesslevel &&
+          item.module === module
+        );
+        return isChecked;
+      };
+    },
   },
   methods: {
-    async permissionAccess() {
+    async accessPermission() {
       try {
-        this.permissions = await PermissionController.permissionAccess();
+        const processedData = await PermissionController.accessPermission();
+        this.accesss = processedData;
       } catch (error) {
-        this.errorMessage = "Error fetching permission data: " + error.errorMessage;
+        this.errorMessage = "Error fetching user data: " + error.errorMessage;
       }
     },
-    async updatePermissionAccess(permission) {
+    async updatePermission(permission, module, accesslevel) {
       try {
-        const message  = await PermissionController.updatepermission(permission);
+        const message  = await PermissionController.updatePermission(permission, module, accesslevel);
         this.UpdateMessage = message;
       } catch (error) {
         this.FailMessage = "Error updating login access: " + error.errorMessage;
       }
     },
-    updateSelectedpermissions() {
-      // Iterate over selectedUserIds and update login access for each
-      this.selectedUserIds.forEach(async (userId) => {
-        const permission = this.permissions.find(u => u.id === userId);
-        if (permission) {
-          await this.updatePermissionAccess(permission);
-        }
-      });
-    },
-    togglePermissionSelection(userId) {
-      const index = this.selectedUserIds.indexOf(userId);
-      if (index !== -1) {
-        this.selectedUserIds.splice(index, 1); 
-      } else {
-        this.selectedUserIds.push(userId);
+    async addPermission() {
+      try {
+        this.UpdateMessage = await PermissionController.addPermission();
+      } catch (error) {
+        this.FailMessage = "Error fetching user data: " + error.errorMessage;
       }
     },
+    openModal() {
+      this.showModal = true;
+    },
     closeModal() {
-      this.showModal = false; // Update the showModal prop to close the modal
+      this.showModal = false;
     },
-    handleSuccessMessage(message) {
-      this.UpdateMessage = message;
+    filterUsers() {},
+    ModalMessage(message) {
+      this.UpdateMessage = message; 
     },
-    filterpermissions() {},
+    ModalErrorMessage(message) {
+      this.FailMessage = message; 
+    },
   },
 };
 </script>
@@ -146,7 +196,4 @@ export default {
 .nested-table td {
   padding: 19px !important;
 }
-
-
-
 </style>

@@ -51,7 +51,7 @@
 <script>
 import Modal from "@/components/Modal/Modal.vue";
 import LoginController from "@/services/controllers/LoginController";
-import store from "@/store";
+import store from "@/services/axios/store";
 export default {
   data() {
     return {
@@ -65,9 +65,10 @@ export default {
       const { token, username, accesslevel, message, success } = await LoginController.login(this.username, this.password);
 
       if (success) {
-
         store.dispatch('setToken', { token, username, accesslevel });
-        this.$router.push("/projectlist");
+        
+        this.$router.push({ name: 'Call For Quotation' });
+        
       } else {
        this.$refs.errorModal.openModal('Error Message',message);
       }

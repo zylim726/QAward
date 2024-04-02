@@ -2,9 +2,9 @@ const PermissionModels = {
   processResponseData(response) {
     const dataArray = response.data;
 
-    console.log(response.data);
-
+    // Map over the filtered data to transform it
     const processedData = dataArray.map((config) => ({
+      id: config.id,
       accesslevel: config.access_level, 
       module: config.module,
       permission: config.permission,
@@ -15,3 +15,4 @@ const PermissionModels = {
 };
 
 export default PermissionModels;
+

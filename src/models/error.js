@@ -6,10 +6,6 @@ const Error = {
         return "Please enter both username and password.";
       case 500:
         return "Internal server error. Please try again later.";
-      case 501:
-        return "Sorry, You don't have any projects";
-      case 502:
-        return "Access level or username not found in Website.";
       case 503:
         return "Failed to fetch project list:";
       case 504:

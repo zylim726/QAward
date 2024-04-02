@@ -598,3 +598,17 @@ background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
+.typeInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  transition: border-color 0.5s ease;
+}
+
+.typeInput:focus {
+  outline: none;
+  border-color: orange;
+}

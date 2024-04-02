@@ -7,7 +7,7 @@ const AccessUserController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
 
-      const response = await axios.get(`${apiHost}/user_configuration`, {
+      const response = await axios.get(`${apiHost}/systemuser`, {
         headers,
       });
 
@@ -27,14 +27,13 @@ const AccessUserController = {
       const headers = config.getHeadersWithToken();
 
       const response = await axios.put(
-        `${apiHost}/user_configuration/edit/${user.id}`,
+        `${apiHost}/systemuser/edit/${user.id}`,
         {
-          access_level:user.accesslevel,
-          login_allowed: user.loginAllowed,
+          subcon_login_access: user.loginAllowed,
         },
         { headers }
       );
-      
+
       return response.data.message;
     } catch (error) {
       const errorMessage = error.response.data.message;

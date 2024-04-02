@@ -3,7 +3,7 @@
     <div class="md-layout">
       <div class="row" style="margin-left: 16px">
         <h6>Project Name :</h6>
-        <h3 class="titleHeader">AR496</h3>
+        <h3 class="titleHeader">{{ projectName }}</h3>
         <br />
       </div>
       <div
@@ -33,9 +33,7 @@
                   >
                 </div>
               </div>
-
-              <!-- Table -->
-              <div class="table-container">
+              <div class="table-container" style="min-height: 500px;">
                 <table>
                   <thead>
                     <tr>
@@ -57,15 +55,15 @@
                       <th style="text-align: center">Status</th>
                     </tr>
                     <tr>
-                      <th colspan="8"></th>
+                      <th colspan="9"></th>
                       <th>Mr Lim</th>
                       <th>Mr Khew</th>
-                      <th>Mr Chuahc</th>
-                      <th colspan="9"></th>
+                      <th>Mr Chuah</th>
+                      <th colspan="8"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="item in SearchTabledata" :key="item.id">
+                    <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td>
                         <li class="md-list-item">
                           <drop-down
@@ -91,24 +89,24 @@
                           </drop-down>
                         </li>
                       </td>
-                      <td>{{ item.id }}</td>
-                      <td>{{ item.category }}</td>
-                      <td>{{ item.trade }}</td>
-                      <td>{{ item.location }}</td>
-                      <td>{{ item.noOfQuote }}</td>
-                      <td>{{ item.actualCalling }}</td>
-                      <td>{{ item.prepareBy }}</td>
-                      <td>{{ item.actualDonedate }}</td>
-                      <td>{{ item.checkby1 }}</td>
-                      <td>{{ item.checkBy2 }}</td>
-                      <td>{{ item.checkBy3 }}</td>
-                      <td>{{ item.awardingTarget }}</td>
-                      <td>{{ item.remarks }}</td>
-                      <td>{{ item.awardedto }}</td>
-                      <td>{{ item.LAref }}</td>
-                      <td>{{ item.costSaving }}</td>
+                      <td>{{ index + 1 }}</td>
+                      <td>{{ callQuotation.tradeCategory }}</td>
+                      <td>{{ callQuotation.trade }}</td>
+                      <td>{{ callQuotation.location }}</td>
+                      <td></td>
+                      <td>{{ callQuotation.CallingQuotationDate }}</td>
+                      <td>{{ callQuotation.createdby }}</td>
+                      <td>{{ callQuotation.actuallDoneDate }}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td>{{ callQuotation.awadingtargetdate }}</td>
+                      <td>{{ callQuotation.remarks }}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                       <td>
-                        <span class="notify-status">Waiting Approval</span>
+                        <span class="notify-status">{{ callQuotation.status }}</span>
                       </td>
                     </tr>
                   </tbody>
@@ -119,11 +117,13 @@
         </md-card>
       </div>
     </div>
+    <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
   </div>
 </template>
 
 <script>
 import { ref } from "vue";
+import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 
 export default {
   props: {
@@ -137,137 +137,51 @@ export default {
       show: ref(false),
       searchQuery: "",
       openedDropdown: null,
-      item: [
-        {
-          id: 1,
-          category: "",
-          trade: "Waterprofing",
-          location: "Location",
-          noquote: "2",
-          actualCalling: "11-Sep-24",
-          prepareby: "chowps",
-          actualDonedate: "20-Sep-24",
-          checkby1: "22-Sep-24",
-          checkBy2: "22-Sep-24",
-          checkBy3: "22-Sep-24",
-          awardingTarget: "",
-          remarks: "",
-          awardedto: "",
-          LAref: "",
-          costSaving: "0.00",
-        },
-        {
-          id: 2,
-          category: "",
-          trade: "Setting Out",
-          location: "Location",
-          noquote: "2",
-          actualCalling: "11-Sep-24",
-          prepareby: "chowps",
-          actualDonedate: "20-Sep-24",
-          checkby1: "22-Sep-24",
-          checkBy2: "22-Sep-24",
-          checkBy3: "22-Sep-24",
-          awardingTarget: "",
-          remarks: "",
-          awardedto: "",
-          LAref: "",
-          costSaving: "0.00",
-        },
-        {
-          id: 3,
-          category: "",
-          trade: "CAR & WC",
-          location: "Location",
-          noquote: "2",
-          actualCalling: "11-Sep-24",
-          prepareby: "chowps",
-          actualDonedate: "20-Sep-24",
-          checkby1: "22-Sep-24",
-          checkBy2: "22-Sep-24",
-          checkBy3: "22-Sep-24",
-          awardingTarget: "",
-          remarks: "",
-          awardedto: "",
-          LAref: "",
-          costSaving: "0.00",
-        },
-        {
-          id: 4,
-          category: "",
-          trade: "Temp. Water",
-          location: "Location",
-          noquote: "2",
-          actualCalling: "11-Sep-24",
-          prepareby: "chowps",
-          actualDonedate: "20-Sep-24",
-          checkby1: "22-Sep-24",
-          checkBy2: "22-Sep-24",
-          checkBy3: "22-Sep-24",
-          awardingTarget: "",
-          remarks: "",
-          awardedto: "",
-          LAref: "",
-          costSaving: "0.00",
-        },
-        {
-          id: 5,
-          category: "",
-          trade: "Signboard",
-          location: "Location",
-          noquote: "2",
-          actualCalling: "11-Sep-24",
-          prepareby: "chowps",
-          actualDonedate: "20-Sep-24",
-          checkby1: "22-Sep-24",
-          checkBy2: "22-Sep-24",
-          checkBy3: "22-Sep-24",
-          awardingTarget: "",
-          remarks: "",
-          awardedto: "",
-          LAref: "",
-          costSaving: "0.00",
-        },
-        {
-          id: 6,
-          category: "",
-          trade: "CIDB",
-          location: "Location",
-          noquote: "2",
-          actualCalling: "11-Sep-24",
-          prepareby: "chowps",
-          actualDonedate: "20-Sep-24",
-          checkby1: "22-Sep-24",
-          checkBy2: "22-Sep-24",
-          checkBy3: "22-Sep-24",
-          awardingTarget: "",
-          remarks: "",
-          awardedto: "",
-          LAref: "",
-          costSaving: "0.00",
-        },
-      ],
+      projectName: "",
+      errorMessage: "",
+      callQuotation: [],
     };
   },
   computed: {
-    SearchTabledata() {
-      let searchData = this.item;
+    SearchcallQuotation() {
+      let searchData = this.callQuotation;
 
-      // Apply search filter
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase().trim();
         searchData = searchData.filter(
-          (item) =>
-            item.trade.toLowerCase().includes(query) ||
-            item.name.toLowerCase().includes(query) ||
-            item.prepareby.toLowerCase().includes(query)
+          (callQuotation) =>
+            callQuotation.trade.toLowerCase().includes(query) ||
+            callQuotation.tradeCategory.toLowerCase().includes(query) ||
+            callQuotation.location.toLowerCase().includes(query)
         );
       }
-
       return searchData;
     },
   },
+  mounted() {
+    const projectName = localStorage.getItem('projectName');
+    if (projectName) {
+      this.projectName = projectName;
+    } else {
+      console.error('Project ID not found in localStorage');
+    };
+    this.accessCQ();
+  },
   methods: {
+    async accessCQ() {
+      try {
+        const processedData = await CallofQuotationController.accessCQ();
+
+        if (processedData.length > 0) {
+          this.callQuotation = processedData;
+          
+        } else {
+          this.errorMessage = "An error occurred while fetching projects.";
+        }
+      } catch (error) {
+        this.errorMessage = "Error fetching data: " + error.errorMessage;
+      }
+    },
     closeOtherDropDowns(clickedItem) {
       if (this.openedDropdown && this.openedDropdown !== clickedItem) {
         this.openedDropdown.dropdown.closeDropDown();

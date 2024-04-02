@@ -1,4 +1,4 @@
-import { axios,Error, API } from "@/services";
+import { axios,Error, config } from "@/services";
 import LoginModel from "@/models/LoginModels";
 
 const LoginController = {
@@ -9,7 +9,7 @@ const LoginController = {
     }
 
     try {
-      const apiHost = API.getHost();
+      const apiHost = config.getHost();
       const response = await axios.post(`${apiHost}/login`, {
         username,
         password,
