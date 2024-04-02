@@ -67,7 +67,14 @@ export default {
       if (success) {
         store.dispatch('setToken', { token, username, accesslevel });
         
-        this.$router.push({ name: 'Call For Quotation' });
+        const projectId = localStorage.getItem('projectId');
+        const projectName = localStorage.getItem('projectName');
+        
+        if (!projectId || !projectName) {
+          this.$router.push({ name: 'Project List' });
+        } else {
+          this.$router.push({ name: 'Call For Quotation' });
+        }
         
       } else {
        this.$refs.errorModal.openModal('Error Message',message);
