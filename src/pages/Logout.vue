@@ -25,14 +25,17 @@
     <div class="login">
       <form>
         <div class="logo">
-          <a href="#" class="simple-text">
-            <img
-              src="@/assets/img/subcon-logo.png"
-              alt=""
-              style="margin-left: 10px"
-            />
-          </a>
+          <img
+            src="@/assets/img/subcon-logo.png"
+            alt=""
+            style="margin-left: 10px"
+          />
         </div>
+        <img
+          src="@/assets/img/logout.png"
+          alt=""
+          style="margin-left: 152px;width: 20%;margin-top: 10px;"
+        />
         <h4 style="text-align: center; margin-top: 30px; margin-bottom: 30px">
           You are Logged Out.
         </h4>

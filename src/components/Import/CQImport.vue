@@ -38,6 +38,16 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-for="(formData, index) in formDataList" :key="index" :class="{ 'selected-row': formData.selected }">
+            <td><input type="checkbox" v-model="formData.selected"></td>
+            <td>{{ formData.tradeCategory }}</td>
+            <td>{{ formData.trade }}</td>
+            <td>{{ formData.location }}</td>
+            <td>{{ formData.budgetAmount }}</td>
+            <td>{{ formData.callingquotationDate }}</td>
+            <td>{{ formData.awadingtaget }}</td>
+            <td>{{ formData.remarks }}</td>
+          </tr>
           <tr
             v-for="(row, index) in importedData"
             :key="index"
@@ -55,15 +65,19 @@
         </tbody>
       </table>
     </div>
-    <br />
-    <button type="submit" class="btn-save">Save</button><br /><br />
   </div>
 </template>
-
 <script>
 import Import from "papaparse";
+import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 
 export default {
+  props: {
+    formDataList: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       importedData: [],
@@ -75,6 +89,24 @@ export default {
     filteredColumns() {
       return this.columnTitles.filter((title) => !this.isBooleanColumn(title));
     },
+  },
+  watch: {
+    formDataList: {
+      handler(newValue) {
+        const selectedFormDataList = newValue.filter(formData => formData.selected);
+        const selectedImportedData = this.importedData.filter(row => row.selected);
+        this.emitSelectedData(selectedFormDataList, selectedImportedData);
+      },
+      deep: true
+    },
+    importedData: {
+      handler(newValue) {
+        const selectedFormDataList = this.formDataList.filter(formData => formData.selected);
+        const selectedImportedData = newValue.filter(row => row.selected);
+        this.emitSelectedData(selectedFormDataList, selectedImportedData);
+      },
+      deep: true
+    }
   },
   methods: {
     projectUpload(event) {
@@ -94,12 +126,15 @@ export default {
       this.importedData.forEach((row) => {
         row.selected = this.selectAll;
       });
+      this.formDataList.forEach((formData) => {
+        formData.selected = this.selectAll;
+      });
     },
     displayValue(value, key) {
       if (typeof value === "boolean") {
-        return ""; // Hide boolean columns
+        return ""; 
       }
-      return value; // Show non-boolean columns
+      return value; 
     },
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
@@ -113,28 +148,26 @@ export default {
       window.open(filePath, "_blank");
     },
     downloadExcelTemplate() {
-      // Fetch the CSV file using Axios
       axios
         .get("@/assets/template/summary-template.csv", { responseType: "blob" })
         .then((response) => {
-          // Create a Blob object from the response data
+          
           const blob = new Blob([response.data], { type: "text/csv" });
 
-          // Create a temporary anchor element
           const link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
           link.download = "excel_template.csv";
 
-          // Programmatically click the anchor element to trigger the download
           link.click();
-
-          // Remove the temporary anchor element
           link.remove();
         })
         .catch((error) => {
           console.error("Error fetching the CSV file:", error);
         });
     },
+    emitSelectedData(selectedFormDataList, selectedImportedData) {
+      this.$emit('data-saved', { selectedFormDataList, selectedImportedData });
+    }
   },
 };
 </script>

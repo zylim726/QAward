@@ -22,23 +22,21 @@
           @focus="onInputFocus('Permission')"
         />
       </div>
-    </div>
+      <button
+      class="btn-save"
+      aria-label="close"
+      @click.stop="closeModal"
+    >
+      Close
+    </button>
     <button
       class="btn-save"
       aria-label="close"
       @click.stop="saveAndCloseModal"
-      style="margin-top: 228px; margin-left: -164px"
     >
       Save
     </button>
-    <button
-      class="btn-save"
-      aria-label="close"
-      @click.stop="closeModal"
-      style="margin-top: 228px"
-    >
-      Close
-    </button>
+    </div>
   </div>
 </template>
 

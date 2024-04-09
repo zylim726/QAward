@@ -12,8 +12,10 @@
         <md-card>
           <md-card-content>
             <div>
+              <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+              <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+              <br>
               <div class="container">
-                <!-- Search bar -->
                 <div class="search-container">
                   <form class="Searchbar">
                     <input
@@ -24,7 +26,6 @@
                   </form>
                 </div>
 
-                <!-- Filter -->
                 <div class="filter-container" style="margin-right: -15px">
                   <a href="createcq"
                     ><md-icon class="mdIcon" style="margin-right: 15px"
@@ -51,6 +52,9 @@
                       <th>Remarks</th>
                       <th>Awarded to</th>
                       <th>LA Ref</th>
+                      <th>LA Date</th>
+                      <th>AA Budget Amount (RM)</th>
+                      <th>Subcontract Amount (RM)</th>
                       <th>Cost Saving / (Overrun) (RM)</th>
                       <th style="text-align: center">Status</th>
                     </tr>
@@ -59,10 +63,12 @@
                       <th>Mr Lim</th>
                       <th>Mr Khew</th>
                       <th>Mr Chuah</th>
-                      <th colspan="8"></th>
+                      <th colspan="11"></th>
                     </tr>
                   </thead>
+                  
                   <tbody>
+                    <tr v-if="errorMessage" ><td colspan="21" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td>
                         <li class="md-list-item">
@@ -83,8 +89,8 @@
                               <li>
                                 <a href="comparison">Subcon Comparison</a>
                               </li>
-                              <li><button class="transparentButton" @click="editModal = true" style="margin-left: -6px;">Edit</button></li>
-                              <li><button class="transparentButton" @click="showModal = true" style="margin-left: -6px;">Delete</button></li>
+                              <li><button class="transparentButton"  v-if="hasAccess" @click="editCallQuotation(callQuotation.id)" style="margin-left: -6px;">Edit</button></li>
+                              <li><button class="transparentButton"  v-if="hasAccess" @click="deleteCallQuotation(callQuotation.id)" style="margin-left: -6px;">Delete</button></li>
                             </ul>
                           </drop-down>
                         </li>
@@ -105,6 +111,9 @@
                       <td></td>
                       <td></td>
                       <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                       <td>
                         <span class="notify-status">{{ callQuotation.status }}</span>
                       </td>
@@ -117,9 +126,8 @@
         </md-card>
       </div>
     </div>
-    <EditCQ :edit-modal="editModal" @close="closeEditModal" title="Edit Call of Quotation"></EditCQ>
-    <DeleteCQ :show-modal="showModal" @close="closeModal" title="Delete Call of Quotation"></DeleteCQ>
-    <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
+    <EditCQ :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId"  title="Edit Call of Quotation"></EditCQ>
+    <DeleteCQ :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage" @close="closeModal" :id="deleteId" title="Delete Call of Quotation"></DeleteCQ>
   </div>
 </template>
 
@@ -127,6 +135,8 @@
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { EditCQ,DeleteCQ }  from "@/components";
+import {  Error } from "@/services";
+import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
@@ -149,6 +159,12 @@ export default {
       callQuotation: [],
       editModal: false,
       showModal: false,
+      deleteId: null,
+      editId: null,
+      UpdateMessage: null,
+      FailMessage: null,
+      item: null,
+      hasAccess: false,
     };
   },
   computed: {
@@ -176,6 +192,9 @@ export default {
     };
     this.accessCQ();
   },
+  async created() {
+    await this.checkPermission();
+  },
   methods: {
     async accessCQ() {
       try {
@@ -183,12 +202,15 @@ export default {
 
         if (processedData.length > 0) {
           this.callQuotation = processedData;
-          
         } else {
           this.errorMessage = "An error occurred while fetching projects.";
         }
       } catch (error) {
-        this.errorMessage = "Error fetching data: " + error.errorMessage;
+        if (error.errorMessage === undefined) {
+          this.errorMessage = "Error fetching data: " + Error.getMessage(504);
+        } else {
+          this.errorMessage = "Error fetching data: " + error.errorMessage;
+        }
       }
     },
     closeOtherDropDowns(clickedItem) {
@@ -197,18 +219,53 @@ export default {
       }
       this.openedDropdown = clickedItem;
     },
-    openEditModal() {
+    editCallQuotation(id) {
+      this.editId = id;
       this.editModal = true;
     },
     closeEditModal() {
       this.editModal = false;
     },
-    openModal() {
+    deleteCallQuotation(id) {
+      this.deleteId = id;
       this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
     },
+    ModalMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 1000);
+    },
+    ModalErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 1000);
+    },
+    EditMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    EditErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    async checkPermission() {
+      try {
+        const permission = await checkAccess(); 
+        const accessIds = ['Add/Edit/Delete CQ'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+      } catch (error) {
+        console.error('Error checking permission:', error);
+      }
+    } 
   },
 };
 </script>

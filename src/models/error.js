@@ -7,9 +7,9 @@ const Error = {
       case 500:
         return "Internal server error. Please try again later.";
       case 503:
-        return "Failed to fetch project list:";
+        return "Failed to fetch project lis.:";
       case 504:
-        return "An error occurred while fetching projects.";
+        return "Data is not available.";
       case 505:
         return "No users found";
       case 506:

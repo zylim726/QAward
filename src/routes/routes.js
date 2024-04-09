@@ -59,7 +59,7 @@ const routes = [
 
       {
         path: "userconfig",
-        name: "User Config",
+        name: "User Access",
         component: UserConfig,
         meta: { requiresAuth: true },
       },

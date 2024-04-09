@@ -23,7 +23,7 @@
         <p class="nav-item">Trade List</p>
       </sidebar-link>
       <h4 class="menutitle">Admin</h4>
-      <sidebar-link class="navbar-link" to="/user">
+      <sidebar-link  class="navbar-link" to="/user">
         <md-icon>person</md-icon>
         <p class="nav-item">Admin</p>
       </sidebar-link>
@@ -31,7 +31,7 @@
         <md-icon>manage_accounts</md-icon>
         <p class="nav-item">User Config</p>
       </sidebar-link>
-      <sidebar-link class="navbar-link" to="/accesspermission">
+      <sidebar-link  v-if="hasAccess" to="/accesspermission">
         <md-icon>settings_applications</md-icon>
         <p class="nav-item">Access Permission</p>
       </sidebar-link>
@@ -55,6 +55,7 @@
 import TopNavbar from "./TopNavbar.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "@/pages/Layout/MobileMenu.vue";
+import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
@@ -66,7 +67,22 @@ export default {
     return {
       sidebarBackground: "orange",
       sidebarBackgroundImage: require("@/assets/img/sidebar.jpg"),
+      hasAccess: false,
     };
   },
+  async created() {
+    await this.checkPermission();
+  },
+  methods: {
+    async checkPermission() {
+      try {
+        const permission = await checkAccess(); 
+        const accessIds = ['Access Permission'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+      } catch (error) {
+        console.error('Error checking permission:', error);
+      }
+    } 
+  }
 };
 </script>

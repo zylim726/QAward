@@ -1,5 +1,4 @@
 const config = {
-  // Define your API hosts
   hosts: {
     production: "https://subconbackend.tribit.com.my",
   },

@@ -1,9 +1,11 @@
 <template>
   <md-card-content>
-    <form @submit.prevent="submitForm">
+    <form>
+      <div v-for="(module, index) in modules" :key="index">
       <div class="form-group">
         <label><b>Unit Type:</b></label>
         <input
+        v-model="module.name"
           type="text"
           class="form-control"
           placeholder="Enter Unit Type"
@@ -14,6 +16,7 @@
       <div class="form-group">
         <label><b>Unit Type Quantity:</b></label>
         <input
+        v-model="module.quantity"
           type="text"
           class="form-control"
           placeholder="Enter Unit Type Quantity"
@@ -24,24 +27,33 @@
       <div class="form-group">
         <label><b>ADJ Factor:</b></label>
         <input
+        v-model="module.adjFactor"
           type="text"
           class="form-control"
-          step="0.01"
           placeholder="Enter ADJ Factor"
           required
         />
       </div>
+      </div>
     </form>
-    <button type="submit" class="btn-save">Updated</button><br /><br />
+    <button type="submit" class="btn-save" @click="addUnit">Updated</button><br /><br />
   </md-card-content>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      modules: [{ name: '', quantity: '', adjFactor: '' }]
+    };
+  },
   methods: {
-    submitForm() {
-      // Handle form submission
-    },
+    addUnit() {
+      const formDataUnit = { ...this.modules[0] }; 
+      this.$emit('form-unit', formDataUnit); 
+    }
+   
   },
 };
 </script>
+

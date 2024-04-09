@@ -1,7 +1,7 @@
 // Tables
 import ComparisonTable from "./Tables/ComparisonTable.vue";
 import ApprovalTable from "./Tables/ApprovalTable.vue";
-import LatradeTable from "./Tables/LatradeTable.vue";
+import CreatecqTable from "./Tables/CreatecqTable.vue";
 import UnittypeTable from "./Tables/UnittypeTable.vue";
 import DescriptionTable from "./Tables/DescriptionTable.vue";
 import VendorTable from "./Tables/VendorTable.vue";
@@ -14,22 +14,21 @@ import PermissionTable from "./Tables/PermissionTable.vue";
 import Modal from "./Modal/Modal.vue";
 import SubmitModal from "./Modal/SubmitModal.vue";
 import Createpermission from "./Modal/Createpermission.vue";
-import Editpermission from "./Modal/Editpermission.vue";
 import DeleteCQ from "./Modal/DeleteCQ.vue";
 import EditCQ from "./Modal/EditCQ.vue";
 
 // IMPORT
 import UnittypeImport from "./Import/UnittypeImport.vue";
-import LaImport from "./Import/LaImport.vue";
+import CQImport from "./Import/CQImport.vue";
 import DescriptionImport from "./Import/DescriptionImport.vue";
 import QuotationImport from "./Import/QuotationImport.vue";
 
 export {
   ComparisonTable,
   ApprovalTable,
-  LaImport,
+  CQImport,
   Modal,
-  LatradeTable,
+  CreatecqTable,
   UnittypeTable,
   UnittypeImport,
   DescriptionImport,
@@ -42,7 +41,6 @@ export {
   AccessuserTable,
   PermissionTable,
   Createpermission,
-  Editpermission,
   DeleteCQ,
   EditCQ
 };

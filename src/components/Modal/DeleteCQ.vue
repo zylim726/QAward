@@ -1,83 +1,66 @@
 <template>
   <div class="modal" :class="{ 'is-active': showModal }">
     <div class="modal-background" @click="closeModal"></div>
-    <div class="modal-content" style="height: 40%; width: 25%">
+    <div class="modal-content" style="width: 25%">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
         <hr style="margin-top: -10px" />
         <br />
-        <input
-          type="text"
-          v-model="module"
-          placeholder="module"
-          class="typeInput"
-          @focus="onInputFocus('Module')"
-        />
-        <input
-          type="text"
-          v-model="permission"
-          placeholder="permission"
-          class="typeInput"
-          @focus="onInputFocus('Permission')"
-        />
-      </div>
-    </div>
-    <button
-      class="btn-save"
-      aria-label="close"
-      @click.stop="saveAndcloseModal"
-      style="margin-top: 228px; margin-left: -164px"
-    >
-      Save
-    </button>
-    <button
+        <md-icon style="text-align: center;font-size: 79px !important;margin-left: 47%;color: red;margin-top: 19px;">highlight_off</md-icon>
+        <p class="Inforrsubtitle" style="margin-top: 50px;">Please confirm deletion of the data !</p>
+      <button
       class="btn-save"
       aria-label="close"
       @click.stop="closeModal"
-      style="margin-top: 228px"
     >
       Close
     </button>
+    <button
+      class="btn-save"
+      aria-label="close"
+      @click.stop="saveAndCloseModal(id)"
+    >
+      OK
+    </button>
+    </div>
+    </div>
   </div>
 </template>
 
 <script>
-import PermissionController from "@/services/controllers/PermissionController.js";
+import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+
 export default {
   props: {
     showModal: Boolean,
     title: String,
+    id: Number 
   },
   data() {
     return {
-      module: "",
-      permission: "",
     };
   },
   methods: {
     closeModal() {
       this.$emit("close");
-      this.module = "";
-      this.permission = "";
     },
-    saveAndcloseModal() {
-      this.addPermissionToServer(this.module, this.permission);
+    saveAndCloseModal(id) {
+      this.removeCQ(id);
       this.closeModal();
     },
-    onInputFocus(input) {},
-    async addPermissionToServer(module, permission) {
+    async removeCQ(id) {
       try {
-        const UpdateMessage = await PermissionController.addPermission(module, permission);
+        const UpdateMessage = await CallofQuotationController.removeCQ(id);
         this.$emit('message', UpdateMessage);
         setTimeout(function() {
             window.location.reload();
-        }, 500); 
+        }, 1000); 
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       }
-    },
+    }
   },
 };
 </script>

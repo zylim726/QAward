@@ -46,7 +46,6 @@ const PermissionController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
   
-      // Fetch all permissions
       const response = await axios.get(`${apiHost}/access_permission`, {
         headers,
       });
@@ -58,13 +57,11 @@ const PermissionController = {
         const dataArray = responseData.data;
         const promises = [];
   
-        // Check if any permission matches the provided criteria
         const permissionExists = dataArray.some(item => {
           return item.access_level === accesslevel && item.permission === permission && item.module === module;
         });
   
         if (permissionExists) {
-          // If permission exists, remove it
           promises.push(
             axios.delete(`${apiHost}/access_permission/remove/${accesslevel}/${permission}`, { headers })
           );
@@ -79,10 +76,8 @@ const PermissionController = {
           );
         }
   
-        // Wait for all promises to resolve
         const results = await Promise.all(promises);
   
-        // Process results
         results.forEach(result => {
           message = result.data.message;
           console.log(message);
@@ -91,7 +86,6 @@ const PermissionController = {
   
       return message;
     } catch (error) {
-      // Handle errors
       console.error('Error updating permission:', error);
       throw { errorMessage: 'An error occurred while updating permission.' };
     }

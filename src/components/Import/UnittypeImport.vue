@@ -39,6 +39,12 @@
             </tr>
           </thead>
           <tbody>
+            <tr v-for="(formDataUnit, index) in formDataUnitList" :key="index" :class="{ 'selected-row': formDataUnit.selected }">
+              <td><input type="checkbox" v-model="formDataUnit.selected"></td>
+              <td>{{ formDataUnit.name }}</td>
+              <td>{{ formDataUnit.quantity }}</td>
+              <td>{{ formDataUnit.adjFactor }}</td>
+            </tr>
             <tr
               v-for="(unit, index) in importUnittype"
               :key="index"
@@ -57,7 +63,7 @@
         </table>
       </div> </md-card-content
     ><br />
-    <button type="submit" class="btn-save">Save</button><br /><br />
+    <button type="submit" class="btn-save" @click="saveData" >Save</button><br /><br />
   </div>
 </template>
 
@@ -65,6 +71,20 @@
 import Import from "papaparse";
 
 export default {
+  props: {
+    formDataUnitList: {
+      type: Array,
+      default: () => []
+    },
+    selectedFormDataList: {
+      type: Array,
+      default: () => []
+    },
+    selectedImportedData: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       importUnittype: [],
@@ -94,6 +114,9 @@ export default {
     selectAllRows() {
       this.importUnittype.forEach((unit) => {
         unit.selected = this.selectAll;
+      });
+      this.formDataUnitList.forEach((formDataUnit) => {
+        formDataUnit.selected = this.selectAll;
       });
     },
     displayValue(value, key) {
@@ -136,6 +159,43 @@ export default {
           console.error("Error fetching the CSV file:", error);
         });
     },
+    // async addUnit(selectedFormDataList, selectedImportedData) {
+    //   try {
+    //     console.log('Checking to see data', selectedFormDataList, selectedImportedData);
+    //     const UpdateMessage = await CallofQuotationController.addUnit(selectedFormDataList, selectedImportedData);
+    //     this.$emit('message', UpdateMessage);
+
+    //     selectedFormDataList.forEach(formData => {
+    //       const index = this.formDataList.indexOf(formData);
+    //       if (index !== -1) {
+    //         this.formDataList.splice(index, 1);
+    //       }
+    //     });
+
+    //     selectedImportedData.forEach(importedRow => {
+    //       const index = this.importedData.indexOf(importedRow);
+    //       if (index !== -1) {
+    //         this.importedData.splice(index, 1);
+    //       }
+    //     });
+
+    //   } catch (error) {
+    //     const FailMessage = "Error updating access permission: " + error.errorMessage;
+    //     this.$emit('fail-message', FailMessage);
+    //   }
+    // },
+    saveData() {
+      const selectedUnitList = this.formDataUnitList.filter(formDataUnit => formDataUnit.selected);
+      const selectedImportUnit = this.importUnittype.filter(unit => unit.selected);
+
+      console.log('Selected Form Data List:', this.selectedFormDataList);
+      console.log('Selected Imported Data:', this.selectedImportedData);
+      console.log('Form Data Unit List:', selectedUnitList);
+      console.log('Imported Unit Type:', selectedImportUnit);
+
+      // Now you can perform further operations with these data sets as needed
+      //this.$emit('data-saved', { selectedFormDataList, selectedImportedData });
+    }
   },
 };
 </script>

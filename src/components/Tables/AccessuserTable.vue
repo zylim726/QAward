@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }}</div>
-    <div v-if="FailMessage" class="notification fail">{{ FailMessage }}</div>
+    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
@@ -88,8 +88,14 @@ export default {
       try {
         const message  = await AccessUserController.updateUserLoginAllowed(user);
         this.UpdateMessage = message;
+        setTimeout(() => {
+          window.location.reload();
+      }, 2000);
       } catch (error) {
-        this.FailMessage = "Error updating login access: " + error.errorMessage;
+        this.FailMessage = "Error updating access: " + error.errorMessage;
+        setTimeout(() => {
+          window.location.reload();
+      }, 2000);
       }
     },
     filterUsers() {},

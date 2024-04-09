@@ -10,7 +10,7 @@ const ProjectController = {
 
       const processedData = ProjectModels.processResponseData(response.data);
 
-      console.log(processedData);
+      console.log('Checking',processedData);
 
       return {
         data: processedData,
