@@ -23,37 +23,6 @@ const CallofQuotationController = {
       
     }
   },
-  async addCQ(selectedFormDataList, selectedImportedData) {
-    try {
-      const apiHost = config.getHost();
-      const headers = config.getHeadersWithToken(); 
-      const projectId = localStorage.getItem('projectId');
-
-      const combinedData = [...selectedFormDataList, ...selectedImportedData];
-
-      for (const data of combinedData) {
-        const response = await axios.post(`${apiHost}/call_for_quotation/add`, {
-          trade_category: data.tradeCategory,
-          trade: data.trade,
-          trade_location1: data.location,
-          actual_calling_quotation_date: data.CallingQuotationDate,
-          awading_target_date: data.awadingtaget,
-          remarks: data.remarks,
-          status: 'Pending',
-          project_id: projectId
-        }, {
-          headers,
-        });
-
-        return response.data.message;
-      }
-    } catch (error) {
-      const errorMessage = error.response.data.message;
-    
-      throw { errorMessage };
-      
-    }
-  },
   async removeCQ(id) {
     try {
       const apiHost = config.getHost();
@@ -107,29 +76,50 @@ const CallofQuotationController = {
         throw { errorMessage };
     }
   },
-  async addUnit(selectedFormDataList, selectedImportedData) {
+  async addUnit(parentFormData, transformedCQImport, selectedUnit, transformedImportUnit) {
     try {
-      console.log('CheckAPI',selectedFormDataList,selectedImportedData)
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
+      const combinedCQData = [...parentFormData, ...transformedCQImport];
+      const combinedUnitData = [...selectedUnit, ...transformedImportUnit];
+      const projectId = localStorage.getItem('projectId');
 
-      const combinedData = [...selectedFormDataList, ...selectedImportedData];
-
-      for (const data of combinedData) {
-        const response = await axios.post(`${apiHost}/cq_unit_type/add`, {
-          type: data.type,
-          adj_factor: data.adjFactor,
-          quantity: data.quantity,
-          call_for_quotation: data.CallingQuotationDate,
+      for (const formData of combinedCQData) {
+        const cqResponse = await axios.post(`${apiHost}/call_for_quotation/add`, {
+          trade_category: formData.tradeCategory,
+          trade: formData.trade,
+          trade_location1: formData.location,
+          actual_calling_quotation_date: formData.CallingQuotationDate,
+          awading_target_date: formData.awadingtaget,
+          remarks: formData.remarks,
+          status: 'Pending',
+          project_id: projectId
         }, {
           headers,
         });
+        const cqId = cqResponse.data.data.id;
 
-        return response.data.message;
+        const unitRequests = [];
+        for (const unitData of combinedUnitData) {
+          const unitRequest = axios.post(`${apiHost}/cq_unit_type/add`, {
+            type: unitData.type,
+            adj_factor: unitData.adjFactor,
+            quantity: unitData.quantity,
+            call_for_quotation_id: cqId,
+          }, { headers });
+
+          unitRequests.push(unitRequest);
+        }
+        
+        await Promise.all(unitRequests);
+        const unitResponses = await Promise.all(unitRequests);
+
+        const UpdateMessage = unitResponses.map(response => response.data.message);
+        return UpdateMessage.join(', ');
+
       }
     } catch (error) {
       const errorMessage = error.response.data.message;
-    
       throw { errorMessage };
       
     }

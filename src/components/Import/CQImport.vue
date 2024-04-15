@@ -69,7 +69,6 @@
 </template>
 <script>
 import Import from "papaparse";
-import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 
 export default {
   props: {
@@ -93,17 +92,17 @@ export default {
   watch: {
     formDataList: {
       handler(newValue) {
-        const selectedFormDataList = newValue.filter(formData => formData.selected);
+        const selectedFormData = newValue.filter(formData => formData.selected);
         const selectedImportedData = this.importedData.filter(row => row.selected);
-        this.emitSelectedData(selectedFormDataList, selectedImportedData);
+        this.emitSelectedData(selectedFormData, selectedImportedData);
       },
       deep: true
     },
     importedData: {
       handler(newValue) {
-        const selectedFormDataList = this.formDataList.filter(formData => formData.selected);
+        const selectedFormData = this.formDataList.filter(formData => formData.selected);
         const selectedImportedData = newValue.filter(row => row.selected);
-        this.emitSelectedData(selectedFormDataList, selectedImportedData);
+        this.emitSelectedData(selectedFormData, selectedImportedData);
       },
       deep: true
     }
@@ -119,8 +118,8 @@ export default {
       });
     },
     importData(data) {
-      this.importedData = data;
-      this.columnTitles = Object.keys(data[0]);
+      this.importedData = this.importedData.concat(data);
+      this.columnTitles = Object.keys(this.importedData[0]);
     },
     selectAllRows() {
       this.importedData.forEach((row) => {
@@ -165,8 +164,8 @@ export default {
           console.error("Error fetching the CSV file:", error);
         });
     },
-    emitSelectedData(selectedFormDataList, selectedImportedData) {
-      this.$emit('data-saved', { selectedFormDataList, selectedImportedData });
+    emitSelectedData(selectedFormData, selectedImportedData) {
+      this.$emit('data-saved', { selectedFormData, selectedImportedData });
     }
   },
 };

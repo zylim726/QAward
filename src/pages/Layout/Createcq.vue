@@ -39,7 +39,14 @@
         class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-75"
       >
         <md-card>
-          <unittype-import :formDataUnitList="formDataUnitList"></unittype-import>
+          <unittype-import
+          :formDataUnitList="formDataUnitList"  
+          :selectedFormData="selectedFormData" 
+          :selectedImportedData="selectedImportedData"
+          @data-saved="CQImportData"
+          @message="ImportMessage" 
+          @fail-message="ImportErrorMessage"
+          ></unittype-import>
         </md-card>
       </div>
     </div>
@@ -67,8 +74,9 @@ export default {
       formDataUnitList: [],
       UpdateMessage: null,
       FailMessage: null,
-      selectedFormDataList: [],
+      selectedFormData: [],
       selectedImportedData: [],
+      updateCQData: [],
     };
   },
   methods: {
@@ -79,22 +87,23 @@ export default {
       this.formDataUnitList.push(formDataUnit);
     },
     CQImportData(data) {
-      this.selectedFormDataList = data.selectedFormDataList;
-      this.selectedImportedData = data.selectedImportedData;
-      console.log('Selected Data:', this.selectedFormDataList);
-      console.log('Selected Imported Data:', this.selectedImportedData);
+      const combinedDataForm =  [...new Set([...this.selectedFormData, ...data.selectedFormData])];
+      const combinedDataImport =  [...new Set([...this.selectedImportedData, ...data.selectedImportedData])];
+      this.selectedFormData = combinedDataForm;
+      this.selectedImportedData = combinedDataImport;
     },
     ImportMessage(message) {
       this.UpdateMessage = message; 
       setTimeout(() => {
         this.UpdateMessage = '';
+        window.location.reload();
       }, 1000);
     },
     ImportErrorMessage(message) {
       this.FailMessage = message; 
       setTimeout(() => {
         this.FailMessage = '';
-      }, 1000);
+      }, 2000);
     },
   }
 };

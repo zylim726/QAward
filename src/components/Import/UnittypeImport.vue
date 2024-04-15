@@ -41,12 +41,12 @@
           <tbody>
             <tr v-for="(formDataUnit, index) in formDataUnitList" :key="index" :class="{ 'selected-row': formDataUnit.selected }">
               <td><input type="checkbox" v-model="formDataUnit.selected"></td>
-              <td>{{ formDataUnit.name }}</td>
+              <td>{{ formDataUnit.type }}</td>
               <td>{{ formDataUnit.quantity }}</td>
               <td>{{ formDataUnit.adjFactor }}</td>
             </tr>
             <tr
-              v-for="(unit, index) in importUnittype"
+              v-for="(unit, index) in importUnitlist"
               :key="index"
               :class="{ 'selected-row': unit.selected }"
             >
@@ -69,6 +69,8 @@
 
 <script>
 import Import from "papaparse";
+import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+import axios from 'axios';
 
 export default {
   props: {
@@ -76,7 +78,7 @@ export default {
       type: Array,
       default: () => []
     },
-    selectedFormDataList: {
+    selectedFormData: {
       type: Array,
       default: () => []
     },
@@ -87,7 +89,7 @@ export default {
   },
   data() {
     return {
-      importUnittype: [],
+      importUnitlist: [],
       columnTitles: [],
       selectAll: false,
     };
@@ -108,11 +110,11 @@ export default {
       });
     },
     importData(data) {
-      this.importUnittype = data;
-      this.columnTitles = Object.keys(data[0]);
+      this.importUnitlist = this.importUnitlist.concat(data);
+      this.columnTitles = Object.keys(this.importUnitlist[0]);
     },
     selectAllRows() {
-      this.importUnittype.forEach((unit) => {
+      this.importUnitlist.forEach((unit) => {
         unit.selected = this.selectAll;
       });
       this.formDataUnitList.forEach((formDataUnit) => {
@@ -126,20 +128,12 @@ export default {
       return value; // Show non-boolean columns
     },
     isBooleanColumn(key) {
-      return this.importUnittype.some((unit) => typeof unit[key] === "boolean");
-    },
-    openCSV() {
-      console.log("Button clicked");
-
-      const filePath =
-        "file:///C:/Users/zylim/Desktop/Project%20Subcon%20Comparison/src/assets/template/unittype-template.csv";
-
-      window.open(filePath, "_blank");
+      return this.importUnitlist.some((unit) => typeof unit[key] === "boolean");
     },
     downloadExcelTemplate() {
       // Fetch the CSV file using Axios
       axios
-        .get("@/assets/template/summary-template.csv", { responseType: "blob" })
+        .get(require("@/assets/template/unittype-template.csv"), { responseType: "blob" })
         .then((response) => {
           // Create a Blob object from the response data
           const blob = new Blob([response.data], { type: "text/csv" });
@@ -159,42 +153,44 @@ export default {
           console.error("Error fetching the CSV file:", error);
         });
     },
-    // async addUnit(selectedFormDataList, selectedImportedData) {
-    //   try {
-    //     console.log('Checking to see data', selectedFormDataList, selectedImportedData);
-    //     const UpdateMessage = await CallofQuotationController.addUnit(selectedFormDataList, selectedImportedData);
-    //     this.$emit('message', UpdateMessage);
+    async saveData() {
+      const selectedUnit = this.formDataUnitList.filter(formDataUnit => formDataUnit.selected);
+      const selectedImportUnit = this.importUnitlist.filter(unit => unit.selected);
+      const parentFormData = this.selectedFormData;
+      const parentImportData = this.selectedImportedData;
 
-    //     selectedFormDataList.forEach(formData => {
-    //       const index = this.formDataList.indexOf(formData);
-    //       if (index !== -1) {
-    //         this.formDataList.splice(index, 1);
-    //       }
-    //     });
+      if (parentFormData.length === 0 || parentImportData.length === 0) {
+        const FailMessage = "Error: No data selected to save.";
+        this.$emit('fail-message', FailMessage);
+        window.scrollTo(0, 0); 
+        return; 
+      }
 
-    //     selectedImportedData.forEach(importedRow => {
-    //       const index = this.importedData.indexOf(importedRow);
-    //       if (index !== -1) {
-    //         this.importedData.splice(index, 1);
-    //       }
-    //     });
+      const transformedCQImport = parentImportData.map(unit => ({
+        tradeCategory: unit["category"],
+        trade: unit["trade"],
+        location: unit["location 1"],
+        budgetAmount: unit["AA Budget Amount"],
+        callingquotationDate: unit["Actuall Calling Quotation Date"],
+        awadingtargetDate: unit["Awading Target Date"],
+        remarks: unit["Remarks"],
+      }));
 
-    //   } catch (error) {
-    //     const FailMessage = "Error updating access permission: " + error.errorMessage;
-    //     this.$emit('fail-message', FailMessage);
-    //   }
-    // },
-    saveData() {
-      const selectedUnitList = this.formDataUnitList.filter(formDataUnit => formDataUnit.selected);
-      const selectedImportUnit = this.importUnittype.filter(unit => unit.selected);
+      const transformedImportUnit = selectedImportUnit.map(unit => ({
+        type: unit["Unit Type"],
+        quantity: unit["Unit Type Quantity"],
+        adjFactor: unit["ADJ Factor"]
+      }));
+      try {
+        const UpdateMessage = await CallofQuotationController.addUnit(parentFormData, transformedCQImport, selectedUnit, transformedImportUnit);
+        window.scrollTo(0, 0); 
+        this.$emit('message', UpdateMessage);
 
-      console.log('Selected Form Data List:', this.selectedFormDataList);
-      console.log('Selected Imported Data:', this.selectedImportedData);
-      console.log('Form Data Unit List:', selectedUnitList);
-      console.log('Imported Unit Type:', selectedImportUnit);
-
-      // Now you can perform further operations with these data sets as needed
-      //this.$emit('data-saved', { selectedFormDataList, selectedImportedData });
+      } catch (error) {
+        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        window.scrollTo(0, 0); 
+        this.$emit('fail-message', FailMessage);
+      }
     }
   },
 };
