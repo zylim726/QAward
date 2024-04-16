@@ -15,6 +15,10 @@
     >
       <md-icon class="mdIcon">download_for_offline</md-icon>
     </button>
+    <a href="/assets/template/la-template.csv" download="excel_template.csv">Download Excel Template</a>
+
+
+
     <div class="projectTable-container">
       <table class="project-table">
         <thead>
@@ -71,6 +75,7 @@
 <script>
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+import axios from 'axios';
 
 export default {
   props: {
@@ -124,20 +129,20 @@ export default {
     },
     downloadExcelTemplate() {
       axios
-        .get("@/assets/template/summary-template.csv", { responseType: "blob" })
-        .then((response) => {
-          const blob = new Blob([response.data], { type: "text/csv" });
+      .get("@/assets/template/la-template.csv", { responseType: "blob" })
+      .then((response) => {
+        const blob = new Blob([response.data], { type: "text/csv" });
 
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = "excel_template.csv";
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "excel_template.csv";
 
-          link.click();
-          link.remove();
-        })
-        .catch((error) => {
-          console.error("Error fetching the CSV file:", error);
-        });
+        link.click();
+        link.remove();
+      })
+      .catch((error) => {
+        console.error("Error fetching the CSV file:", error);
+      });
     },
     async saveData() {
       const selectedFormData = this.formDataList.filter(formData => formData.selected);

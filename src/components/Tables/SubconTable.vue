@@ -15,10 +15,10 @@
       </div>
       
       <div class="filter-container" style="margin-right: -15px">
-        <button class="btn-save" @click="showModal = true">
+        <button class="btn-save" @click="showModal = true" v-if="hasAccess">
           Add
         </button>
-        <Createsubcon :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage"  @close="closeModal" title="Create Subcon"></Createsubcon>
+        <Createsubcon :show-modal="showModal"  @message="ModalMessage" @fail-message="ModalErrorMessage"  @close="closeModal" title="Create Subcon"></Createsubcon>
       </div>
     </div>
     <div class="table-container" style="max-height: 700px; overflow-y: auto">
@@ -28,7 +28,7 @@
             <th>No</th>
             <th>Subcon Name</th>
             <th>Update Date</th>
-            <th style="text-align: center;">Action</th>
+            <th style="text-align: center;" v-if="hasAccess">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -36,9 +36,9 @@
             <td>{{ index + 1 }}</td>
             <td>{{ subcon.name }}</td>
             <td>{{ subcon.updatedAt }}</td>
-            <td style="text-align: center">
-              <button class="transparentButton" @click="editSubcon(subcon.id)" style="margin-left: -6px;"><md-icon class="mdIcon">edit</md-icon></button>
-              <button class="transparentButton" @click="deleteSubcon(subcon.id)" style="margin-left: -6px;"><md-icon class="mdIcon">delete</md-icon></button>
+            <td style="text-align: center" v-if="hasAccess">
+              <button class="transparentButton"  @click="editSubcon(subcon.id)" style="margin-left: -6px;"><md-icon class="mdIcon">edit</md-icon></button>
+              <button class="transparentButton"  @click="deleteSubcon(subcon.id)" style="margin-left: -6px;"><md-icon class="mdIcon">delete</md-icon></button>
             </td>
           </tr>
         </tbody>
@@ -52,7 +52,7 @@
 <script>
 import SubconController from "@/services/controllers/SubconController.js";
 import Createsubcon from "@/components/Modal/Createsubcon.vue";
-
+import { checkAccess } from "@/services/axios/accessControl.js";
 export default {
   components: {
     Createsubcon,
@@ -65,7 +65,11 @@ export default {
       UpdateMessage: null,
       FailMessage: null,
       showModal: false,
+      hasAccess: false,
     };
+  },
+  async created() {
+    await this.checkPermission();
   },
   mounted() {
     this.accessSubcon();
@@ -116,6 +120,15 @@ export default {
     ModalErrorMessage(message) {
       this.FailMessage = message; 
     },
+    async checkPermission() {
+      try {
+        const permission = await checkAccess(); 
+        const accessIds = ['Add-Edit-Remove Subcon'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+      } catch (error) {
+        console.error('Error checking permission:', error);
+      }
+    } 
   },
 };
 </script>

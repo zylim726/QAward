@@ -9,7 +9,7 @@
         <br />
         <input
           type="text"
-          v-model="processedData[0].tradeCategory"
+          v-model="processedData[0].trade_category"
           placeholder="Category"
           class="typeInput"
           @focus="onInputFocus('Category')"
@@ -23,28 +23,28 @@
         />
         <input
           type="text"
-          v-model="processedData[0].location"
+          v-model="processedData[0].trade_location1"
           placeholder="Location 1"
           class="typeInput"
           @focus="onInputFocus('Location')"
         />
         <input
           type="text"
-          v-model="processedData[0].budgetAmount"
+          v-model="processedData[0].aa_budget_amount"
           placeholder="AA Budget Amount"
           class="typeInput"
           @focus="onInputFocus('BudgetAmount')"
         />
         <input
           type="date"
-          v-model="processedData[0].CallingQuotationDate"
+          v-model="processedData[0].actual_calling_quotation_date"
           placeholder="Actuall Calling Quotation Date"
           class="typeInput"
           @focus="onInputFocus('ActuallCallingDate')"
         />
         <input
           type="date"
-          v-model="processedData[0].awadingtargetdate"
+          v-model="processedData[0].awading_target_date"
           placeholder="Awading Target Date"
           class="typeInput"
           @focus="onInputFocus('awadingTarget')"
@@ -93,7 +93,7 @@ export default {
   watch: {
     id(newVal) {
       if (newVal !== null) {
-        this.getCQ(newVal);
+        this.getDetailCQ(newVal);
       }
     }
   },
@@ -102,14 +102,15 @@ export default {
       this.$emit("close");
     },
     saveAndCloseModal() {
-      const id = this.processedData[0].id; // Get the id from processedData
-      const updatedData = { ...this.processedData[0] }; // Clone the processedData object
-      this.editCQ(id, updatedData); // Pass id and updatedData to editCQ method
+      const id = this.processedData[0].id; 
+      const updatedData = { ...this.processedData[0] };
+      this.editCQ(id, updatedData); 
       this.closeEditModal();
     },
-    async getCQ(id) {
+    async getDetailCQ(id) {
       try {
-        this.processedData = await CallofQuotationController.getCQ(id);
+        this.processedData = await CallofQuotationController.getDetailCQ(id);
+        console.log('checking',this.processedData);
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);

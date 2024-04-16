@@ -4,7 +4,7 @@
       <div class="row" style="margin-left: 16px">
         <h6>Project Name :</h6>
         <h3 class="titleHeader">{{ projectName }}</h3>
-        <br />
+        <br >
       </div>
       <div
         class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
