@@ -10,8 +10,6 @@ const ProjectController = {
 
       const processedData = ProjectModels.processResponseData(response.data);
 
-      console.log('Checking',processedData);
-
       return {
         data: processedData,
         message: null, 
@@ -30,5 +28,6 @@ const ProjectController = {
     }
   },
 };
+
 
 export default ProjectController;

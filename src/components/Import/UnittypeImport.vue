@@ -41,7 +41,7 @@
           <tbody>
             <tr v-for="(formDataUnit, index) in formDataUnitList" :key="index" :class="{ 'selected-row': formDataUnit.selected }">
               <td><input type="checkbox" v-model="formDataUnit.selected"></td>
-              <td>{{ formDataUnit.type }}</td>
+              <td>{{ formDataUnit.name }}</td>
               <td>{{ formDataUnit.quantity }}</td>
               <td>{{ formDataUnit.adjFactor }}</td>
             </tr>
@@ -69,8 +69,6 @@
 
 <script>
 import Import from "papaparse";
-import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import axios from 'axios';
 
 export default {
   props: {
@@ -131,22 +129,16 @@ export default {
       return this.importUnitlist.some((unit) => typeof unit[key] === "boolean");
     },
     downloadExcelTemplate() {
-      // Fetch the CSV file using Axios
       axios
-        .get(require("@/assets/template/unittype-template.csv"), { responseType: "blob" })
+        .get("@/assets/template/summary-template.csv", { responseType: "blob" })
         .then((response) => {
-          // Create a Blob object from the response data
           const blob = new Blob([response.data], { type: "text/csv" });
 
-          // Create a temporary anchor element
           const link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
           link.download = "excel_template.csv";
 
-          // Programmatically click the anchor element to trigger the download
           link.click();
-
-          // Remove the temporary anchor element
           link.remove();
         })
         .catch((error) => {
@@ -154,43 +146,18 @@ export default {
         });
     },
     async saveData() {
-      const selectedUnit = this.formDataUnitList.filter(formDataUnit => formDataUnit.selected);
-      const selectedImportUnit = this.importUnitlist.filter(unit => unit.selected);
-      const parentFormData = this.selectedFormData;
-      const parentImportData = this.selectedImportedData;
-
-      if (parentFormData.length === 0 || parentImportData.length === 0) {
-        const FailMessage = "Error: No data selected to save.";
-        this.$emit('fail-message', FailMessage);
-        window.scrollTo(0, 0); 
-        return; 
-      }
-
-      const transformedCQImport = parentImportData.map(unit => ({
-        tradeCategory: unit["category"],
-        trade: unit["trade"],
-        location: unit["location 1"],
-        budgetAmount: unit["AA Budget Amount"],
-        callingquotationDate: unit["Actuall Calling Quotation Date"],
-        awadingtargetDate: unit["Awading Target Date"],
-        remarks: unit["Remarks"],
-      }));
-
-      const transformedImportUnit = selectedImportUnit.map(unit => ({
-        type: unit["Unit Type"],
+      const selectedFormData = this.formDataUnitList.filter(formDataUnit => formDataUnit.selected);
+      const selectedImportedData = this.importUnitlist.filter(unit => unit.selected);
+      
+      const transformedCQImport = selectedImportedData.map(unit => ({
+        name: unit["Unit Type"],
         quantity: unit["Unit Type Quantity"],
-        adjFactor: unit["ADJ Factor"]
+        adjFactor: unit["ADJ Factor"],
       }));
-      try {
-        const UpdateMessage = await CallofQuotationController.addUnit(parentFormData, transformedCQImport, selectedUnit, transformedImportUnit);
-        window.scrollTo(0, 0); 
-        this.$emit('message', UpdateMessage);
 
-      } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
-        window.scrollTo(0, 0); 
-        this.$emit('fail-message', FailMessage);
-      }
+      const combinedData = [...selectedFormData, ...transformedCQImport];
+  
+      this.$emit('save-data', combinedData);
     }
   },
 };

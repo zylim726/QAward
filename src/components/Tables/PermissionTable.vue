@@ -86,7 +86,6 @@
 import PermissionController from "@/services/controllers/PermissionController.js";
 import Createpermission  from "@/components/Modal/Createpermission.vue";
 
-
 export default {
   components: {
     Createpermission,
@@ -94,6 +93,7 @@ export default {
   data() {
     return {
       accesss: [],
+      filteredAccesss: [], // Initialize filteredAccesss array
       searchText: "",
       errorMessage: null,
       UpdateMessage: null,
@@ -109,16 +109,9 @@ export default {
     this.accessPermission();
   },
   computed: {
-    filteredUsers() {
-      return this.accesss.filter((access) => {
-        return access.permission
-          .toLowerCase()
-          .includes(this.searchText.toLowerCase());
-      });
-    },
     uniqueModules() {
       const uniqueModules = {};
-      this.accesss.forEach(module => {
+      this.filteredAccesss.forEach(module => {
         if (!uniqueModules[module.module]) {
           uniqueModules[module.module] = {
             module: module.module,
@@ -135,7 +128,7 @@ export default {
     },
     isPermissionChecked() {
       return (permission, module, accesslevel) => {
-        const isChecked = this.accesss.some(item =>
+        const isChecked = this.filteredAccesss.some(item =>
           item.permission === permission &&
           item.accesslevel === accesslevel &&
           item.module === module
@@ -149,6 +142,7 @@ export default {
       try {
         const processedData = await PermissionController.accessPermission();
         this.accesss = processedData;
+        this.filteredAccesss = processedData; 
       } catch (error) {
         this.errorMessage = "Error fetching user data: " + error.errorMessage;
       }
@@ -163,24 +157,22 @@ export default {
       } catch (error) {
         this.FailMessage = "Error updating access: " + error.errorMessage;
         setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+          window.location.reload();
+        }, 2000);
       }
-    },
-    async addPermission() {
-      try {
-        this.UpdateMessage = await PermissionController.addPermission();
-      } catch (error) {
-        this.FailMessage = "Error fetching user data: " + error.errorMessage;
-      }
-    },
-    openModal() {
-      this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
     },
-    filterUsers() {},
+    filterUsers() {
+      // Convert searchText to lowercase for case-insensitive filtering
+      const searchTerm = this.searchText.toLowerCase();
+
+      // Filter accesss data based on searchText
+      this.filteredAccesss = this.accesss.filter(access => {
+        return access.permission.toLowerCase().includes(searchTerm);
+      });
+    },
     ModalMessage(message) {
       this.UpdateMessage = message; 
       setTimeout(() => {

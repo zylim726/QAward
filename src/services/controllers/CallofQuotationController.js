@@ -37,17 +37,14 @@ const CallofQuotationController = {
       throw { errorMessage };
     }
   },
-  async getCQ(id) {
+  async getDetailCQ(id) {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
-
       const response = await axios.get(`${apiHost}/call_for_quotation/${id}`, {
         headers,
       });
-
-      const processedData = CallQuotationModels.processResponseData(response.data);
-      return processedData;
+      return response.data.data;
       
     } catch (error) {
       const errorMessage = error.response.data.message;
@@ -76,14 +73,34 @@ const CallofQuotationController = {
         throw { errorMessage };
     }
   },
-  async addUnit(parentFormData, transformedCQImport, selectedUnit, transformedImportUnit) {
+  async getCQ() {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
-      const combinedCQData = [...parentFormData, ...transformedCQImport];
-      const combinedUnitData = [...selectedUnit, ...transformedImportUnit];
       const projectId = localStorage.getItem('projectId');
+      const response = await axios.get(`${apiHost}/call_for_quotation/showByProject/${projectId}`, {
+        headers,
+      });
 
+      console.log('response',response.data);
+
+      const processedData = CallQuotationModels.processResponseData(response.data);
+      return processedData;
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
+    }
+  },
+  async addCQ(selectedFormData, transformedCQImport) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+      const combinedCQData = [...selectedFormData, ...transformedCQImport];
+      const projectId = localStorage.getItem('projectId');
+      const messages = [];
+  
       for (const formData of combinedCQData) {
         const cqResponse = await axios.post(`${apiHost}/call_for_quotation/add`, {
           trade_category: formData.tradeCategory,
@@ -97,31 +114,48 @@ const CallofQuotationController = {
         }, {
           headers,
         });
-        const cqId = cqResponse.data.data.id;
-
-        const unitRequests = [];
-        for (const unitData of combinedUnitData) {
-          const unitRequest = axios.post(`${apiHost}/cq_unit_type/add`, {
-            type: unitData.type,
-            adj_factor: unitData.adjFactor,
-            quantity: unitData.quantity,
-            call_for_quotation_id: cqId,
-          }, { headers });
-
-          unitRequests.push(unitRequest);
-        }
-        
-        await Promise.all(unitRequests);
-        const unitResponses = await Promise.all(unitRequests);
-
-        const UpdateMessage = unitResponses.map(response => response.data.message);
-        return UpdateMessage.join(', ');
-
+        messages.push(cqResponse.data.message);
       }
+
+      return messages;
+  
     } catch (error) {
       const errorMessage = error.response.data.message;
       throw { errorMessage };
-      
+    }
+  },
+  async addUnit(ids, selectedUnit) {
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        let latestMessage = ''; 
+        
+        for (const innerRow of selectedUnit) {
+          for (const object of innerRow) {
+            for (const id of ids) {
+                try {
+                    const cqResponse = await axios.post(`${apiHost}/cq_unit_type/add`, {
+                        type: object.name,
+                        adj_factor: object.adjFactor,
+                        quantity: object.quantity,
+                        call_for_quotation_id: id 
+                    }, {
+                        headers,
+                    });
+                    
+                    latestMessage = cqResponse.data.message;
+                } catch (error) {
+                    const errorMessage = error.response.data.message;
+                    throw errorMessage;
+                }
+            }
+          }
+        }
+
+        return latestMessage; 
+    } catch (error) {
+        const errorMessage = error.response.data.message;
+        throw errorMessage; 
     }
   },
 };

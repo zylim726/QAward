@@ -52,7 +52,7 @@ const PermissionController = {
   
       const responseData = response.data;
       let message;
-  
+
       if (responseData && responseData.data && Array.isArray(responseData.data)) {
         const dataArray = responseData.data;
         const promises = [];
@@ -60,13 +60,12 @@ const PermissionController = {
         const permissionExists = dataArray.some(item => {
           return item.access_level === accesslevel && item.permission === permission && item.module === module;
         });
-  
+
         if (permissionExists) {
           promises.push(
             axios.delete(`${apiHost}/access_permission/remove/${accesslevel}/${permission}`, { headers })
           );
         } else {
-          // If permission does not exist, add it
           promises.push(
             axios.post(`${apiHost}/access_permission/add`, {
               access_level: accesslevel,

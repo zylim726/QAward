@@ -9,11 +9,14 @@ import TotalTable from "./Tables/TotalTable.vue";
 import ProjectcontrolTable from "./Tables/ProjectcontrolTable.vue";
 import AccessuserTable from "./Tables/AccessuserTable.vue";
 import PermissionTable from "./Tables/PermissionTable.vue";
+import GetcallquotationTable from "./Tables/GetcallquotationTable.vue";
+import SubconTable from "./Tables/SubconTable.vue";
 
 // MODAL
 import Modal from "./Modal/Modal.vue";
 import SubmitModal from "./Modal/SubmitModal.vue";
 import Createpermission from "./Modal/Createpermission.vue";
+import Createsubcon from "./Modal/Createsubcon.vue";
 import DeleteCQ from "./Modal/DeleteCQ.vue";
 import EditCQ from "./Modal/EditCQ.vue";
 
@@ -42,5 +45,8 @@ export {
   PermissionTable,
   Createpermission,
   DeleteCQ,
-  EditCQ
+  EditCQ,
+  GetcallquotationTable,
+  SubconTable,
+  Createsubcon
 };

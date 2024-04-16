@@ -65,10 +65,12 @@
         </tbody>
       </table>
     </div>
+    <button type="submit" class="btn-save" @click="saveData" >Save</button><br /><br />
   </div>
 </template>
 <script>
 import Import from "papaparse";
+import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 
 export default {
   props: {
@@ -88,24 +90,6 @@ export default {
     filteredColumns() {
       return this.columnTitles.filter((title) => !this.isBooleanColumn(title));
     },
-  },
-  watch: {
-    formDataList: {
-      handler(newValue) {
-        const selectedFormData = newValue.filter(formData => formData.selected);
-        const selectedImportedData = this.importedData.filter(row => row.selected);
-        this.emitSelectedData(selectedFormData, selectedImportedData);
-      },
-      deep: true
-    },
-    importedData: {
-      handler(newValue) {
-        const selectedFormData = this.formDataList.filter(formData => formData.selected);
-        const selectedImportedData = newValue.filter(row => row.selected);
-        this.emitSelectedData(selectedFormData, selectedImportedData);
-      },
-      deep: true
-    }
   },
   methods: {
     projectUpload(event) {
@@ -138,19 +122,10 @@ export default {
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
-    openCSV() {
-      console.log("Button clicked");
-
-      const filePath =
-        "file:///C:/Users/zylim/Desktop/Project%20Subcon%20Comparison/src/assets/template/template.csv";
-
-      window.open(filePath, "_blank");
-    },
     downloadExcelTemplate() {
       axios
         .get("@/assets/template/summary-template.csv", { responseType: "blob" })
         .then((response) => {
-          
           const blob = new Blob([response.data], { type: "text/csv" });
 
           const link = document.createElement("a");
@@ -164,8 +139,46 @@ export default {
           console.error("Error fetching the CSV file:", error);
         });
     },
-    emitSelectedData(selectedFormData, selectedImportedData) {
-      this.$emit('data-saved', { selectedFormData, selectedImportedData });
+    async saveData() {
+      const selectedFormData = this.formDataList.filter(formData => formData.selected);
+      const selectedImportedData = this.importedData.filter(importedRow => importedRow.selected);
+
+      const transformedCQImport = selectedImportedData.map(unit => ({
+        tradeCategory: unit["category"],
+        trade: unit["trade"],
+        location: unit["location 1"],
+        budgetAmount: unit["AA Budget Amount"],
+        CallingQuotationDate: unit["Actuall Calling Quotation Date"],
+        awadingtaget: unit["Awading Target Date"],
+        remarks: unit["Remarks"],
+      }));
+
+      try {
+        const Message = await CallofQuotationController.addCQ(selectedFormData, transformedCQImport);
+        const UpdateMessage = Message[0]; 
+        this.$emit('message', UpdateMessage);
+
+        selectedFormData.forEach(formData => {
+          const index = this.formDataList.indexOf(formData);
+          if (index !== -1) {
+            this.$emit('remove-item', index); 
+          }
+        });
+
+        selectedImportedData.forEach(importedRow => {
+          const index = this.importedData.indexOf(importedRow);
+          if (index !== -1) {
+            this.importedData.splice(index, 1);
+          }
+        });
+
+        this.selectAll = false;
+
+      } catch (error) {
+        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        window.scrollTo(0, 0); 
+        this.$emit('fail-message', FailMessage);
+      }
     }
   },
 };

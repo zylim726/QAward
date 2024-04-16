@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="filter-container" style="margin-right: -15px">
-                  <a href="createcq"
+                  <a href="createcq" v-if="hasAccess"
                     ><md-icon class="mdIcon" style="margin-right: 15px"
                       >add</md-icon
                     ></a
@@ -87,7 +87,7 @@
                               style="margin-left: 48px !important"
                             >
                               <li>
-                                <a href="comparison">Subcon Comparison</a>
+                                <a :href="'/comparison?cqID=' + callQuotation.id">Subcon Comparison</a>
                               </li>
                               <li><button class="transparentButton"  v-if="hasAccess" @click="editCallQuotation(callQuotation.id)" style="margin-left: -6px;">Edit</button></li>
                               <li><button class="transparentButton"  v-if="hasAccess" @click="deleteCallQuotation(callQuotation.id)" style="margin-left: -6px;">Delete</button></li>
@@ -199,7 +199,6 @@ export default {
     async accessCQ() {
       try {
         const processedData = await CallofQuotationController.accessCQ();
-
         if (processedData.length > 0) {
           this.callQuotation = processedData;
         } else {
@@ -260,7 +259,7 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Add/Edit/Delete CQ'];
+        const accessIds = ['Add-Edit-Remove CQ'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
         console.error('Error checking permission:', error);

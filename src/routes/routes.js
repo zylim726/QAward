@@ -7,13 +7,17 @@ import Comparison from "@/pages/Comparison.vue";
 import UserConfig from "@/pages/UserConfig.vue";
 import AccessPermission from "@/pages/AccessPermission.vue";
 import Description from "@/pages/Description.vue";
+import Subcon from "@/pages/Subcon.vue";
+
+//IMPORT LAYOUT
 import Createcq from "@/pages/Layout/Createcq.vue";
 import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
 import ProjectControl from "@/pages/Layout/ProjectControl.vue";
 import Revision from "@/pages/Layout/Revision.vue";
 import Quotation from "@/pages/Layout/Quotation.vue";
 
-// Define your routes
+
+
 const routes = [
   {
     path: "/",
@@ -82,6 +86,13 @@ const routes = [
         path: "quotation",
         name: "Create / Import Quotation",
         component: Quotation,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "subcon",
+        name: "Subcon List",
+        component: Subcon,
         meta: { requiresAuth: true },
       },
     ],

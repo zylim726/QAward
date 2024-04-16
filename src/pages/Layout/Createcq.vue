@@ -2,10 +2,12 @@
   <div class="content">
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
-    <label class="titleHeader"
-      >Step 1 : Create / Import Call of Quotation</label
-    >
-    <div class="md-layout">
+    <br>
+    <div class="step-buttons">
+      <button class="step-button" @click="activeStep = 1" :class="{ active: activeStep === 1 }">Step 1 : Create / Import Call of Quotation</button>
+      <button class="step-button" @click="activeStep = 2" :class="{ active: activeStep === 2 }">Step 2 : Create / Import Unit Type</button>
+    </div>
+    <div class="md-layout" v-show="activeStep === 1">
       <div
         class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25"
         style="padding: 0px 17px"
@@ -19,14 +21,13 @@
       >
         <md-card>
           <md-card-content>
-            <CQ-import :formDataList="formDataList" @data-saved="CQImportData"></CQ-import>
+            <CQ-import :formDataList="formDataList" @message="ImportMessage"  @fail-message="ImportErrorMessage" @remove-item="removeItem"></CQ-import>
           </md-card-content>
         </md-card>
       </div>
     </div>
     <br />
-    <label class="titleHeader">Step 2 : Create / Import Unit Type </label>
-    <div class="md-layout">
+    <div class="md-layout" v-show="activeStep === 2">
       <div
         class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25"
         style="padding: 0px 17px"
@@ -40,15 +41,17 @@
       >
         <md-card>
           <unittype-import
-          :formDataUnitList="formDataUnitList"  
-          :selectedFormData="selectedFormData" 
-          :selectedImportedData="selectedImportedData"
-          @data-saved="CQImportData"
-          @message="ImportMessage" 
-          @fail-message="ImportErrorMessage"
+            :formDataUnitList="formDataUnitList"  
+            @save-data="UnitSaveData"
           ></unittype-import>
         </md-card>
       </div>
+      <div v-if="hasDataToShow" class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
+      <div class="notification warning">Please Select the Call for Quotation <md-icon style="color:orange">error_outline</md-icon></div>
+      <md-card>
+        <getcallquotation-table :Unittype="Unittype" @message="ImportMessage"  @fail-message="ImportErrorMessage"></getcallquotation-table>
+      </md-card>
+    </div>
     </div>
   </div>
 </template>
@@ -59,6 +62,7 @@ import {
   CreatecqTable,
   UnittypeTable,
   UnittypeImport,
+  GetcallquotationTable
 } from "@/components";
 
 export default {
@@ -67,16 +71,16 @@ export default {
     CreatecqTable,
     UnittypeTable,
     UnittypeImport,
+    GetcallquotationTable,
   },
   data() {
     return {
       formDataList: [],
-      formDataUnitList: [],
       UpdateMessage: null,
       FailMessage: null,
-      selectedFormData: [],
-      selectedImportedData: [],
-      updateCQData: [],
+      activeStep: 1, 
+      hasDataToShow: false,
+      Unittype:[],
     };
   },
   methods: {
@@ -86,18 +90,13 @@ export default {
     unitformSubmit(formDataUnit) {
       this.formDataUnitList.push(formDataUnit);
     },
-    CQImportData(data) {
-      const combinedDataForm =  [...new Set([...this.selectedFormData, ...data.selectedFormData])];
-      const combinedDataImport =  [...new Set([...this.selectedImportedData, ...data.selectedImportedData])];
-      this.selectedFormData = combinedDataForm;
-      this.selectedImportedData = combinedDataImport;
-    },
     ImportMessage(message) {
-      this.UpdateMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-        window.location.reload();
-      }, 1000);
+      if (!this.UpdateMessage) {
+        this.UpdateMessage = message;
+        setTimeout(() => {
+          this.UpdateMessage = '';
+        }, 2000);
+      }
     },
     ImportErrorMessage(message) {
       this.FailMessage = message; 
@@ -105,6 +104,39 @@ export default {
         this.FailMessage = '';
       }, 2000);
     },
+    removeItem(index) {
+      this.formDataList.splice(index, 1);
+    },
+    UnitSaveData(data) {
+      this.Unittype.push(data);
+      if (this.Unittype.length > 0) {
+        this.hasDataToShow = true;
+      } else {
+        this.hasDataToShow = false;
+      }
+    }
   }
 };
 </script>
+
+<style>
+.step-buttons {
+  display: flex;
+}
+
+.step-button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.step-button.active {
+  background-color: orange;
+  color: #fff;
+}
+</style>
