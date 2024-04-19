@@ -35,12 +35,12 @@
         </thead>
         <tbody>
           <template v-for="(module, index) in uniqueModules">
-            <tr :key="'module_' + index" >
+            <tr :key="moduleKeys[index]"> 
               <td><b>{{ module.module }}</b></td>
               <td colspan="5"></td>
             </tr>
             
-            <tr v-for="(permission, pIndex) in module.permissions" :key="'permission_' + pIndex">
+            <tr v-for="(permission, pIndex) in module.permissions" :key="'_permission_' + pIndex">
               <td>{{ permission }}</td>
               <td style="text-align: center">
                 <input
@@ -84,7 +84,7 @@
 
 <script>
 import PermissionController from "@/services/controllers/PermissionController.js";
-import Createpermission  from "@/components/Modal/Createpermission.vue";
+import Createpermission  from "@/components/Pop-Up-Modal/Createpermission.vue";
 
 export default {
   components: {
@@ -135,6 +135,16 @@ export default {
         );
         return isChecked;
       };
+    },
+    moduleKeys() {
+      return this.uniqueModules.map((module, index) => 'module_' + index);
+    },
+    computedRows() {
+      // Generate an array of objects with module and key properties
+      return this.uniqueModules.map((module, index) => ({
+        module: module,
+        key: 'module_' + index, // Use a unique key for each module
+      }));
     },
   },
   methods: {

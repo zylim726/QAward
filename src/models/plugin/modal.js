@@ -1,4 +1,4 @@
-import Modal from "@/components/Modal/Modal.vue";
+import Modal from "@/components/Pop-Up-Modal/Modal.vue";
 
 const ModalPlugin = {
   install(Vue) {

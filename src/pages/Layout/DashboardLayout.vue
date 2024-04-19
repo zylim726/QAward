@@ -7,7 +7,6 @@
     >
       <mobile-menu slot="content"></mobile-menu>
 
-      <!-- <h4 class="menutitle">Subcon Comparison</h4> -->
       <sidebar-link class="navbar-link" to="/callquotation">
         <md-icon>check_circle_outline</md-icon>
         <p class="nav-item">Call for Quotation</p>

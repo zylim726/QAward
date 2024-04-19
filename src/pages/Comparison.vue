@@ -112,7 +112,7 @@
 
 <script>
 import { ComparisonTable, ApprovalTable, TotalTable } from "@/components";
-import SubmitModal from "@/components/Modal/SubmitModal.vue";
+import SubmitModal from "@/components/Pop-Up-Modal/SubmitModal.vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 
 import { Error } from "@/services";

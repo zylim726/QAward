@@ -28,7 +28,7 @@
             <td>{{ formData.tradeCategory }}</td>
             <td>{{ formData.trade }}</td>
             <td>{{ formData.location }}</td>
-            <td>{{ formData.budgetAmount }}</td>
+            <td>{{ formData.aa_budget_amount }}</td>
             <td>{{ formData.CallingQuotationDate }}</td>
             <td>{{ formData.awadingtargetdate }}</td>
             <td>{{ formData.remarks }}</td>

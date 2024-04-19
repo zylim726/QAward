@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import Modal from "@/components/Modal/Modal.vue";
+import Modal from "@/components/Pop-Up-Modal/Modal.vue";
 import LoginController from "@/services/controllers/LoginController";
 import store from "@/services/axios/store";
 export default {

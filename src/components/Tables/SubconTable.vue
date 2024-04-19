@@ -8,7 +8,6 @@
           <input
             type="text"
             v-model="searchText"
-            @input="filterUsers"
             placeholder="Search by subcon"
           />
         </form>
@@ -26,8 +25,12 @@
         <thead>
           <tr>
             <th>No</th>
-            <th>Subcon Name</th>
-            <th>Update Date</th>
+            <th>Name</th>
+            <th>Reg No</th>
+            <th>Acc Code</th>
+            <th>Email</th>
+            <th>Short Code</th>
+            <th>Phone</th>
             <th style="text-align: center;" v-if="hasAccess">Action</th>
           </tr>
         </thead>
@@ -35,10 +38,14 @@
           <tr v-for="(subcon, index) in filterSubcon" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ subcon.name }}</td>
-            <td>{{ subcon.updatedAt }}</td>
+            <td>{{ subcon.reg_no }}</td>
+            <td>{{ subcon.acc_code }}</td>
+            <td>{{ subcon.email }}</td>
+            <td>{{ subcon.short_code }}</td>
+            <td>{{ subcon.contact_person }}({{ subcon.phone }})</td>
             <td style="text-align: center" v-if="hasAccess">
-              <button class="transparentButton"  @click="editSubcon(subcon.id)" style="margin-left: -6px;"><md-icon class="mdIcon">edit</md-icon></button>
-              <button class="transparentButton"  @click="deleteSubcon(subcon.id)" style="margin-left: -6px;"><md-icon class="mdIcon">delete</md-icon></button>
+              <button class="transparentButton"  @click="editSub(subcon.id)" style="margin-left: -6px;"><md-icon style="color: orange !important;">edit</md-icon></button>
+              <button class="transparentButton"  @click="deleteSub(subcon.id)" style="margin-left: -6px;"><md-icon style="color: orange !important;">delete</md-icon></button>
             </td>
           </tr>
         </tbody>
@@ -46,16 +53,23 @@
       <br />
     </div>
     <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
+    <EditSubcon :edit-subcon="showEditModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage"  @close="closeEditModal" :id="editId" title="Edit Subcon"></EditSubcon>
+    <DeleteSubcon :delete-subcon="showDeleteModal" @deletemessage="DeleteMessage" @deletefail-message="DeleteErrorMessage" @close="closeDeleteModal" :id="deleteId" title="Delete Subcon"></DeleteSubcon>
   </div>
 </template>
 
 <script>
 import SubconController from "@/services/controllers/SubconController.js";
-import Createsubcon from "@/components/Modal/Createsubcon.vue";
+import Createsubcon from "@/components/Pop-Up-Modal/Createsubcon.vue";
+import EditSubcon from "@/components/Pop-Up-Modal/EditSubcon.vue";
+import DeleteSubcon from "@/components/Pop-Up-Modal/DeleteSubcon.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
+
 export default {
   components: {
     Createsubcon,
+    EditSubcon,
+    DeleteSubcon 
   },
   data() {
     return {
@@ -64,8 +78,12 @@ export default {
       errorMessage: null,
       UpdateMessage: null,
       FailMessage: null,
-      showModal: false,
       hasAccess: false,
+      showModal: false,
+      showEditModal: false,
+      showDeleteModal: false,
+      editId: null,
+      deleteId: null
     };
   },
   async created() {
@@ -90,28 +108,25 @@ export default {
         this.errorMessage = "Error fetching subcon data: " + error.errorMessage;
       }
     },
-    // async updatePermission(permission, module, accesslevel) {
-    //   try {
-    //     this.UpdateMessage = await SubconController.updatePermission(permission, module, accesslevel);
-    //     this.accessSubcon(); 
-    //   } catch (error) {
-    //     this.FailMessage = "Error updating access: " + error.errorMessage;
-    //   }
-    // },
-    // editSubcon(subconId) {
-    //   // Implement your logic for editing a subcon
-    // },
-    // deleteSubcon(subconId) {
-    //   // Implement your logic for deleting a subcon
-    // },
+    editSub(subconId) {
+      this.editId = subconId;
+      this.showEditModal = true; 
+    },
+    closeEditModal() {
+      this.showEditModal = false; 
+    },
+    deleteSub(subconId) {
+      this.deleteId = subconId;
+      this.showDeleteModal = true; 
+    },
+    closeDeleteModal() {
+      this.showDeleteModal = false; 
+    },
     openModal() {
       this.showModal = true;
     },
     closeModal() {
       this.showModal = false;
-    },
-    filterUsers() {
-      // Implement your filtering logic if needed
     },
     ModalMessage(message) {
       this.UpdateMessage = message; 
@@ -119,6 +134,30 @@ export default {
     },
     ModalErrorMessage(message) {
       this.FailMessage = message; 
+    },
+    EditMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    EditErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    DeleteMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    DeleteErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
     },
     async checkPermission() {
       try {
@@ -133,9 +172,9 @@ export default {
 };
 </script>
 
+
 <style>
-.nested-table th,
 .nested-table td {
-  padding: 19px !important;
+  padding: 15px !important;
 }
 </style>

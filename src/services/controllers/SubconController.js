@@ -19,7 +19,7 @@ const SubconController = {
       throw { errorMessage };
     }
   },
-  async addSubcon(name) {
+  async addSubcon(subconData) {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
@@ -27,7 +27,15 @@ const SubconController = {
       const response = await axios.post(
         `${apiHost}/subcon/add`,
         {
-          name: name,
+          name: subconData.name,
+          reg_no: subconData.reg_no,
+          gst_id: subconData.gst_id,
+          address: subconData.address,
+          acc_code: subconData.acc_code,
+          phone: subconData.phone,
+          contact_person: subconData.contact_person,
+          email: subconData.email,
+          short_code: subconData.short_code
         },
         { headers }
       );
@@ -36,6 +44,58 @@ const SubconController = {
       const errorMessage = error.response.data.message;
       throw { errorMessage };
 
+    }
+  },
+  async getDetailSubcon(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+      const response = await axios.get(`${apiHost}/subcon/${id}`, {
+        headers,
+      });
+      return response.data.data;
+      
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
+    }
+  },
+  async editSubc(id, updatedData) {
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+
+        const response = await axios.put(`${apiHost}/subcon/edit/${id}`, {
+          name: updatedData.name,
+          reg_no: updatedData.reg_no,
+          gst_id: updatedData.gst_id,
+          address: updatedData.address,
+          acc_code: updatedData.acc_code,
+          phone: updatedData.phone,
+          contact_person: updatedData.contact_person,
+          email: updatedData.email,
+          short_code: updatedData.short_code
+        }, { headers });
+        return response.data.message;
+    } catch (error) {
+        const errorMessage = error.response.data.message;
+        throw { errorMessage };
+    }
+  },
+  async removeSubcon(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+
+      const response = await axios.delete(`${apiHost}/subcon/remove/${id}`, {
+        headers,
+      });
+      return response.data.message;
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+      throw { errorMessage };
     }
   },
   // async updatePermission(permission, module, accesslevel) {

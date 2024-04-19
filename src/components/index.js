@@ -13,12 +13,14 @@ import GetcallquotationTable from "./Tables/GetcallquotationTable.vue";
 import SubconTable from "./Tables/SubconTable.vue";
 
 // MODAL
-import Modal from "./Modal/Modal.vue";
-import SubmitModal from "./Modal/SubmitModal.vue";
-import Createpermission from "./Modal/Createpermission.vue";
-import Createsubcon from "./Modal/Createsubcon.vue";
-import DeleteCQ from "./Modal/DeleteCQ.vue";
-import EditCQ from "./Modal/EditCQ.vue";
+import Modal from "./Pop-Up-Modal/Modal.vue";
+import SubmitModal from "./Pop-Up-Modal/SubmitModal.vue";
+import Createpermission from "./Pop-Up-Modal/Createpermission.vue";
+import Createsubcon from "./Pop-Up-Modal/Createsubcon.vue";
+import DeleteCQ from "./Pop-Up-Modal/DeleteCQ.vue";
+import EditCQ from "./Pop-Up-Modal/EditCQ.vue";
+import EditSubcon from "./Pop-Up-Modal/EditSubcon.vue";
+import DeleteSubcon from "./Pop-Up-Modal/DeleteSubcon.vue";
 
 // IMPORT
 import UnittypeImport from "./Import/UnittypeImport.vue";
@@ -48,5 +50,7 @@ export {
   EditCQ,
   GetcallquotationTable,
   SubconTable,
-  Createsubcon
+  Createsubcon,
+  EditSubcon,
+  DeleteSubcon
 };

@@ -6,7 +6,7 @@
         <h1 class="Inforrtitle">{{ title }}</h1>
         <hr style="margin-top: -45px" />
         <br /><br />
-        <md-icon style="font-size: 79px !important;margin-left: 47%;color: red;">highlight_off</md-icon>
+        <md-icon style="font-size: 79px !important;margin-left: 47%;color: red;">highlight_off</md-icon><br><br>
         <p class="Inforrsubtitle">{{ body }}</p>
       </div>
     </div>

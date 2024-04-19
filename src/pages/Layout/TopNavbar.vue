@@ -81,10 +81,8 @@ export default {
       this.$sidebar.displaySidebar(!this.$sidebar.showSidebar);
     },
     logout() {
-      // Dispatch the clearToken action to clear token and access level
       store.dispatch("clearToken");
 
-      // Optionally, redirect the user to another route upon successful logout
       this.$router.push("/logout");
     },
   },

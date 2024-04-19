@@ -63,12 +63,13 @@
         </table>
       </div> </md-card-content
     ><br />
-    <button type="submit" class="btn-save" @click="saveData" >Save</button><br /><br />
+    <button type="submit" class="btn-save" @click="saveData" :disabled="isSaveButtonDisabled">Select the Call for Quotation</button><br /><br />
   </div>
 </template>
 
 <script>
 import Import from "papaparse";
+import csvUnitData from "@/assets/template/unittype-template.js";
 
 export default {
   props: {
@@ -96,6 +97,9 @@ export default {
     filteredColumns() {
       return this.columnTitles.filter((title) => !this.isBooleanColumn(title));
     },
+    isSaveButtonDisabled() {
+      return this.formDataUnitList.length === 0 && this.importUnitlist.length === 0;
+    }
   },
   methods: {
     unittypefileUpload(event) {
@@ -121,29 +125,28 @@ export default {
     },
     displayValue(value, key) {
       if (typeof value === "boolean") {
-        return ""; // Hide boolean columns
+        return ""; 
       }
-      return value; // Show non-boolean columns
+      return value; 
     },
     isBooleanColumn(key) {
       return this.importUnitlist.some((unit) => typeof unit[key] === "boolean");
     },
     downloadExcelTemplate() {
-      axios
-        .get("@/assets/template/summary-template.csv", { responseType: "blob" })
-        .then((response) => {
-          const blob = new Blob([response.data], { type: "text/csv" });
 
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = "excel_template.csv";
+    let csv = 'Unit Type,Unit Type Quantity,ADJ Factor\n';
 
-          link.click();
-          link.remove();
-        })
-        .catch((error) => {
-          console.error("Error fetching the CSV file:", error);
-        });
+    csvUnitData.forEach(function(row) {
+      csv += row.join(',');
+      csv += '\n';
+    });
+
+    const hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.target = '_blank';
+
+    hiddenElement.download = 'Unittype_template.csv';
+    hiddenElement.click();
     },
     async saveData() {
       const selectedFormData = this.formDataUnitList.filter(formDataUnit => formDataUnit.selected);

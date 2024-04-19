@@ -111,7 +111,7 @@
                       <td></td>
                       <td></td>
                       <td></td>
-                      <td></td>
+                      <td>{{ callQuotation.aa_budget_amount }}</td>
                       <td></td>
                       <td></td>
                       <td>
@@ -281,7 +281,7 @@ table {
 thead th {
   background-color: #fef4e4;
   border-bottom: none;
-  padding: 12px;
+  padding: 10px;
   text-align: left;
   white-space: nowrap; 
 }

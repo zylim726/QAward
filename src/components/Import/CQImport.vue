@@ -15,8 +15,7 @@
     >
       <md-icon class="mdIcon">download_for_offline</md-icon>
     </button>
-    <a href="/assets/template/la-template.csv" download="excel_template.csv">Download Excel Template</a>
-
+   
 
 
     <div class="projectTable-container">
@@ -75,7 +74,7 @@
 <script>
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import axios from 'axios';
+import csvLaData from "@/assets/template/la-template.js";
 
 export default {
   props: {
@@ -88,7 +87,7 @@ export default {
     return {
       importedData: [],
       columnTitles: [],
-      selectAll: false,
+      selectAll: false
     };
   },
   computed: {
@@ -128,22 +127,31 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-      axios
-      .get("@/assets/template/la-template.csv", { responseType: "blob" })
-      .then((response) => {
-        const blob = new Blob([response.data], { type: "text/csv" });
+    let csv = 'category,trade,location 1,AA Budget Amount,Actuall Calling Quotation Date,Awading Target Date,Remarks\n';
 
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = "excel_template.csv";
+    csvLaData.forEach(function(row) {
+        // Convert dates to desired format (e.g., YYYY-MM-DD)
+        const formattedRow = row.map((value, index) => {
+            // Check if the value is a date (assuming date values are in the 5th and 6th columns)
+            if (index === 4 || index === 5) { // Adjust the indices based on the position of date columns
+                const dateParts = value.split('/');
+                // Reformat the date to YYYY-MM-DD format
+                return `${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`;
+            } else {
+                return value;
+            }
+        });
+        csv += formattedRow.join(',');
+        csv += '\n';
+    });
 
-        link.click();
-        link.remove();
-      })
-      .catch((error) => {
-        console.error("Error fetching the CSV file:", error);
-      });
-    },
+    const hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    hiddenElement.target = '_blank';
+
+    hiddenElement.download = 'La_template.csv';
+    hiddenElement.click();
+},
     async saveData() {
       const selectedFormData = this.formDataList.filter(formData => formData.selected);
       const selectedImportedData = this.importedData.filter(importedRow => importedRow.selected);

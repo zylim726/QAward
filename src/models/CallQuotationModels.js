@@ -28,6 +28,7 @@ const CallQuotationModels = {
         actuallDoneDate: config.actual_done_date,
         awadingtargetdate: config.awading_target_date,
         remarks: config.remarks,
+        aa_budget_amount: config.aa_budget_amount,
         la_id: config.la_id,
         status: config.status,
         projectId: config.project_id,

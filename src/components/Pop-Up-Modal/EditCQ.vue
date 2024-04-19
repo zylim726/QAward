@@ -12,49 +12,42 @@
           v-model="processedData[0].trade_category"
           placeholder="Category"
           class="typeInput"
-          @focus="onInputFocus('Category')"
         />
         <input
           type="text"
           v-model="processedData[0].trade"
           placeholder="Trade"
           class="typeInput"
-          @focus="onInputFocus('Trade')"
         />
         <input
           type="text"
           v-model="processedData[0].trade_location1"
           placeholder="Location 1"
           class="typeInput"
-          @focus="onInputFocus('Location')"
         />
         <input
           type="text"
           v-model="processedData[0].aa_budget_amount"
           placeholder="AA Budget Amount"
           class="typeInput"
-          @focus="onInputFocus('BudgetAmount')"
         />
         <input
           type="date"
           v-model="processedData[0].actual_calling_quotation_date"
           placeholder="Actuall Calling Quotation Date"
           class="typeInput"
-          @focus="onInputFocus('ActuallCallingDate')"
         />
         <input
           type="date"
           v-model="processedData[0].awading_target_date"
           placeholder="Awading Target Date"
           class="typeInput"
-          @focus="onInputFocus('awadingTarget')"
         />
         <input
           type="text"
           v-model="processedData[0].remarks"
           placeholder="Remarks"
           class="typeInput"
-          @focus="onInputFocus('Remarks')"
         />
       </div>
       <button class="btn-save" aria-label="close" @click.stop="closeEditModal">Close</button>
@@ -74,17 +67,7 @@ export default {
   },
   data() {
     return {
-      processedData: [
-        {
-          tradeCategory: "",
-          trade: "",
-          location:"",
-          budgetAmount:"",
-          actuallCallingDate:"",
-          awadingTargetDate:"",
-          remarks:""
-        }
-      ]
+      processedData: "",
     };
   },
   mounted() {
@@ -110,7 +93,7 @@ export default {
     async getDetailCQ(id) {
       try {
         this.processedData = await CallofQuotationController.getDetailCQ(id);
-        console.log('checking',this.processedData);
+
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
@@ -122,7 +105,7 @@ export default {
         this.$emit('editMessage', this.UpdateMessage);
         setTimeout(() => {
           window.location.reload();
-        }, 2500); 
+        }, 1000); 
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);

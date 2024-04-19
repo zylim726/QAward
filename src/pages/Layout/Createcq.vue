@@ -1,10 +1,10 @@
 <template>
   <div class="content">
-    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
-    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
-    <br>
+    <div v-if="UpdateMessage" class="notification success" style="margin-left: 15px;">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+    <div v-if="FailMessage" class="notification fail" style="margin-left: 15px;">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+
     <div class="step-buttons">
-      <button class="step-button" @click="activeStep = 1" :class="{ active: activeStep === 1 }">Step 1 : Create / Import Call of Quotation</button>
+      <button class="step-button" @click="activeStep = 1" :class="{ active: activeStep === 1 }">Step 1 : Create / Import Call for Quotation</button>
       <button class="step-button" @click="activeStep = 2" :class="{ active: activeStep === 2 }">Step 2 : Create / Import Unit Type</button>
     </div>
     <div class="md-layout" v-show="activeStep === 1">
@@ -26,7 +26,6 @@
         </md-card>
       </div>
     </div>
-    <br />
     <div class="md-layout" v-show="activeStep === 2">
       <div
         class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25"
@@ -81,6 +80,7 @@ export default {
       activeStep: 1, 
       hasDataToShow: false,
       Unittype:[],
+      formDataUnitList:[],
     };
   },
   methods: {
@@ -89,6 +89,7 @@ export default {
     },
     unitformSubmit(formDataUnit) {
       this.formDataUnitList.push(formDataUnit);
+      console.log('this.formDa',this.formDataUnitList)
     },
     ImportMessage(message) {
       if (!this.UpdateMessage) {
@@ -122,6 +123,8 @@ export default {
 <style>
 .step-buttons {
   display: flex;
+  margin-left: 16px;
+  margin-top: 5px;
 }
 
 .step-button {

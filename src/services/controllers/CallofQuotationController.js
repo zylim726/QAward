@@ -57,13 +57,14 @@ const CallofQuotationController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-
+       
         const response = await axios.put(`${apiHost}/call_for_quotation/edit/${id}`, {
-          trade_category: updatedData.tradeCategory, 
+          trade_category: updatedData.trade_category, 
           trade: updatedData.trade, 
-          trade_location1: updatedData.location, 
-          actual_calling_quotation_date: updatedData.CallingQuotationDate, 
-          awading_target_date: updatedData.awadingtargetdate, 
+          trade_location1: updatedData.trade_location1, 
+          actual_calling_quotation_date: updatedData.actual_calling_quotation_date, 
+          awading_target_date: updatedData.awading_target_date, 
+          aa_budget_amount: updatedData.aa_budget_amount,
           remarks: updatedData.remarks
         }, { headers });
 
@@ -108,6 +109,7 @@ const CallofQuotationController = {
           trade_location1: formData.location,
           actual_calling_quotation_date: formData.CallingQuotationDate,
           awading_target_date: formData.awadingtaget,
+          aa_budget_amount: formData.budgetAmount,
           remarks: formData.remarks,
           status: 'Pending',
           project_id: projectId
