@@ -89,7 +89,6 @@ export default {
     },
     unitformSubmit(formDataUnit) {
       this.formDataUnitList.push(formDataUnit);
-      console.log('this.formDa',this.formDataUnitList)
     },
     ImportMessage(message) {
       if (!this.UpdateMessage) {

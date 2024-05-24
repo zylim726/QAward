@@ -79,7 +79,6 @@ const PermissionController = {
   
         results.forEach(result => {
           message = result.data.message;
-          console.log(message);
         });
       }
   

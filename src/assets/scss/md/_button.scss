@@ -188,6 +188,11 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
   align-items: center;
   justify-content: center;
 }
+.edit-button {
+  background: orange;
+  border: 1px solid orange;
+  color: white;
+}
 
 .btnList button {
   margin: 10px;
@@ -208,4 +213,9 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 .btn-approval {
   background-color: #32CD32; /* Lime Green */
   color: white;
+}
+
+.confirmation-message .btn-save {
+  padding: 5px 18px;
+
 }

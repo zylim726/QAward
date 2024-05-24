@@ -35,74 +35,10 @@
         </md-card>
       </div>
 
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
-      >
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
         <md-card style="height: 97%">
-          <md-card-content>
-            <comparison-table></comparison-table>
-          </md-card-content>
-        </md-card>
-      </div>
-
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
-      >
-        <md-card>
-          <md-card-content>
-            <div class="comparison-title">
-              <h4 class="titleHeader">
-                <md-icon class="doneAll">done_all</md-icon> It is Ready to
-                Submit Approval Quotation ?
-              </h4>
-              <div class="save-btn"></div>
-              <SubmitModal
-                :is-visible="showModal"
-                @close-modal="closeModal"
-              ></SubmitModal>
-            </div>
-          </md-card-content>
-        </md-card>
-      </div>
-
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-40"
-      >
-        <md-card style="background-color: #fef4e4">
-          <md-card-content>
-            <total-table></total-table>
-            <button
-              type="submit"
-              class="btn-save"
-              style="margin-bottom: 10px; margin-top: -20px"
-            >
-              Updated
-            </button>
-          </md-card-content>
-        </md-card>
-      </div>
-
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-60"
-      >
-        <md-card>
-          <md-card style="width: 92%; margin-left: 39px">
-            <md-card-content>
-              <div class="btnList">
-                <button type="submit" class="btn-approval">Approval</button>
-                <button type="submit" class="btn-rejected">Rejected</button>
-              </div>
-            </md-card-content>
-          </md-card>
-          <md-card-content>
-            <approval-table></approval-table>
-            <button
-              type="submit"
-              class="btn-save"
-              style="margin-bottom: 10px; margin-top: -20px"
-            >
-              Updated
-            </button>
+          <md-card-content style="line-height: 16px !important;">
+            <comparison-table :cqId="cqId" ></comparison-table>
           </md-card-content>
         </md-card>
       </div>
@@ -111,26 +47,21 @@
 </template>
 
 <script>
-import { ComparisonTable, ApprovalTable, TotalTable } from "@/components";
-import SubmitModal from "@/components/Pop-Up-Modal/SubmitModal.vue";
+import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-
 import { Error } from "@/services";
 
 export default {
   components: {
-    ApprovalTable,
     ComparisonTable,
-    TotalTable,
-    SubmitModal,
   },
   data() {
     return {
       showModal: false,
-      cqID: null,
       callQuotation: {},
       errorMessage: "",
       projectName: "",
+      cqId: 0,
     };
   },
   mounted() {
@@ -141,11 +72,13 @@ export default {
       console.error('Project ID not found in localStorage');
     };
     const Id = this.$route.query.cqID;
+    this.cqId = Id;
     this.getDetailCQ(Id);
   },
   methods: {
     async getDetailCQ(Id) {
       try {
+        
         const processedData = await CallofQuotationController.getDetailCQ(Id);
         this.callQuotation = processedData[0];
         if (processedData && processedData.data) {
@@ -167,9 +100,6 @@ export default {
         }
       }
     },
-    closeModal() {
-      this.showModal = false; // Update showModal to false when modal is closed
-    },
   },
 };
 </script>
@@ -184,7 +114,7 @@ export default {
 }
 
 .md-layout-item {
-  padding: 0 8px; /* Adjust spacing between items */
+  padding: 0 8px; 
 }
 
 .titleHeader {
@@ -199,41 +129,6 @@ export default {
   margin-top: -12px;
 }
 .row h6 {
-  margin-right: 10px; /* Adjust spacing between elements */
-}
-
-.doneAll {
-  color: orange !important;
-}
-
-.btnList {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  justify-content: center;
-}
-
-.btnList button {
-  margin: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-left: 70px;
-  margin-right: 50px;
-}
-
-.btn-rejected {
-  background-color: #ff6347; /* Tomato */
-  color: white;
-}
-
-.btn-approval {
-  background-color: #32cd32; /* Lime Green */
-  color: white;
+  margin-right: 10px; 
 }
 </style>

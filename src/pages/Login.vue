@@ -62,10 +62,9 @@ export default {
   },
   methods: {
     async LoginSubmit() {
-      const { token, username, accesslevel, message, success } = await LoginController.login(this.username, this.password);
-
+      const { token, username, userid, accesslevel, message, success } = await LoginController.login(this.username, this.password);
       if (success) {
-        store.dispatch('setToken', { token, username, accesslevel });
+        store.dispatch('setToken', { token, username, userid, accesslevel });
         
         const projectId = localStorage.getItem('projectId');
         const projectName = localStorage.getItem('projectName');

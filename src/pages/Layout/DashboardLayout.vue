@@ -13,24 +13,24 @@
       </sidebar-link>
 
       <h4 class="menutitle">Master</h4>
+      <sidebar-link class="navbar-link" to="/projectsetup">
+        <md-icon>content_paste</md-icon>
+        <p class="nav-item">Project Setup</p>
+      </sidebar-link>
       <sidebar-link class="navbar-link" to="/subcon">
         <md-icon>wysiwyg</md-icon>
         <p class="nav-item">Subcon List</p>
-      </sidebar-link>
-      <sidebar-link class="navbar-link" to="/trade">
-        <md-icon>content_paste</md-icon>
-        <p class="nav-item">Trade List</p>
       </sidebar-link>
       <h4 class="menutitle">Admin</h4>
       <sidebar-link  class="navbar-link" to="/user">
         <md-icon>person</md-icon>
         <p class="nav-item">Admin</p>
       </sidebar-link>
-      <sidebar-link class="navbar-link" to="/userconfig">
+      <sidebar-link   v-if="hasAccess('User Access')" class="navbar-link" to="/userconfig">
         <md-icon>manage_accounts</md-icon>
-        <p class="nav-item">User Config</p>
+        <p class="nav-item">User Access</p>
       </sidebar-link>
-      <sidebar-link  v-if="hasAccess" to="/accesspermission">
+      <sidebar-link  v-if="hasAccess('Access Permission')" to="/accesspermission">
         <md-icon>settings_applications</md-icon>
         <p class="nav-item">Access Permission</p>
       </sidebar-link>
@@ -66,7 +66,7 @@ export default {
     return {
       sidebarBackground: "orange",
       sidebarBackgroundImage: require("@/assets/img/sidebar.jpg"),
-      hasAccess: false,
+      userPermissions: [],
     };
   },
   async created() {
@@ -76,12 +76,14 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Access Permission'];
-        this.hasAccess = accessIds.some(id => permission.includes(id));
+        this.userPermissions = permission;
       } catch (error) {
         console.error('Error checking permission:', error);
       }
-    } 
+    },
+    hasAccess(permissionName) {
+      return this.userPermissions.includes(permissionName);
+    }
   }
 };
 </script>

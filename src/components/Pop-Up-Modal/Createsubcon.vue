@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': showModal }">
     <div class="modal-background" @click="closeModal"></div>
-    <div class="modal-content" style="width: 25%">
+    <div class="modal-content" style="width: 35%;max-height: 110vh !important;">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
@@ -37,10 +37,10 @@
         />
         <input
           type="text"
-          v-model="acc_code"
-          placeholder="Acc Code"
+          v-model="phone_fex"
+          placeholder="Phone Fex"
           class="typeInput"
-          @focus="onInputFocus('acc_code')"
+          @focus="onInputFocus('phone_fex')"
         />
         <input
           type="text"
@@ -58,10 +58,24 @@
         />
         <input
           type="text"
-          v-model="email"
-          placeholder="Email"
+          v-model="email_1"
+          placeholder="First Email"
           class="typeInput"
-          @focus="onInputFocus('email')"
+          @focus="onInputFocus('email_1')"
+        />
+        <input
+          type="text"
+          v-model="email_2"
+          placeholder="Second Email"
+          class="typeInput"
+          @focus="onInputFocus('email_2')"
+        />
+        <input
+          type="text"
+          v-model="email_3"
+          placeholder="Third Email"
+          class="typeInput"
+          @focus="onInputFocus('email_3')"
         />
         <input
           type="text"
@@ -102,10 +116,12 @@ export default {
       reg_no: "",
       gst_id: "",
       address: "",
-      acc_code: "",
+      phone_fex: "",
       phone: "",
       contact_person: "",
-      email: "",
+      email_1: "",
+      email_2: "",
+      email_3: "",
       short_code: "",
     };
   },
@@ -116,10 +132,12 @@ export default {
       this.reg_no ="";
       this.gst_id ="";
       this.address ="";
-      this.acc_code ="";
+      this.phone_fex ="";
       this.phone ="";
       this.contact_person ="";
-      this.email ="";
+      this.email_1 ="";
+      this.email_2 ="";
+      this.email_3 ="";
       this.short_code ="";
     },
     saveAndCloseModal() {
@@ -128,10 +146,12 @@ export default {
         reg_no: this.reg_no,
         gst_id: this.gst_id,
         address: this.address,
-        acc_code: this.acc_code,
+        phone_fex: this.phone_fex,
         phone: this.phone,
         contact_person: this.contact_person,
-        email: this.email,
+        email_1: this.email_1,
+        email_2: this.email_2,
+        email_3: this.email_3,
         short_code: this.short_code
       };
       this.addSubconToServer(subconData);

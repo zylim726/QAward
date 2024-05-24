@@ -1,109 +1,83 @@
 <template>
-  <div>
-    <div class="modal-overlay" v-if="isVisible" @click="closeModal">
-      <div class="modal">
-        <md-icon class="close" @click="closeModal">close</md-icon>
-        <div class="content">
-          <img class="check" src="../../assets/img/check.png" alt="Checkmark" />
-          <h4>Confirm Submit the Approval Quotation.</h4>
-          <div class="submit-footer">
-            <button @click="submitForm" class="btnApproval">Approval</button>
-          </div>
-        </div>
+  <div class="modal" :class="{ 'is-active': submitModal }">
+    <div class="modal-background" @click="closesubmitModal"></div>
+    <div class="modal-content" style="width: 30%">
+      <div class="box">
+        <h1 class="titleHeader">{{ title }}</h1>
+        <br />
+        <hr style="margin-top: -10px" />
+        <br />
+        <p>Remarks : </p>
+        <!-- Bind input value to remarksData -->
+        <input
+            type="text"
+            placeholder="Remarks"
+            class="typeInput"
+            v-model="remarksData"
+        />
       </div>
+      <button class="btn-save" aria-label="close" @click.stop="closesubmitModal">Close</button>
+      <!-- Pass remarksData and ApprovalData to saveAndCloseModal -->
+      <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal(remarksData, ApprovalData)">Save</button>
     </div>
-    <button
-      @click="openModal"
-      class="btn-finalysave"
-      style="margin-right: -20px"
-    >
-      Submit
-    </button>
   </div>
 </template>
 
 <script>
+import QuotationController from "@/services/controllers/QuotationController.js";
+
 export default {
+  props: {
+    submitModal: {
+      type: Boolean,
+      required: true
+    },
+    title: {
+      type: String,
+      required: true
+    },
+    ApprovalData: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
-      isVisible: false, // Set to false initially
+      remarksData: ""
     };
   },
-  methods: {
-    openModal() {
-      this.isVisible = true; // Set isVisible to true to show the modal
-    },
-    closeModal() {
-      this.isVisible = false; // Set isVisible to false to hide the modal
-    },
-    submitForm() {
-      // Handle form submission
-      this.$emit("submit-form");
-      this.isVisible = false; // Optionally, hide the modal after submitting the form
-    },
+  mounted() {
+    this.$emit('open');
   },
+  methods: {
+    closesubmitModal() {
+      this.$emit("close");
+    },
+    saveAndCloseModal(remarksData, approvalData) {
+      this.addCQApproval(remarksData, approvalData);
+      //this.closeEditModal();
+    },
+    async addCQApproval(remarksData, approvalData) {
+      try {
+        this.UpdateMessage = await QuotationController.addCQApproval(remarksData, approvalData);
+        console.log('message',this.UpdateMessage);
+        //this.$emit('editMessage', this.UpdateMessage);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 1000); 
+      } catch (error) {
+        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        this.$emit('fail-message', FailMessage);
+      }
+    }
+  },
+  watch: {
+    // Watch for changes in ApprovalData
+    ApprovalData: {
+      handler(newValue, oldValue) {
+      },
+      immediate: true // Log the initial value immediately
+    }
+  }
 };
 </script>
-
-<style scoped>
-/* Your modal styles here */
-</style>
-
-<style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Vertically center content */
-}
-
-.modal {
-  text-align: center;
-  background-color: white;
-  width: 300px; /* Adjust as needed */
-  max-height: 40%; /* Adjust as needed */
-  overflow-y: auto; /* Add scrollbar if content exceeds max-height */
-  padding: 24px;
-  border-radius: 20px;
-  position: relative;
-  margin-top: -180px;
-  background-color: #fffaf0;
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
-
-.content {
-  margin-bottom: 20px;
-}
-
-.check {
-  width: 130px;
-  margin-bottom: 20px;
-}
-
-.submit-footer {
-  display: flex;
-  justify-content: center; /* Center button horizontally */
-}
-
-.btnApproval {
-  background-color: #0ab39c;
-  width: 135px;
-  height: 35px;
-  color: white;
-  font-size: 14px;
-  border-radius: 16px;
-  border: none;
-  cursor: pointer;
-  margin-top: 20px;
-}
-</style>

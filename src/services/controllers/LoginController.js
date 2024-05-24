@@ -20,6 +20,7 @@ const LoginController = {
       return {
         token: processedData.token,
         username: processedData.username,
+        userid: processedData.userid,
         accesslevel: processedData.accesslevel,
         message: processedData.message,
         success: true,

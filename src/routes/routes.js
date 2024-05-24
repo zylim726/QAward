@@ -1,4 +1,4 @@
-// Import your components
+// Import your pages
 import Login from "@/pages/Login.vue";
 import Logout from "@/pages/Logout.vue";
 import ProjectList from "@/pages/ProjectList.vue";
@@ -6,8 +6,8 @@ import Callquotation from "@/pages/Callquotation.vue";
 import Comparison from "@/pages/Comparison.vue";
 import UserConfig from "@/pages/UserConfig.vue";
 import AccessPermission from "@/pages/AccessPermission.vue";
-import Description from "@/pages/Description.vue";
 import Subcon from "@/pages/Subcon.vue";
+import ProjectSetup from "@/pages/ProjectSetup.vue";
 
 //IMPORT LAYOUT
 import Createcq from "@/pages/Layout/Createcq.vue";
@@ -15,7 +15,8 @@ import DashboardLayout from "@/pages/Layout/DashboardLayout.vue";
 import ProjectControl from "@/pages/Layout/ProjectControl.vue";
 import Revision from "@/pages/Layout/Revision.vue";
 import Quotation from "@/pages/Layout/Quotation.vue";
-
+import EditQuotation from "@/pages/Layout/EditQuotation.vue";
+import Description from "@/pages/Layout/Description.vue";
 
 
 const routes = [
@@ -90,9 +91,23 @@ const routes = [
       },
 
       {
+        path: "editquotation",
+        name: "Edit Quotation",
+        component: EditQuotation,
+        meta: { requiresAuth: true },
+      },
+
+      {
         path: "subcon",
         name: "Subcon List",
         component: Subcon,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "projectsetup",
+        name: "Project Setup",
+        component: ProjectSetup,
         meta: { requiresAuth: true },
       },
     ],

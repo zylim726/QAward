@@ -1,452 +1,366 @@
 <template>
   <div>
+    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="container" style="margin-top: 20px">
-      <!-- Search bar -->
       <div class="search-container">
         <form class="Searchbar">
-          <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search Description....."
-          />
+          <input type="text" v-model="searchQuery" placeholder="Search Description....." />
         </form>
       </div>
-
-      <!-- Filter -->
       <div class="filter-container">
-        <a href="revision"
-          ><button type="button" class="btn-save" style="margin-right: 10px">
-            Revision
-          </button></a
-        >
-        <a href="quotation"
-          ><button type="button" class="btn-save" style="margin-right: 10px">
-            Add Quotation
-          </button></a
-        >
-        <a href="description"
-          ><button type="button" class="btn-save" style="margin-right: 10px">
-            Add Description
-          </button></a
-        >
-
-        <button
-          @click="toggleFilter"
-          class="transparentButton"
-          style="margin-right: 10px"
-        >
-          <md-icon class="mdIcon">
-            {{ isHide ? "visibility_off" : "visibility" }}
-          </md-icon>
+        <a href="revision"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
+        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Add Quotation</button></a>
+        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Add Description</button></a>
+        <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px">
+          <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
         </button>
-        <button
-          type="button"
-          class="transparentButton"
-          style="margin-right: 10px"
-          @click="exportToCsv"
-        >
+        <button type="button" class="transparentButton" style="margin-right: 10px" @click="downloadExcelTemplate">
           <md-icon class="mdIcon">system_update_alt</md-icon>
         </button>
       </div>
     </div>
     <div class="table-container">
-      <table class="nested-table">
+      <table class="nested-table" id="data-table">
         <thead>
           <tr>
+            <th scope="col">Action</th>
             <th scope="col">Item</th>
             <th scope="col">Element</th>
             <th scope="col">Sub Element</th>
             <th scope="col">Sub Sub Element</th>
             <th scope="col">Description</th>
             <th scope="col">Unit</th>
-            <th scope="col" v-if="!isHide">Type A1</th>
-            <th scope="col" v-if="!isHide">Type E1</th>
-            <th scope="col" v-if="!isHide">Type C1</th>
-            <th scope="col" v-if="!isHide">BQ Qty</th>
-            <th scope="col" v-if="!isHide">ADJ Qty</th>
-            <th scope="col">QTY</th>
-            <th scope="col" colspan="2">AA Cost</th>
-            <th scope="col" colspan="2">Wekwork</th>
+            <template v-if="!isHide">
+              <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
+              <th scope="col">BQ QTY</th>
+              <th scope="col">(ADJ) QTY</th>
+            </template>
+            <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
+              {{ quotationData.Call_For_Quotation_Subcon_List.subcon_id }}
+              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id">
+                  <button type="button" class="transparentButton" >
+                    <md-icon style="color:orange;font-size: 34px !important;">edit_note</md-icon>
+                  </button>
+              </a>
+              </th>
+
           </tr>
           <tr>
+            <th></th>
             <th colspan="6"></th>
-            <th scope="col" class="unityQuantityClass" v-if="isHide"></th>
-            <th scope="col" class="unityQuantityClass" v-if="!isHide">24</th>
-            <th scope="col" class="unityQuantityClass" v-if="!isHide">40</th>
-            <th scope="col" class="unityQuantityClass" v-if="!isHide">38</th>
-            <th scope="col" class="unityQuantityClass" v-if="!isHide"></th>
-            <th scope="col" class="unityQuantityClass" v-if="!isHide"></th>
-            <th scope="col" class="unityQuantityClass" v-if="!isHide"></th>
-            <th scope="col">Rate</th>
-            <th scope="col">Amount</th>
-            <th scope="col">Rate</th>
-            <th scope="col">Amount</th>
+            <template v-if="!isHide">
+              <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
+              <th colspan="2"></th>
+            </template>
+            <th v-for="(header, index) in generatedHeaders" :key="index" style="text-align: center;border-left:1px solid #ddd !important;border-right:1px solid #ddd !important">{{ header }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>Element</td>
-            <td>Sub Element</td>
-            <td>WATERPROOFING</td>
-            <td>EXTERNAL FLOOR FINISHES</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td colspan="5"></td>
-          </tr>
-          <tr>
-            <td>1.1</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Work in Connection With Waterproofing</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td colspan="5"></td>
-          </tr>
-          <tr>
-            <td><b>1.1.1</b></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <b>Laid on concrete floors (RC Coping at Carporch & AC Ledge)</b>
-            </td>
-            <td><b>m2</b></td>
-            <td v-if="!isHide"><b>10.90</b></td>
-            <td v-if="!isHide"><b>21.90</b></td>
-            <td v-if="!isHide"><b>18.90</b></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td><b>24539.90</b></td>
-            <td>10.00</td>
-            <td>1000.00</td>
-            <td>9.00</td>
-            <td>900.00</td>
-          </tr>
-          <tr>
-            <td><b>1.1.2</b></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <b>Laid on concrete floors (RC Coping at Carporch & AC Ledge)</b>
-            </td>
-            <td><b>m2</b></td>
-            <td v-if="!isHide"><b>9.90</b></td>
-            <td v-if="!isHide"><b>21.90</b></td>
-            <td v-if="!isHide"><b>18.90</b></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td><b>24539.90</b></td>
-            <td>10.00</td>
-            <td>1000.00</td>
-            <td>9.00</td>
-            <td>900.00</td>
-          </tr>
-          <tr>
-            <td><b>1.1.3</b></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <b>Laid on concrete floors (RC Coping at Carporch & AC Ledge)</b>
-            </td>
-            <td><b>m2</b></td>
-            <td v-if="!isHide"><b>10.90</b></td>
-            <td v-if="!isHide"><b>21.90</b></td>
-            <td v-if="!isHide"><b>18.90</b></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td><b>24539.90</b></td>
-            <td>10.00</td>
-            <td>1000.00</td>
-            <td>9.00</td>
-            <td>900.00</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Element</td>
-            <td>Sub Element</td>
-            <td>WATERPROOFING</td>
-            <td>EXTERNAL FLOOR FINISHES</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>2.1</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Work in Connection With Waterproofing</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><b>2.1.1</b></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <b>Laid on concrete floors (RC Coping at Carporch & AC Ledge)</b>
-            </td>
-            <td><b>m2</b></td>
-            <td v-if="!isHide"><b>10.90</b></td>
-            <td v-if="!isHide"><b>21.90</b></td>
-            <td v-if="!isHide"><b>18.90</b></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td><b>24539.90</b></td>
-            <td>10.00</td>
-            <td>1000.00</td>
-            <td>9.00</td>
-            <td>900.00</td>
-          </tr>
-          <tr>
-            <td>2.2</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>Work in Connection With Waterproofing</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><b>2.2.1</b></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <b>Laid on concrete floors (RC Coping at Carporch & AC Ledge)</b>
-            </td>
-            <td><b>m2</b></td>
-            <td v-if="!isHide"><b>10.90</b></td>
-            <td v-if="!isHide"><b>21.90</b></td>
-            <td v-if="!isHide"><b>18.90</b></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td><b>24539.90</b></td>
-            <td>10.00</td>
-            <td>1000.00</td>
-            <td>9.00</td>
-            <td>900.00</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Element</td>
-            <td>Sub Element</td>
-            <td>WATERPROOFING</td>
-            <td>EXTERNAL FLOOR FINISHES</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Element</td>
-            <td>Sub Element</td>
-            <td>WATERPROOFING</td>
-            <td>EXTERNAL FLOOR FINISHES</td>
-            <td></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td><b>4.1.1</b></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>
-              <b>Laid on concrete floors (RC Coping at Carporch & AC Ledge)</b>
-            </td>
-            <td><b>m2</b></td>
-            <td v-if="!isHide"><b>10.90</b></td>
-            <td v-if="!isHide"><b>21.90</b></td>
-            <td v-if="!isHide"><b>18.90</b></td>
-            <td v-if="!isHide"></td>
-            <td v-if="!isHide"></td>
-            <td><b>24539.90</b></td>
-            <td>10.00</td>
-            <td>1000.00</td>
-            <td>9.00</td>
-            <td>900.00</td>
-          </tr>
         </tbody>
+        <br>
+        <tfoot style="line-height: 8px !important;">
+        </tfoot>
       </table>
       <br />
     </div>
+    <div class="confirmation-message" v-if="QuotationName.length > 0">
+      <p>Are you sure you want to submit the quotation?</p>
+      <button class="btn-save" @click="submitQuotation">Submit</button>
+    </div>
+    <EditDescription :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
+    <SubmitModal :submit-modal="submitModal" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+const XLSX = require('xlsx');
+import { ref } from 'vue';
+import DescriptionController from '@/services/controllers/DescriptionController.js';
+import EditDescription from '@/components/Pop-Up-Modal/EditDescription.vue';
+import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
 
 export default {
-  name: "ordered-table",
+  components: {
+    EditDescription,
+    SubmitModal,
+  },
   props: {
-    tableHeaderColor: {
-      type: String,
-      default: "",
+    cqId: {
+      type: Number,
+      required: true,
     },
   },
   data() {
     return {
-      show: ref(false), // Define show as a reactive ref
-      searchQuery: "",
+      Unittype: [],
+      QuotationName: [],
+      show: ref(false),
+      searchQuery: '',
       isHide: true,
-      dynamicColumns: [],
-      items: [
-        {
-          id: 1,
-          description:
-            "Laid on concrete floors (RC Coping at Carporch & AC Ledge) ",
-          unit: "m2",
-          A1: "10.90",
-          E1: "21.90",
-          C1: "21.90",
-          ADJ: "2290",
-          BQ: "2543.90",
-          infra: "-",
-          QTY: "3941",
-          rate: "0.00",
-        },
-        {
-          id: 2,
-          description:
-            "Upturn; not exceeding 150mm high (at bathroom doors and drop at shower)",
-          unit: "m2",
-          A1: "10.90",
-          E1: "21.90",
-          C1: "21.90",
-          ADJ: "2290",
-          BQ: "2543.90",
-          infra: "-",
-          QTY: "3941",
-          rate: "0.00",
-        },
-        {
-          id: 3,
-          description: "Laid on concrete floors (Water Tank) ",
-          unit: "m2",
-          A1: "10.90",
-          E1: "21.90",
-          C1: "21.90",
-          ADJ: "2290",
-          BQ: "2543.90",
-          infra: "-",
-          QTY: "3941",
-          rate: "0.00",
-        },
-        {
-          id: 4,
-          description:
-            "Upturn; not exceeding 150mm high (to sides of concrete platform at Water Tank) ",
-          unit: "m2",
-          A1: "10.90",
-          E1: "21.90",
-          C1: "21.90",
-          ADJ: "2290",
-          BQ: "2543.90",
-          infra: "-",
-          QTY: "3941",
-          rate: "0.00",
-        },
-      ],
+      errorMessage: '',
+      editModal: false,
+      editId: null,
+      submitModal: false,
+      submitId: null,
+      UpdateMessage: null,
+      FailMessage: null,
+      ApprovalDataArray: [],
     };
   },
-  computed: {
-    filteredUsers() {
-      let filteredData = this.users;
-
-      // Apply search filter
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase().trim();
-        filteredData = filteredData.filter(
-          (user) =>
-            user.description.toLowerCase().includes(query) ||
-            user.unit.toLowerCase().includes(query) ||
-            user.QTY.toLowerCase().includes(query)
-        );
-      }
-      return filteredData;
-    },
-    showDynamicColumnsHeader() {
-      return !this.isHide || this.dynamicColumns.length >= 1;
+  watch: {
+    cqId(newValue, oldValue) {
+      this.getDescription(newValue, this.isHide);
     },
   },
+  computed: {
+    generatedHeaders() {
+      const headers = [];
+      for (let i = 0; i < this.QuotationName.length; i++) {
+        headers.push('Rate', 'Amount');
+      }
+      return headers;
+    },
+    latestApprovalData() {
+      return this.ApprovalDataArray[this.ApprovalDataArray.length - 1];
+    }
+  },
   methods: {
+    editDescription(id) {
+      this.editId = id;
+      this.editModal = true;
+    },
+    closeEditModal() {
+      this.editModal = false;
+    },
+    closesubmitModal() {
+      this.submitModal = false;
+    },
     toggleFilter() {
       this.isHide = !this.isHide;
+      this.getDescription(this.cqId, this.isHide);
     },
     filterTable(filterValue) {
       this.isHide = !this.isHide;
     },
-    exportToCsv() {
-      const csvContent = this.convertToCSV(this.items); // Pass items array to convertToCSV method
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    async getDescription(id, isHide) {
+      try {
+        let processedData = await DescriptionController.getNewDescription(id);
 
-      // Create anchor tag
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.setAttribute("download", "export_data.csv");
-      link.click();
-    },
-    convertToCSV(data) {
-      const headers = Object.keys(data[0]);
-      const rows = data.map((obj) => headers.map((header) => obj[header]));
-      const headerRow = headers.join(",");
-      const csvRows = [headerRow, ...rows.map((row) => row.join(","))];
-      return csvRows.join("\n");
-    },
-  },
-  mounted() {
-    // Get all checkboxes
-    const checkboxes = document.querySelectorAll('input[name="checkbox"]');
+        if (!Array.isArray(processedData)) {
+          processedData = [];
+        }
 
-    // Add event listener to each checkbox
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        if (checkbox.checked) {
-          // Uncheck other checkboxes
-          checkboxes.forEach((otherCheckbox) => {
-            if (otherCheckbox !== checkbox) {
-              otherCheckbox.checked = false;
+        this.processedData = processedData;
+
+        if (processedData.length > 0) {
+          const tableBody = document.querySelector('.nested-table tbody');
+          tableBody.innerHTML = '';
+
+          let head1Counter = 0;
+          let head2Counter = 0;
+          let ApprovalDataArray = [];
+
+          const totalQuotationAmounts = {};
+
+          for (const formData of processedData) {
+            const cqUnitType = formData.cqUnitType;
+            this.Unittype = cqUnitType;
+            const getQuotation = formData.quotation;
+            this.QuotationName = getQuotation;
+
+            if (formData.bq_quantity === 0) {
+              head1Counter++;
+
+              const head1Row = document.createElement('tr');
+              head1Row.innerHTML = `
+                <td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>
+                <td><b>${head1Counter}</b></td>
+                <td><b>${formData.element || ''}</b></td>
+                <td><b>${formData.sub_element || ''}</b></td>
+                <td><b>${formData.description_sub_sub_element || ''}</b></td>
+                <td><b>${formData.description_item}</b></td>
+              `;
+              tableBody.appendChild(head1Row);
+
+              head1Row.querySelector('.edit-button').addEventListener('click', (event) => {
+                const formId = event.target.dataset.formid;
+                this.editDescription(formId);
+              });
+
+              head2Counter = 0;
             }
-          });
+
+            if (formData.bq_quantity !== 0) {
+              head2Counter++;
+
+              let unitQuantityTDs = '';
+              cqUnitType.forEach((cqUnit) => {
+                unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
+              });
+
+              let quotationTDs = '';
+              for (const quotationRate of getQuotation) {
+                const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
+                const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
+
+                if (!totalQuotationAmounts[SubconId]) {
+                  totalQuotationAmounts[SubconId] = totalQuotation;
+                } else {
+                  totalQuotationAmounts[SubconId] = {
+                    ...totalQuotationAmounts[SubconId],
+                    ...totalQuotation
+                  };
+                }
+
+                if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
+                this.ApprovalDataArray.push({
+                  cqId: id,
+                  callSubconId: quotationRate.call_for_quotation_subcon_list_id
+                });
+                }
+
+    
+                quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
+                                <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
+              }
+
+              const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td><td>${formData.adj_quantity}</td>`;
+              const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
+
+              const head2Row = document.createElement('tr');
+              head2Row.innerHTML = `
+                <td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>
+                <td>${head1Counter}.${head2Counter}</td>
+                <td>${formData.element || ''}</td>
+                <td>${formData.sub_element || ''}</td>
+                <td>${formData.description_sub_sub_element || ''}</td>
+                <td style="padding-left:60px !important;">${formData.description_item}</td>
+                <td>${formData.description_unit || ''}</td>
+                ${unitQuantityHTML}
+                ${getHideHTML}
+                ${quotationTDs}
+              `;
+              tableBody.appendChild(head2Row);
+              head2Row.querySelector('.edit-button').addEventListener('click', (event) => {
+                const formId = event.target.dataset.formid;
+                this.editDescription(formId);
+              });
+            }
+          }
+
+          let totalSubconTDs = '';
+          let discountGivenTDs = '';
+          let afterdiscountTDs = '';
+          let overrumTDs = '';
+          let winnerTDs = '';
+          let rateTDs = '';
+          for (const subconAmount of Object.values(totalQuotationAmounts)) {
+            totalSubconTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
+            discountGivenTDs += `<td colspan="2" >${subconAmount[0].discount_given}</td>`;
+            afterdiscountTDs += `<td colspan="2" >${subconAmount[0].afterDiscount_give}</td>`;
+            overrumTDs += `<td colspan="2" >${subconAmount[0].afterDiscount_give}</td>`;
+            winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}sd</b></td>`;
+            rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
+          }
+
+          const getHideHTML = isHide ? '' : `<td colspan="4"></td>`;
+        
+          const tableFoot = document.querySelector('.nested-table tfoot');
+          tableFoot.innerHTML = `
+          <tr>
+              ${getHideHTML}
+              <td colspan="7"><b>BQ Total Amount (RM)</b></td>
+              ${totalSubconTDs}
+            </tr>
+            <tr>
+              ${getHideHTML}
+              <td colspan="7"><b>ADJ Total Amount (RM)</b></td>
+              ${totalSubconTDs}
+            </tr>
+            <tr>
+              ${getHideHTML}
+              <td colspan="7" ><b>Discount Given (RM)</b></td>
+              ${discountGivenTDs}
+            </tr>
+            <tr>
+              ${getHideHTML}
+              <td colspan="7" ><b>After Discount Given (RM)</b></td>
+              ${afterdiscountTDs}
+            </tr>
+            <tr>
+              ${getHideHTML}
+              <td colspan="7" ><b>Total Saving / Overrun (RM)</b></td>
+              ${overrumTDs}
+            </tr>
+            <tr>
+              ${getHideHTML}
+              <td colspan="7" ></td>
+              ${rateTDs}
+            </tr>
+            <tr>
+              ${getHideHTML}
+              <td colspan="7" ></td>
+              ${winnerTDs}
+            </tr>
+          `;
+          
+        } else {
+          const tableBody = document.querySelector('.nested-table tbody');
+          tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
+        
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        this.errorMessage = 'An error occurred while fetching data.';
+      }
+    },
+    downloadExcelTemplate() {
+      const wb = XLSX.utils.book_new();
+      const clonedTable = document.querySelector('#data-table').cloneNode(true);
+
+      clonedTable.querySelectorAll('.edit_note').forEach(icon => {
+        icon.parentNode.removeChild(icon);
+      });
+
+      clonedTable.querySelectorAll('tfoot tr').forEach(row => {
+        const firstCell = row.cells[0];
+        if (firstCell && firstCell.getAttribute('colspan') === '7') {
+          firstCell.setAttribute('colspan', '7');
         }
       });
-    });
+
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
+      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+      XLSX.writeFile(wb, 'comparisonTable.xlsx');
+    },
+    EditMessage(message) {
+      this.UpdateMessage = message;
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    EditErrorMessage(message) {
+      this.FailMessage = message;
+      setTimeout(() => {
+        this.FailMessage = '';
+      }, 2000);
+    },
+    submitQuotation() {
+      this.submitModal = true;
+    },
   },
 };
 </script>
+
+<style>
+.nested-table tfoot {
+  border-top: 1px solid #bbb;
+}
+
+.nested-table tfoot td {
+  text-align: right;
+  border-left: 1px solid #ddd;
+}
+
+</style>

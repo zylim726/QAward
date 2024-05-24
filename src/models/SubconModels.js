@@ -9,10 +9,12 @@ const SubconModels = {
       reg_no: config.reg_no,
       gst_id: config.gst_id,
       address: config.address,
-      acc_code: config.acc_code,
+      phone_fex: config.phone_fex,
       phone: config.phone,
       contact_person: config.contact_person,
-      email: config.email,
+      email_1: config.email_1,
+      email_2: config.email_2,
+      email_3: config.email_3,
       short_code: config.short_code
     }));
 

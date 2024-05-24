@@ -1,5 +1,6 @@
 import { axios, config } from "@/services";
 import CallQuotationModels from "@/models/CallQuotationModels.js";
+import UnittypeModels from "@/models/UnittypeModels.js";
 
 const CallofQuotationController = {
   async accessCQ() {
@@ -64,7 +65,7 @@ const CallofQuotationController = {
           trade_location1: updatedData.trade_location1, 
           actual_calling_quotation_date: updatedData.actual_calling_quotation_date, 
           awading_target_date: updatedData.awading_target_date, 
-          aa_budget_amount: updatedData.aa_budget_amount,
+          budget_amount: updatedData.budget_amount,
           remarks: updatedData.remarks
         }, { headers });
 
@@ -82,8 +83,6 @@ const CallofQuotationController = {
       const response = await axios.get(`${apiHost}/call_for_quotation/showByProject/${projectId}`, {
         headers,
       });
-
-      console.log('response',response.data);
 
       const processedData = CallQuotationModels.processResponseData(response.data);
       return processedData;
@@ -109,7 +108,7 @@ const CallofQuotationController = {
           trade_location1: formData.location,
           actual_calling_quotation_date: formData.CallingQuotationDate,
           awading_target_date: formData.awadingtaget,
-          aa_budget_amount: formData.budgetAmount,
+          budget_amount: formData.budgetAmount,
           remarks: formData.remarks,
           status: 'Pending',
           project_id: projectId
@@ -158,6 +157,24 @@ const CallofQuotationController = {
     } catch (error) {
         const errorMessage = error.response.data.message;
         throw errorMessage; 
+    }
+  },
+  async getUnittype(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+
+      const response = await axios.get(`${apiHost}/cq_unit_type/showByCallForQuotation/${id}`, {
+        headers,
+      });
+       const processedData = UnittypeModels.processResponseData(response.data);
+       return processedData;
+      
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
     }
   },
 };

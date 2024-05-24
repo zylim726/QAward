@@ -135,8 +135,7 @@
   border: 1px solid #ddd;
   text-align: center;
   padding: 13px;
-  overflow: visible; /* Allow overflow for full text visibility */
-  white-space: nowrap;
+  overflow: visible;
 }
 
 
@@ -153,7 +152,7 @@
 
 .table-container {
   overflow-x: auto;
-  white-space: nowrap;
+ 
 }
 
 .finalTable {

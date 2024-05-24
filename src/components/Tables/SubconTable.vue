@@ -27,7 +27,7 @@
             <th>No</th>
             <th>Name</th>
             <th>Reg No</th>
-            <th>Acc Code</th>
+            <th>Gst Id</th>
             <th>Email</th>
             <th>Short Code</th>
             <th>Phone</th>
@@ -39,8 +39,8 @@
             <td>{{ index + 1 }}</td>
             <td>{{ subcon.name }}</td>
             <td>{{ subcon.reg_no }}</td>
-            <td>{{ subcon.acc_code }}</td>
-            <td>{{ subcon.email }}</td>
+            <td>{{ subcon.gst_id }}</td>
+            <td>{{ subcon.email_1 }}</td>
             <td>{{ subcon.short_code }}</td>
             <td>{{ subcon.contact_person }}({{ subcon.phone }})</td>
             <td style="text-align: center" v-if="hasAccess">

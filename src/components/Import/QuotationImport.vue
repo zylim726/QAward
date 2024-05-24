@@ -34,14 +34,10 @@
             <th scope="col">Sub Sub Element</th>
             <th scope="col">Description</th>
             <th scope="col">Unit</th>
-            <th scope="col">Type A1</th>
-            <th scope="col">Type E1</th>
-            <th scope="col">Type C1</th>
+            <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.type }}</th>
             <th scope="col">BQ Qty</th>
             <th scope="col">ADJ Qty</th>
             <th scope="col">QTY</th>
-            <th scope="col">Vendor</th>
-            <th scope="col">Rate</th>
           </tr>
         </thead>
         <tbody>
@@ -67,14 +63,27 @@
 
 <script>
 import Import from "papaparse";
+import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 
 export default {
+  props: {
+    cqId: {
+      type: Number,
+      required: true
+    }
+  },
   data() {
     return {
       importedData: [],
       columnTitles: [],
       selectAll: false,
+      Unittype: [],
     };
+  },
+  watch: {
+    cqId(newValue, oldValue) {
+      this.getUnittype(newValue);
+    }
   },
   computed: {
     filteredColumns() {
@@ -82,6 +91,14 @@ export default {
     },
   },
   methods: {
+    async getUnittype(id) {
+      try {
+        const processedData = await CallofQuotationController.getUnittype(id);
+        this.Unittype = processedData;
+      } catch (error) {
+        console.error('Error fetching Unittype:', error);
+      }
+    },
     quotationUpload(event) {
       const file = event.target.files[0];
       Import.parse(file, {
@@ -102,38 +119,23 @@ export default {
     },
     displayValue(value, key) {
       if (typeof value === "boolean") {
-        return ""; // Hide boolean columns
+        return "";
       }
-      return value; // Show non-boolean columns
+      return value; 
     },
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
-    openCSV() {
-      console.log("Button clicked");
-
-      const filePath =
-        "file:///C:/Users/zylim/Desktop/Project%20Subcon%20Comparison/src/assets/template/template.csv";
-
-      window.open(filePath, "_blank");
-    },
     downloadExcelTemplate() {
-      // Fetch the CSV file using Axios
       axios
         .get("@/assets/template/summary-template.csv", { responseType: "blob" })
         .then((response) => {
-          // Create a Blob object from the response data
           const blob = new Blob([response.data], { type: "text/csv" });
 
-          // Create a temporary anchor element
           const link = document.createElement("a");
           link.href = window.URL.createObjectURL(blob);
           link.download = "excel_template.csv";
-
-          // Programmatically click the anchor element to trigger the download
           link.click();
-
-          // Remove the temporary anchor element
           link.remove();
         })
         .catch((error) => {

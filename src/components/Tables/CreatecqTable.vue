@@ -37,12 +37,12 @@
       </div>
 
       <div class="form-group">
-        <label><b>AA Budget Amount:</b></label>
+        <label><b>Budget Amount:</b></label>
         <input
         v-model="module.budgetAmount"
           type="number"
           class="form-control"
-          placeholder="Enter AA Budget Amount"
+          placeholder="Enter Budget Amount"
           required
         />
       </div>

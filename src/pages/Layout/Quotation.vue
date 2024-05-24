@@ -1,14 +1,20 @@
 <template>
   <div class="content">
+    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="md-layout">
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
-        style="padding: 0px 17px"
-      >
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
+        <label style="margin-right: 10px; float: right" class="file-label">
+          <md-icon class="mdIcon">upload_file</md-icon>
+          <input type="file" multiple @change="importDataFromFiles" />
+        </label>
+        <button @click="downloadExcelTemplate" class="transparentButton" style="margin-right: 10px; float: right">
+          <md-icon class="mdIcon">download_for_offline</md-icon>
+        </button>
         <md-card>
           <md-card-content>
             <div class="table-container">
-              <table class="nested-table">
+              <table class="nested-table" id="data-table">
                 <thead>
                   <tr>
                     <th scope="col">Item</th>
@@ -17,241 +23,230 @@
                     <th scope="col">Sub Sub Element</th>
                     <th scope="col">Description</th>
                     <th scope="col">Unit</th>
-                    <th scope="col">Type A1</th>
-                    <th scope="col">Type E1</th>
-                    <th scope="col">Type C1</th>
-                    <th scope="col">BQ Qty</th>
-                    <th scope="col">ADJ Qty</th>
-                    <th scope="col">QTY</th>
-                    <th scope="col" colspan="2">
-                      <input
-                        type="text"
-                        style="width: 100%"
-                        placeholder="Wekwork"
-                      />
+                    <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
+                      {{ unitdata.cqUnitType.type }}
                     </th>
+                    <th scope="col">BQ Qty</th>
+                    <th scope="col">(ADJ) QTY</th>
+                    <th scope="col">{{ columnKTitle }}</th>
                   </tr>
                   <tr>
                     <th colspan="6"></th>
-                    <th scope="col">24</th>
-                    <th scope="col">40</th>
-                    <th scope="col">38</th>
-                    <th scope="col"></th>
+                    <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
+                      {{ unitdata.cqUnitType.quantity }}
+                    </th>
                     <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col">Rate</th>
-                    <th scope="col">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Element</td>
-                    <td>Sub Element</td>
-                    <td>WATERPROOFING</td>
-                    <td>EXTERNAL FLOOR FINISHES</td>
-                    <td colspan="9"></td>
-                  </tr>
-                  <tr>
-                    <td>1.1</td>
-                    <td colspan="3"></td>
-                    <td>Work in Connection With Waterproofing</td>
-                    <td colspan="9"></td>
-                  </tr>
-                  <tr>
-                    <td><b>1.1.1</b></td>
-                    <td colspan="3"></td>
-                    <td>
-                      <b
-                        >Laid on concrete floors (RC Coping at Carporch & AC
-                        Ledge)</b
-                      >
-                    </td>
-                    <td><b>m2</b></td>
-                    <td><b>10.90</b></td>
-                    <td><b>21.90</b></td>
-                    <td><b>18.90</b></td>
-                    <td colspan="2"></td>
-                    <td><b>24539.90</b></td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><b>1.1.2</b></td>
-                    <td colspan="3"></td>
-                    <td>
-                      <b
-                        >Laid on concrete floors (RC Coping at Carporch & AC
-                        Ledge)</b
-                      >
-                    </td>
-                    <td><b>m2</b></td>
-                    <td><b>9.90</b></td>
-                    <td><b>21.90</b></td>
-                    <td><b>18.90</b></td>
-                    <td colspan="2"></td>
-                    <td><b>24539.90</b></td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><b>1.1.3</b></td>
-                    <td colspan="3"></td>
-                    <td>
-                      <b
-                        >Laid on concrete floors (RC Coping at Carporch & AC
-                        Ledge)</b
-                      >
-                    </td>
-                    <td><b>m2</b></td>
-                    <td><b>10.90</b></td>
-                    <td><b>21.90</b></td>
-                    <td><b>18.90</b></td>
-                    <td colspan="2"></td>
-                    <td><b>24539.90</b></td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Element</td>
-                    <td>Sub Element</td>
-                    <td>WATERPROOFING</td>
-                    <td>EXTERNAL FLOOR FINISHES</td>
-                    <td colspan="5"></td>
-                  </tr>
-                  <tr>
-                    <td>2.1</td>
-                    <td colspan="3"></td>
-                    <td>Work in Connection With Waterproofing</td>
-                    <td colspan="5"></td>
-                  </tr>
-                  <tr>
-                    <td><b>2.1.1</b></td>
-                    <td colspan="3"></td>
-                    <td>
-                      <b
-                        >Laid on concrete floors (RC Coping at Carporch & AC
-                        Ledge)</b
-                      >
-                    </td>
-                    <td><b>m2</b></td>
-                    <td><b>10.90</b></td>
-                    <td><b>21.90</b></td>
-                    <td><b>18.90</b></td>
-                    <td colspan="2"></td>
-                    <td><b>24539.90</b></td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2.2</td>
-                    <td colspan="3"></td>
-                    <td>Work in Connection With Waterproofing</td>
-                    <td colspan="5"></td>
-                  </tr>
-                  <tr>
-                    <td><b>2.2.1</b></td>
-                    <td colspan="3"></td>
-                    <td>
-                      <b
-                        >Laid on concrete floors (RC Coping at Carporch & AC
-                        Ledge)</b
-                      >
-                    </td>
-                    <td><b>m2</b></td>
-                    <td><b>10.90</b></td>
-                    <td><b>21.90</b></td>
-                    <td><b>18.90</b></td>
-                    <td colspan="2"></td>
-                    <td><b>24539.90</b></td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Element</td>
-                    <td>Sub Element</td>
-                    <td>WATERPROOFING</td>
-                    <td>EXTERNAL FLOOR FINISHES</td>
-                    <td colspan="5"></td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>Element</td>
-                    <td>Sub Element</td>
-                    <td>WATERPROOFING</td>
-                    <td>EXTERNAL FLOOR FINISHES</td>
-                    <td colspan="5"></td>
-                  </tr>
-                  <tr>
-                    <td><b>4.1.1</b></td>
-                    <td colspan="3"></td>
-                    <td>
-                      <b
-                        >Laid on concrete floors (RC Coping at Carporch & AC
-                        Ledge)</b
-                      >
-                    </td>
-                    <td><b>m2</b></td>
-                    <td><b>10.90</b></td>
-                    <td><b>21.90</b></td>
-                    <td><b>18.90</b></td>
-                    <td colspan="2"></td>
-                    <td><b>24539.90</b></td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                    <td>
-                      <input type="number" style="width: 100%" step="0.01" />
-                    </td>
-                  </tr>
                 </tbody>
               </table>
             </div>
+            <br>
+            <button type="submit" class="btn-save" @click="saveAllData">Submit</button>
+            <br>
           </md-card-content>
+          <br>
         </md-card>
-      </div>
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
-      >
-        <md-card>
-          <md-card-content>
-            <quotation-import></quotation-import>
-          </md-card-content>
-        </md-card>
-        <button type="submit" class="btn-save">Save</button>
+        <br>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { QuotationImport } from "@/components";
+const XLSX = require('xlsx');
+import DescriptionController from "@/services/controllers/DescriptionController.js";
+import QuotationController from "@/services/controllers/QuotationController.js";
 
 export default {
-  components: {
-    QuotationImport,
+  data() {
+    return {
+      cqId: 0,
+      UpdateMessage: null,
+      FailMessage: null,
+      cqUnit: [],
+      columnKTitle: '',
+      columnKData: [],
+      QuotationDataArray: [], 
+    };
   },
+  mounted() {
+    const id = this.$route.query.cqId;
+    this.getNewDescription(id)
+      .then(() => {
+        this.generateTable(this.Description, id);
+      })
+      .catch(error => {
+        console.error('Error fetching Description:', error);
+        this.FailMessage = error.message;
+      });
+  },
+  computed: {
+    getCqUnitTypes() {
+      return this.cqUnit.length > 0 ? this.cqUnit : [];
+    }
+  },
+  methods: {
+    async getNewDescription(id) {
+      try {
+        const processedData = await DescriptionController.getNewDescription(id);
+        this.Description = processedData;
+        this.cqUnit = processedData[0].cqUnitType || [];
+      } catch (error) {
+        console.error('Error fetching Description:', error);
+        throw error;
+      }
+    },
+    importDataFromFiles(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const columnK = XLSX.utils.sheet_to_json(worksheet, { header: 1 }).map(row => row[9]);
+          this.columnKTitle = columnK[0];
+
+          const columnKData = [];
+          let foundRate = false;
+
+          for (let i = 0; i < columnK.length; i++) {
+            if (foundRate && columnK[i] !== undefined) {
+              columnKData.push(columnK[i]);
+            } else if (columnK[i] === 'Rate') {
+              foundRate = true;
+            }
+          }
+          this.columnKData = columnKData; 
+          this.generateTable(this.Description, this.$route.query.cqId, columnKData);
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    },
+    generateTable(data, id, columnKData) {
+      const tableBody = document.querySelector('#data-table tbody');
+      let head1Counter = 0;
+      let head2Counter = 0;
+      let prevHead1 = null;
+      let prevHead2 = null;
+      tableBody.innerHTML = '';
+
+      if (!Array.isArray(columnKData) || columnKData.length === 0) {
+        columnKData = new Array(data.length).fill('');
+      }
+
+      let columnKDataIndex = 0;
+
+      data.forEach((formData, dataIndex) => {
+        const cqUnitType = formData.cqUnitType;
+
+        if (formData.bq_quantity === 0) {
+          head1Counter++;
+          prevHead1 = formData.description_item;
+
+          const head1Row = document.createElement('tr');
+          head1Row.innerHTML = `
+            <td><b>${head1Counter}</b></td>
+            <td><b>${formData.element || ''}</b></td>
+            <td><b>${formData.sub_element || ''}</b></td>
+            <td><b>${formData.description_sub_sub_element || ''}</b></td>
+            <td><b>${formData.description_item}</b></td>
+            <td><b>${formData.description_unit || ''}</b></td>
+          `;
+          tableBody.appendChild(head1Row);
+
+          head2Counter = 0;
+          prevHead2 = null;
+        }
+
+        if (formData.bq_quantity !== 0) {
+          head2Counter++;
+          prevHead2 = formData.description_item;
+
+          let unitQuantityTDs = '';
+          cqUnitType.forEach(cqUnit => {
+            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
+          });
+
+          const head2Row = document.createElement('tr');
+          head2Row.innerHTML = ` 
+            <td>${head1Counter}.${head2Counter}</td>
+            <td>${formData.element || ''}</td>
+            <td>${formData.sub_element || ''}</td>
+            <td>${formData.description_sub_sub_element || ''}</td>
+            <td style="padding-left:60px !important;">${formData.description_item}</td>
+            <td>${formData.description_unit || ''}</td> 
+            ${unitQuantityTDs}
+            <td>${formData.bq_quantity}</td>
+            <td>${formData.adj_quantity}</td>
+            <td style="text-align:center;">${columnKData[columnKDataIndex] !== undefined ? columnKData[columnKDataIndex] : ''}</td>
+          `;
+          tableBody.appendChild(head2Row);
+
+          this.QuotationDataArray.push({
+            description_id: formData.id,
+            quotationName: this.columnKTitle,
+            rate: columnKData[columnKDataIndex] || '',
+            cqId: id
+          });
+
+          columnKDataIndex++;
+        }
+      });
+    },
+    async saveAllData() {
+      try {
+        for (const QuotationData of this.QuotationDataArray) {
+          await this.saveData(QuotationData);
+        }
+      } catch (error) {
+        this.$emit('fail-message', error.message);
+      }
+    },
+    async saveData(QuotationData) {
+      try {
+        this.UpdateMessage = await QuotationController.addQuotation(QuotationData);
+        setTimeout(() => {
+        this.UpdateMessage = '';
+        window.location.reload(); 
+      }, 2000);
+      } catch (error) {
+        this.FailMessage =  error.message;
+        setTimeout(() => {
+        this.UpdateMessage = '';
+        window.location.reload(); 
+      }, 2000);
+      }
+    },
+    downloadExcelTemplate() {
+      const wb = XLSX.utils.book_new();
+      const dataTable = document.querySelector('#data-table');
+      const ws = XLSX.utils.table_to_sheet(dataTable);
+
+      // Convert the worksheet to JSON to manipulate columns easily
+      const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+      // Remove the "BQ Qty" column from each row
+      const updatedData = jsonData.map(row => {
+        // The "BQ Qty" column is the 8th column (index 7)
+        if (Array.isArray(row) && row.length > 8) {
+          row.splice(8, 1); // Remove the 9th column
+        }
+        return row;
+      });
+
+      // Create a new worksheet with the updated data
+      const updatedWs = XLSX.utils.aoa_to_sheet(updatedData);
+      XLSX.utils.book_append_sheet(wb, updatedWs, 'Table Data');
+      XLSX.writeFile(wb, 'table_data.xlsx');
+    }
+  }
 };
 </script>

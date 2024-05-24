@@ -10,7 +10,7 @@
         class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
       >
         <md-card>
-          <md-card-content>
+          <md-card-content style="font-size: 13px !important;line-height: 17px !important">
             <div>
               <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
               <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
@@ -34,7 +34,7 @@
                   >
                 </div>
               </div>
-              <div class="table-container" style="min-height: 500px;">
+              <div class="table-container" style="min-height: 100px;max-height: 600px;">
                 <table>
                   <thead>
                     <tr>
@@ -53,8 +53,10 @@
                       <th>Awarded to</th>
                       <th>LA Ref</th>
                       <th>LA Date</th>
-                      <th>AA Budget Amount (RM)</th>
+                      <th>Budget Amount (RM)</th>
+                      <th>Budget (ADJ) Amount (RM)</th>
                       <th>Subcontract Amount (RM)</th>
+                      <th>Subcontract (ADJ) Amount (RM)</th>
                       <th>Cost Saving / (Overrun) (RM)</th>
                       <th style="text-align: center">Status</th>
                     </tr>
@@ -68,7 +70,7 @@
                   </thead>
                   
                   <tbody>
-                    <tr v-if="errorMessage" ><td colspan="21" class="message">{{ errorMessage }}</td></tr>
+                    <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td>
                         <li class="md-list-item">
@@ -111,7 +113,9 @@
                       <td></td>
                       <td></td>
                       <td></td>
-                      <td>{{ callQuotation.aa_budget_amount }}</td>
+                      <td>{{ callQuotation.budget_amount }}</td>
+                      <td>{{ callQuotation.adj_budget_amount }}</td>
+                      <td></td>
                       <td></td>
                       <td></td>
                       <td>
@@ -142,12 +146,6 @@ export default {
   components: {
     EditCQ,
     DeleteCQ
-  },
-  props: {
-    tableHeaderColor: {
-      type: String,
-      default: "",
-    },
   },
   data() {
     return {
@@ -205,11 +203,7 @@ export default {
           this.errorMessage = "An error occurred while fetching projects.";
         }
       } catch (error) {
-        if (error.errorMessage === undefined) {
-          this.errorMessage = "Error fetching data: " + Error.getMessage(504);
-        } else {
-          this.errorMessage = "Error fetching data: " + error.errorMessage;
-        }
+        this.errorMessage = "Error fetching data: " + error.errorMessage;
       }
     },
     closeOtherDropDowns(clickedItem) {
@@ -283,7 +277,7 @@ thead th {
   border-bottom: none;
   padding: 10px;
   text-align: left;
-  white-space: nowrap; 
+
 }
 
 tbody td {

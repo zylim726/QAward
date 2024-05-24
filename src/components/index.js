@@ -3,7 +3,6 @@ import ComparisonTable from "./Tables/ComparisonTable.vue";
 import ApprovalTable from "./Tables/ApprovalTable.vue";
 import CreatecqTable from "./Tables/CreatecqTable.vue";
 import UnittypeTable from "./Tables/UnittypeTable.vue";
-import DescriptionTable from "./Tables/DescriptionTable.vue";
 import VendorTable from "./Tables/VendorTable.vue";
 import TotalTable from "./Tables/TotalTable.vue";
 import ProjectcontrolTable from "./Tables/ProjectcontrolTable.vue";
@@ -11,6 +10,8 @@ import AccessuserTable from "./Tables/AccessuserTable.vue";
 import PermissionTable from "./Tables/PermissionTable.vue";
 import GetcallquotationTable from "./Tables/GetcallquotationTable.vue";
 import SubconTable from "./Tables/SubconTable.vue";
+import ProjectTable from "./Tables/ProjectTable.vue";
+
 
 // MODAL
 import Modal from "./Pop-Up-Modal/Modal.vue";
@@ -20,7 +21,10 @@ import Createsubcon from "./Pop-Up-Modal/Createsubcon.vue";
 import DeleteCQ from "./Pop-Up-Modal/DeleteCQ.vue";
 import EditCQ from "./Pop-Up-Modal/EditCQ.vue";
 import EditSubcon from "./Pop-Up-Modal/EditSubcon.vue";
-import DeleteSubcon from "./Pop-Up-Modal/DeleteSubcon.vue";
+import DeleteSubcon from "./Pop-Up-Modal/DeleteProject.vue";
+import Createproject from "./Pop-Up-Modal/Createproject.vue";
+import EditProject from "./Pop-Up-Modal/EditProject.vue";
+import DeleteProject from "./Pop-Up-Modal/DeleteProject.vue";
 
 // IMPORT
 import UnittypeImport from "./Import/UnittypeImport.vue";
@@ -37,7 +41,6 @@ export {
   UnittypeTable,
   UnittypeImport,
   DescriptionImport,
-  DescriptionTable,
   VendorTable,
   TotalTable,
   QuotationImport,
@@ -50,7 +53,11 @@ export {
   EditCQ,
   GetcallquotationTable,
   SubconTable,
+  ProjectTable,
   Createsubcon,
   EditSubcon,
-  DeleteSubcon
+  DeleteSubcon,
+  Createproject,
+  EditProject,
+  DeleteProject
 };
