@@ -34,8 +34,8 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="(module, index) in uniqueModules">
-            <tr :key="moduleKeys[index]"> 
+          <div v-for="(module, index) in uniqueModules" :key="moduleKeys[index]">
+            <tr > 
               <td><b>{{ module.module }}</b></td>
               <td colspan="5"></td>
             </tr>
@@ -73,7 +73,7 @@
                   @change="updatePermission(permission, module.module, 'PD')">
               </td>
             </tr>
-          </template>
+          </div>
         </tbody>
       </table>
       <br />
