@@ -7,17 +7,15 @@
         <br />
         <hr style="margin-top: -10px" />
         <br />
-        <p>Remarks : </p>
-        <!-- Bind input value to remarksData -->
+        <p>Remarks:</p>
         <input
-            type="text"
-            placeholder="Remarks"
-            class="typeInput"
-            v-model="remarksData"
+          type="text"
+          placeholder="Remarks"
+          class="typeInput"
+          v-model="remarksData"
         />
       </div>
       <button class="btn-save" aria-label="close" @click.stop="closesubmitModal">Close</button>
-      <!-- Pass remarksData and ApprovalData to saveAndCloseModal -->
       <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal(remarksData, ApprovalData)">Save</button>
     </div>
   </div>
@@ -46,37 +44,26 @@ export default {
       remarksData: ""
     };
   },
-  mounted() {
-    this.$emit('open');
-  },
   methods: {
     closesubmitModal() {
       this.$emit("close");
+      this.scrollToTop(); 
     },
-    saveAndCloseModal(remarksData, approvalData) {
-      this.addCQApproval(remarksData, approvalData);
-      //this.closeEditModal();
-    },
-    async addCQApproval(remarksData, approvalData) {
+    async saveAndCloseModal(remarksData, approvalData) {
       try {
-        this.UpdateMessage = await QuotationController.addCQApproval(remarksData, approvalData);
-        console.log('message',this.UpdateMessage);
-        //this.$emit('editMessage', this.UpdateMessage);
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 1000); 
+        const SuccessMessage = await QuotationController.addApproval(remarksData, approvalData);
+        const concatenatedMessage = SuccessMessage.join(', ');
+        const Message = concatenatedMessage.split(',')[0].trim();
+        this.$emit('editMessage', Message); // Emit the message
+        this.closesubmitModal(); // Close the modal
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
+        this.scrollToTop(); // Call the method to scroll to the top
       }
-    }
-  },
-  watch: {
-    // Watch for changes in ApprovalData
-    ApprovalData: {
-      handler(newValue, oldValue) {
-      },
-      immediate: true // Log the initial value immediately
+    },
+    scrollToTop() {
+      window.scrollTo(0, 0); // Scroll to the top of the window
     }
   }
 };

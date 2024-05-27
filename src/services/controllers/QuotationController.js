@@ -5,7 +5,6 @@ const QuotaionController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        const messages = [];
 
         const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${QuotationData.quotationName}`, {
             headers,
@@ -14,7 +13,6 @@ const QuotaionController = {
         const calculateSubcon = getSubcon.data.data;
 
         if (calculateSubcon.length > 0) {
-            // Array to hold all promises for asynchronous operations
             const promises = calculateSubcon.map(async (item) => {
                 try {
                     const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
@@ -41,35 +39,29 @@ const QuotaionController = {
                 }
             });
 
-            // Wait for all promises to resolve
             const responses = await Promise.all(promises);
 
-            // Concatenate all messages
-            return responses.join(', '); // Or return any other formatted message
+            return responses.join(', '); 
         } 
     } catch (error) {
         throw error;
     }
   },
-  async addCQApproval(remarksData, approvalDataArray){
+  async addApproval(remarksData, approvalDataArray){
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        //const userId = localStorage.getItem('userid');
-        const userId = '1';
         const messages = [];
-        for (const appData of approvalDataArray){
+        const cqId = approvalDataArray[0].cqId;
+        
+        const response = await axios.post(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+            remarks: remarksData,
+            status: 'Waiting Approval',
+        }, { headers });
 
-            const response = await axios.post(`${apiHost}/cq_approval/add`, {
-                approval_remarks: remarksData,
-                approval_status: Approval,
-                call_for_quotation_id: appData.cqId,
-                call_for_quotation_subcon_list_id: appData.callSubconId,
-                system_user_id: userId
-            }, { headers });
-            console.log('response',response);
-            //messages.push(response.data.message);
-        }       
+        console.log('response',response);
+        messages.push(response.data.message);
+            
 
         return messages;
 

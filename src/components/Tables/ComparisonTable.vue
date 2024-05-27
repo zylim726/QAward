@@ -68,8 +68,11 @@
       <p>Are you sure you want to submit the quotation?</p>
       <button class="btn-save" @click="submitQuotation">Submit</button>
     </div>
+    <div class="box-container">
+      <div class="box"></div>
+    </div>
     <EditDescription :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
-    <SubmitModal :submit-modal="submitModal" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
+    <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
   </div>
 </template>
 
@@ -169,6 +172,48 @@ export default {
             const getQuotation = formData.quotation;
             this.QuotationName = getQuotation;
 
+            let quotationTDs = '';
+            let noquotationTDs = '';
+            for (const quotationRate of getQuotation) {
+              const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
+              const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
+           
+              if (!totalQuotationAmounts[SubconId]) {
+                totalQuotationAmounts[SubconId] = totalQuotation;
+              } else {
+                totalQuotationAmounts[SubconId] = {
+                  ...totalQuotationAmounts[SubconId],
+                  ...totalQuotation
+                };
+              }
+
+              if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
+              this.ApprovalDataArray.push({
+                cqId: id,
+                callSubconId: quotationRate.call_for_quotation_subcon_list_id
+              });
+              }
+              quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
+                              <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
+            
+              noquotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important"></td>
+                                <td style="text-align:center;border-right:1px solid #ddd !important"></td>`;
+            }
+
+            let unitQuantityTDs = '';
+            let nounitQuantityTDs = '';
+            cqUnitType.forEach((cqUnit) => {
+              unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
+              nounitQuantityTDs += `<td style="text-align:center;"></td>`;
+            });
+
+
+            const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td><td>${formData.adj_quantity}</td>`;
+            const getNoHideHTML = isHide ? '' : `<td>$</td><td></td>`;
+            const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
+            const nounitQuantityHTML = isHide ? '' : nounitQuantityTDs;
+
+
             if (formData.bq_quantity === 0) {
               head1Counter++;
 
@@ -180,6 +225,10 @@ export default {
                 <td><b>${formData.sub_element || ''}</b></td>
                 <td><b>${formData.description_sub_sub_element || ''}</b></td>
                 <td><b>${formData.description_item}</b></td>
+                <td></td>
+                ${nounitQuantityHTML}
+                ${getNoHideHTML}
+                ${noquotationTDs}
               `;
               tableBody.appendChild(head1Row);
 
@@ -193,41 +242,7 @@ export default {
 
             if (formData.bq_quantity !== 0) {
               head2Counter++;
-
-              let unitQuantityTDs = '';
-              cqUnitType.forEach((cqUnit) => {
-                unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
-              });
-
-              let quotationTDs = '';
-              for (const quotationRate of getQuotation) {
-                const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
-                const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-
-                if (!totalQuotationAmounts[SubconId]) {
-                  totalQuotationAmounts[SubconId] = totalQuotation;
-                } else {
-                  totalQuotationAmounts[SubconId] = {
-                    ...totalQuotationAmounts[SubconId],
-                    ...totalQuotation
-                  };
-                }
-
-                if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
-                this.ApprovalDataArray.push({
-                  cqId: id,
-                  callSubconId: quotationRate.call_for_quotation_subcon_list_id
-                });
-                }
-
-    
-                quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
-                                <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
-              }
-
-              const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td><td>${formData.adj_quantity}</td>`;
-              const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
-
+      
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
                 <td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>
@@ -249,17 +264,19 @@ export default {
             }
           }
 
-          let totalSubconTDs = '';
+          let bqTotalAmountTDs = '';
+          let adjTotalAmountTDs = '';
           let discountGivenTDs = '';
-          let afterdiscountTDs = '';
+          let afterADJDiscountTDs = '';
           let overrumTDs = '';
           let winnerTDs = '';
           let rateTDs = '';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
-            totalSubconTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
+            bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalSaving}</td>`;
+            adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].adj_totalSaving}</td>`;
             discountGivenTDs += `<td colspan="2" >${subconAmount[0].discount_given}</td>`;
-            afterdiscountTDs += `<td colspan="2" >${subconAmount[0].afterDiscount_give}</td>`;
-            overrumTDs += `<td colspan="2" >${subconAmount[0].afterDiscount_give}</td>`;
+            afterADJDiscountTDs += `<td colspan="2" >${subconAmount[0].afterADJDiscount_give}</td>`;
+            overrumTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
             winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}sd</b></td>`;
             rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
           }
@@ -268,15 +285,15 @@ export default {
         
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
-          <tr>
+            <tr>
               ${getHideHTML}
               <td colspan="7"><b>BQ Total Amount (RM)</b></td>
-              ${totalSubconTDs}
+              ${bqTotalAmountTDs}
             </tr>
             <tr>
               ${getHideHTML}
               <td colspan="7"><b>ADJ Total Amount (RM)</b></td>
-              ${totalSubconTDs}
+              ${adjTotalAmountTDs}
             </tr>
             <tr>
               ${getHideHTML}
@@ -286,7 +303,7 @@ export default {
             <tr>
               ${getHideHTML}
               <td colspan="7" ><b>After Discount Given (RM)</b></td>
-              ${afterdiscountTDs}
+              ${afterADJDiscountTDs}
             </tr>
             <tr>
               ${getHideHTML}
@@ -338,12 +355,14 @@ export default {
       this.UpdateMessage = message;
       setTimeout(() => {
         this.UpdateMessage = '';
+        window.scrollTo(0, 0);
       }, 2000);
     },
     EditErrorMessage(message) {
       this.FailMessage = message;
       setTimeout(() => {
         this.FailMessage = '';
+        window.scrollTo(0, 0);
       }, 2000);
     },
     submitQuotation() {
@@ -360,7 +379,10 @@ export default {
 
 .nested-table tfoot td {
   text-align: right;
-  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
 }
+
+
+
 
 </style>

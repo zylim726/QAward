@@ -63,9 +63,11 @@ export default {
   methods: {
     async LoginSubmit() {
       const { token, username, userid, accesslevel, message, success } = await LoginController.login(this.username, this.password);
+      localStorage.setItem('userid', userid);
+      
       if (success) {
-        store.dispatch('setToken', { token, username, userid, accesslevel });
-        
+        store.dispatch('setToken', { token, username, accesslevel });
+      
         const projectId = localStorage.getItem('projectId');
         const projectName = localStorage.getItem('projectName');
         
@@ -73,7 +75,7 @@ export default {
           this.$router.push({ name: 'Project List' });
         } else {
           this.$router.push({ name: 'Call For Quotation' });
-        }
+         }
         
       } else {
        this.$refs.errorModal.openModal('Error Message',message);

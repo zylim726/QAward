@@ -1,12 +1,11 @@
 const LoginModel = {
     processResponseData(response) {
-      const responseData = response.data || {}; // Ensure response.data exists
-      console.log('responsedDa',responseData);
+      const responseData = response.data || {}; 
       return {
         token: String(responseData.accessToken || ''),
         accesslevel: String(responseData.accesslevel || ''),
         username: String(responseData.username || ''),
-        id: String(responseData.id || ''),
+        userid: String(responseData.user_id || ''),
         message: String(response.message || ''),
       };
     },
