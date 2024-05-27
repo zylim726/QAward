@@ -276,7 +276,7 @@ export default {
             adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].adj_totalSaving}</td>`;
             discountGivenTDs += `<td colspan="2" >${subconAmount[0].discount_given}</td>`;
             afterADJDiscountTDs += `<td colspan="2" >${subconAmount[0].afterADJDiscount_give}</td>`;
-            overrumTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
+            overrumTDs += `<td colspan="2" >${subconAmount[0].adj_totalSaving}</td>`;
             winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}sd</b></td>`;
             rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
           }
