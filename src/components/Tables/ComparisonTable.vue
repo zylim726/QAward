@@ -37,14 +37,13 @@
               <th scope="col">(ADJ) QTY</th>
             </template>
             <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
-              {{ quotationData.Call_For_Quotation_Subcon_List.subcon_id }}
+              {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
               <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id">
                   <button type="button" class="transparentButton" >
                     <md-icon style="color:orange;font-size: 34px !important;">edit_note</md-icon>
                   </button>
               </a>
               </th>
-
           </tr>
           <tr>
             <th></th>
@@ -59,29 +58,77 @@
         <tbody>
         </tbody>
         <br>
-        <tfoot style="line-height: 8px !important;">
+        <tfoot style="line-height: 2px !important;">
         </tfoot>
       </table>
       <br />
     </div>
-    <div class="confirmation-message" v-if="QuotationName.length > 0">
-      <p>Are you sure you want to submit the quotation?</p>
-      <button class="btn-save" @click="submitQuotation">Submit</button>
-    </div>
-    <div class="box-container">
-      <div class="box"></div>
-    </div>
+    <div v-for="(project, index) in projectData" :key="index">
+      <template v-if="project.status === 'Pending' && QuotationName.length > 0">
+        <div class="confirmation-message">
+          <p>Are you sure you want to submit the quotation?</p>
+          <button class="btn-save" @click="submitQuotation">Submit</button>
+        </div>
+      </template>
+      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0">
+        <div class="confirmation-message">
+          <p>Is this quotation acceptable for approval?</p>
+          <button class="btn-save" @click="approvalQuotation">Approval</button>
+          <button class="btn-save" @click="rejectedQuotation" >Rejected</button>
+        </div>
+      </template> 
+    <template v-if="project.status === 'Approval' && QuotationName.length > 0">
+      <div class="cqapprovalBox-container">
+        <template v-if="cqApprovalData.length === 0">
+          <div class="confirmation-message" style="width: 100% !important;">
+            <p>Please go to project control and get admin approval.</p>
+            <a href="projectcontrol">
+              <button class="btn-save">Project Control</button>
+            </a>
+          </div>
+        </template>
+        <template v-else><br>
+          <div class="row" v-for="(approvalData, index) in cqApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
+            <div class="cqbox">
+              <div class="left-container">
+                <div class="md-card-avatar">
+                  <img class="img" src="@/assets/img/admin.png" />
+                </div>
+              </div>
+              <div class="right-container">
+                <div v-for="user in approvalData.systemuser" :key="user.id" class="user-info">
+                  <p class="user-name">Name: {{ user.name }}</p>
+                  <p class="user-access">Level: {{ user.accesslevel }}</p>
+                </div>
+                <p style="margin: 8px 0 10px;">Quotation:</p>
+                <select v-model="selectedQuotations[index]" class="quotation-select">
+                  <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
+                    {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
+                  </option>
+                </select>
+                <p style="margin: 8px 0 10px;">Remarks:</p>
+                <textarea v-model="remarks[approvalData.id]" class="remarks-textarea"></textarea>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <button class="btn-save" @click="submitAdminApproval">Submit</button><br>
+    </template>
+  </div> 
     <EditDescription :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
   </div>
 </template>
 
 <script>
-const XLSX = require('xlsx');
 import { ref } from 'vue';
 import DescriptionController from '@/services/controllers/DescriptionController.js';
+import QuotationController from '@/services/controllers/QuotationController.js';
+import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
 import EditDescription from '@/components/Pop-Up-Modal/EditDescription.vue';
 import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
+import * as XLSX from 'xlsx';
 
 export default {
   components: {
@@ -109,11 +156,18 @@ export default {
       UpdateMessage: null,
       FailMessage: null,
       ApprovalDataArray: [],
+      cqApprovalData: [],
+      projectData: [],
+      selectedQuotations: {},
+      remarks: {},
     };
   },
   watch: {
     cqId(newValue, oldValue) {
       this.getDescription(newValue, this.isHide);
+      this.getCQApproval();
+      this.getProject(newValue);
+      this.getCQdetailsApproval(newValue);
     },
   },
   computed: {
@@ -126,9 +180,38 @@ export default {
     },
     latestApprovalData() {
       return this.ApprovalDataArray[this.ApprovalDataArray.length - 1];
+    },
+    filteredQuotationName() {
+      return this.QuotationName.filter(quotationData => quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1);
     }
   },
   methods: {
+    getRowData(rowIndex) {
+      const start = rowIndex * 4;
+      const end = start + 4;
+      return this.cqApprovalData.slice(start, end);
+    },
+    async submitAdminApproval() {
+      const approvalDataToSubmit = this.cqApprovalData.map((approvalData, index) => {
+        const selectedSubconListId = this.selectedQuotations[index];
+
+        return {
+          cqId: this.cqId,
+          userId: approvalData.system_user_id,
+          SubconListId: selectedSubconListId,
+          remark: this.remarks[approvalData.id]
+        };
+      });
+
+      try {
+        const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
+        const concatenatedMessage = SuccessMessage.join(', ');
+        const Message = concatenatedMessage.split(',')[0].trim();
+        this.UpdateMessage = Message;
+      } catch (error) {
+        console.error('Error while submitting approval data:', error);
+      }
+    },
     editDescription(id) {
       this.editId = id;
       this.editModal = true;
@@ -155,7 +238,7 @@ export default {
         }
 
         this.processedData = processedData;
-
+        
         if (processedData.length > 0) {
           const tableBody = document.querySelector('.nested-table tbody');
           tableBody.innerHTML = '';
@@ -170,53 +253,9 @@ export default {
             const cqUnitType = formData.cqUnitType;
             this.Unittype = cqUnitType;
             const getQuotation = formData.quotation;
-            this.QuotationName = getQuotation;
 
-            let quotationTDs = '';
-            let noquotationTDs = '';
-            for (const quotationRate of getQuotation) {
-              const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
-              const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-           
-              if (!totalQuotationAmounts[SubconId]) {
-                totalQuotationAmounts[SubconId] = totalQuotation;
-              } else {
-                totalQuotationAmounts[SubconId] = {
-                  ...totalQuotationAmounts[SubconId],
-                  ...totalQuotation
-                };
-              }
-
-              if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
-              this.ApprovalDataArray.push({
-                cqId: id,
-                callSubconId: quotationRate.call_for_quotation_subcon_list_id
-              });
-              }
-              quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
-                              <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
-            
-              noquotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important"></td>
-                                <td style="text-align:center;border-right:1px solid #ddd !important"></td>`;
-            }
-
-            let unitQuantityTDs = '';
-            let nounitQuantityTDs = '';
-            cqUnitType.forEach((cqUnit) => {
-              unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
-              nounitQuantityTDs += `<td style="text-align:center;"></td>`;
-            });
-
-
-            const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td><td>${formData.adj_quantity}</td>`;
-            const getNoHideHTML = isHide ? '' : `<td>$</td><td></td>`;
-            const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
-            const nounitQuantityHTML = isHide ? '' : nounitQuantityTDs;
-
-
-            if (formData.bq_quantity === 0) {
+            if (getQuotation.length <= 0 || getQuotation[0].total_quote_amount === 0) {
               head1Counter++;
-
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
                 <td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>
@@ -225,10 +264,6 @@ export default {
                 <td><b>${formData.sub_element || ''}</b></td>
                 <td><b>${formData.description_sub_sub_element || ''}</b></td>
                 <td><b>${formData.description_item}</b></td>
-                <td></td>
-                ${nounitQuantityHTML}
-                ${getNoHideHTML}
-                ${noquotationTDs}
               `;
               tableBody.appendChild(head1Row);
 
@@ -236,12 +271,46 @@ export default {
                 const formId = event.target.dataset.formid;
                 this.editDescription(formId);
               });
-
               head2Counter = 0;
             }
 
-            if (formData.bq_quantity !== 0) {
+            if (getQuotation.length > 0 && getQuotation[0].total_quote_amount !== 0) {
               head2Counter++;
+    
+              this.QuotationName = getQuotation;
+
+              let quotationTDs = '';
+              for (const quotationRate of getQuotation) {
+                const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
+                const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
+      
+                this.totalQuotationData = totalQuotation;
+
+                if (!totalQuotationAmounts[SubconId]) {
+                  totalQuotationAmounts[SubconId] = totalQuotation;
+                } else {
+                  totalQuotationAmounts[SubconId] = {
+                    ...totalQuotationAmounts[SubconId],
+                    ...totalQuotation
+                  };
+                }
+
+                if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
+                this.ApprovalDataArray.push({
+                  cqId: id,
+                  callSubconId: quotationRate.call_for_quotation_subcon_list_id
+                });
+                }
+                quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
+                                <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
+              }
+              let unitQuantityTDs = '';
+              cqUnitType.forEach((cqUnit) => {
+                unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
+              });
+
+              const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td><td>${formData.adj_quantity}</td>`;
+              const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
       
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
@@ -263,7 +332,6 @@ export default {
               });
             }
           }
-
           let bqTotalAmountTDs = '';
           let adjTotalAmountTDs = '';
           let discountGivenTDs = '';
@@ -272,12 +340,12 @@ export default {
           let winnerTDs = '';
           let rateTDs = '';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
-            bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalSaving}</td>`;
-            adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].adj_totalSaving}</td>`;
-            discountGivenTDs += `<td colspan="2" >${subconAmount[0].discount_given}</td>`;
+            bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
+            adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
+            discountGivenTDs += `<td colspan="2" >${subconAmount  [0].discount_given}</td>`;
             afterADJDiscountTDs += `<td colspan="2" >${subconAmount[0].afterADJDiscount_give}</td>`;
             overrumTDs += `<td colspan="2" >${subconAmount[0].adj_totalSaving}</td>`;
-            winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}sd</b></td>`;
+            winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}</b></td>`;
             rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
           }
 
@@ -332,6 +400,21 @@ export default {
         this.errorMessage = 'An error occurred while fetching data.';
       }
     },
+    async getCQApproval() {
+      try {
+        const response = await QuotationController.getCQApproval();
+        this.cqApprovalData = response;
+      } catch (error) {
+        this.FailMessage = 'Error fetching CQ Approval data:', error;
+      }
+    },
+    async getProject(id) {
+      try {
+        this.projectData = await CallofQuotationController.getDetailCQ(id);
+      } catch (error) {
+        this.FailMessage = 'Error fetching CQ Approval data:', error;
+      }
+    },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
       const clonedTable = document.querySelector('#data-table').cloneNode(true);
@@ -356,6 +439,7 @@ export default {
       setTimeout(() => {
         this.UpdateMessage = '';
         window.scrollTo(0, 0);
+        window.location.reload();
       }, 2000);
     },
     EditErrorMessage(message) {
@@ -363,10 +447,74 @@ export default {
       setTimeout(() => {
         this.FailMessage = '';
         window.scrollTo(0, 0);
+        window.location.reload();
       }, 2000);
     },
     submitQuotation() {
       this.submitModal = true;
+    },
+    async rejectedQuotation(){
+      try {
+        this.UpdateMessage = await QuotationController.rejectedQuotation(this.cqId); 
+        setTimeout(() => {
+        this.UpdateMessage = '';
+        window.scrollTo(0, 0);
+        window.location.reload();
+      }, 2000);
+      } catch (error) {
+        this.FailMessage = "Error updating access permission: " + error.errorMessage;
+        setTimeout(() => {
+        this.UpdateMessage = '';
+        window.scrollTo(0, 0);
+        window.location.reload();
+      }, 2000);
+      }
+    },
+    generateExcelTemplate() {
+      const wb = XLSX.utils.book_new();
+      const clonedTable = document.querySelector('#data-table').cloneNode(true);
+
+      clonedTable.querySelectorAll('.edit_note').forEach(icon => {
+        icon.parentNode.removeChild(icon);
+      });
+
+      clonedTable.querySelectorAll('tfoot tr').forEach(row => {
+        const firstCell = row.cells[0];
+        if (firstCell && firstCell.getAttribute('colspan') === '7') {
+          firstCell.setAttribute('colspan', '7');
+        }
+      });
+
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
+      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+
+      const todayDate = new Date().toISOString().split('T')[0]; // Get today's date in yyyy-mm-dd format
+      const filename = `revision-${todayDate}.xlsx`;
+
+      // Save the Excel file and trigger download
+      XLSX.writeFile(wb, filename);
+
+      return filename;
+    },
+    async approvalQuotation() {
+      try {
+        const filename = this.generateExcelTemplate();
+        console.log('filename',filename);
+       // this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId, filename); // Pass the filename to the API
+        console.log('Update Message', this.UpdateMessage);
+        // setTimeout(() => {
+        //   this.UpdateMessage = '';
+        //   window.scrollTo(0, 0);
+        //   window.location.reload();
+        // }, 2000);
+      } catch (error) {
+        // this.FailMessage = "Error updating access permission: " + error.message;
+        // setTimeout(() => {
+        //   this.UpdateMessage = '';
+        //   window.scrollTo(0, 0);
+        //   window.location.reload();
+        // }, 2000);
+      }
     },
   },
 };
@@ -382,6 +530,80 @@ export default {
   border-right: 1px solid #ddd;
 }
 
+.cqapprovalBox-container {
+  display: flex; 
+}
+
+.img {
+  width: 100px  !important;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cqbox {
+  display: flex;
+  border: 1px solid orange;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #fef4e4;
+  margin-bottom: 15px;
+  width: 100%;
+  box-shadow: 0 2px 4px #;
+}
+
+.left-container {
+  flex: 0 0 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.md-card-avatar img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.right-container {
+  flex: 1;
+  padding-left: 20px;
+}
+
+.user-info {
+  margin-bottom: 10px;
+}
+
+.user-name, .user-access {
+  margin: 8px 0 10px;
+}
+
+.remarks-textarea {
+  width: 100%;
+  height: 80px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.quotation-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #fff;
+  appearance: none;
+  cursor: pointer;
+}
+
+.quotation-select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
 
 
 

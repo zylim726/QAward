@@ -13,7 +13,7 @@
         </button>
         <md-card>
           <md-card-content>
-            <div class="table-container">
+            <div class="table-container" style="    margin-top: 0px !important;">
               <table class="nested-table" id="data-table">
                 <thead>
                   <tr>
@@ -28,7 +28,13 @@
                     </th>
                     <th scope="col">BQ Qty</th>
                     <th scope="col">(ADJ) QTY</th>
-                    <th scope="col">{{ columnKTitle }}</th>
+                    <th style="text-align: center;">
+                      <select v-model="selectedOption">
+                        <option value="" disabled selected>Select Subcon</option>
+                        <option v-for="(subconData, index) in columnKTitle" :key="index">{{ subconData.name }}</option>
+                      </select>
+
+                    </th>
                   </tr>
                   <tr>
                     <th colspan="6"></th>
@@ -60,6 +66,7 @@
 const XLSX = require('xlsx');
 import DescriptionController from "@/services/controllers/DescriptionController.js";
 import QuotationController from "@/services/controllers/QuotationController.js";
+import SubconController from "@/services/controllers/SubconController.js";
 
 export default {
   data() {
@@ -68,8 +75,9 @@ export default {
       UpdateMessage: null,
       FailMessage: null,
       cqUnit: [],
-      columnKTitle: '',
+      columnKTitle: [],
       columnKData: [],
+      selectedOption: [],
       QuotationDataArray: [], 
     };
   },
@@ -83,6 +91,7 @@ export default {
         console.error('Error fetching Description:', error);
         this.FailMessage = error.message;
       });
+    this.accessSubcon();
   },
   computed: {
     getCqUnitTypes() {
@@ -90,6 +99,14 @@ export default {
     }
   },
   methods: {
+    async accessSubcon(){
+      try {
+        const processedData = await SubconController.accessSubcon();
+        this.columnKTitle = processedData;
+      } catch (error) {
+        this.errorMessage = "Error fetching subcon data: " + error.errorMessage;
+      }
+    },
     async getNewDescription(id) {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
@@ -111,26 +128,44 @@ export default {
           const workbook = XLSX.read(data, { type: 'array' });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
-          const columnK = XLSX.utils.sheet_to_json(worksheet, { header: 1 }).map(row => row[9]);
-          this.columnKTitle = columnK[0];
+          
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          const rateIndex = jsonData[1].indexOf('Rate');
 
-          const columnKData = [];
-          let foundRate = false;
+          const allValuesAtRateIndex = jsonData.map(row => row[rateIndex]);;
+        
+          const finalColumnKData = allValuesAtRateIndex.filter(value => {
+            return typeof value === 'number' || (typeof value === 'string' && /[0-9]/.test(value));
+          });
 
-          for (let i = 0; i < columnK.length; i++) {
-            if (foundRate && columnK[i] !== undefined) {
-              columnKData.push(columnK[i]);
-            } else if (columnK[i] === 'Rate') {
-              foundRate = true;
+          const columnKData = finalColumnKData.map(value => {
+            if (typeof value === 'string') {
+              const numericPart = value.match(/\d+/);
+              return numericPart ? parseFloat(numericPart[0]) : NaN;
+            } else {
+              return value;
             }
-          }
-          this.columnKData = columnKData; 
+           });
+          this.columnKData = columnKData;
           this.generateTable(this.Description, this.$route.query.cqId, columnKData);
+
         };
         reader.readAsArrayBuffer(file);
       });
     },
     generateTable(data, id, columnKData) {
+  
+      const filteredFormData = data.filter(item => {
+        if (item.quotation && item.quotation.length > 0) {
+          if (item.quotation[0].total_quote_amount !== 0) {
+            return true;
+          }
+        }
+        return false;
+      });
+
+      const count = filteredFormData.length;
+      const rateCount = columnKData ? columnKData.length : 0;
       const tableBody = document.querySelector('#data-table tbody');
       let head1Counter = 0;
       let head2Counter = 0;
@@ -146,8 +181,9 @@ export default {
 
       data.forEach((formData, dataIndex) => {
         const cqUnitType = formData.cqUnitType;
+        const getQuotation = formData.quotation;
 
-        if (formData.bq_quantity === 0) {
+        if (getQuotation.length <= 0 || getQuotation[0].total_quote_amount === 0) {
           head1Counter++;
           prevHead1 = formData.description_item;
 
@@ -166,7 +202,7 @@ export default {
           prevHead2 = null;
         }
 
-        if (formData.bq_quantity !== 0) {
+        if (getQuotation.length > 0 && getQuotation[0].total_quote_amount !== 0) {
           head2Counter++;
           prevHead2 = formData.description_item;
 
@@ -189,13 +225,18 @@ export default {
             <td style="text-align:center;">${columnKData[columnKDataIndex] !== undefined ? columnKData[columnKDataIndex] : ''}</td>
           `;
           tableBody.appendChild(head2Row);
-
-          this.QuotationDataArray.push({
-            description_id: formData.id,
-            quotationName: this.columnKTitle,
-            rate: columnKData[columnKDataIndex] || '',
-            cqId: id
-          });
+  
+         console.log('this',this.selectedOption);
+          if (columnKData[columnKDataIndex] !== '') {
+            this.QuotationDataArray.push({
+              description_id: formData.id,
+              countData: count,
+              rateData: rateCount,
+              quotationName: this.selectedOption,
+              rate: columnKData[columnKDataIndex],
+              cqId: id
+            });
+          }
 
           columnKDataIndex++;
         }
@@ -212,40 +253,45 @@ export default {
     },
     async saveData(QuotationData) {
       try {
-        this.UpdateMessage = await QuotationController.addQuotation(QuotationData);
-        setTimeout(() => {
-        this.UpdateMessage = '';
-        window.location.reload(); 
-      }, 2000);
+        if (QuotationData.rateData === QuotationData.countData) {
+
+          this.UpdateMessage = await QuotationController.addQuotation(QuotationData);
+            setTimeout(() => {
+            this.UpdateMessage = '';
+            window.location.reload(); 
+          }, 2000);
+        }else {
+          this.FailMessage = "Error: Rate data is empty";
+          setTimeout(() => {
+            this.UpdateMessage = '';
+            window.location.reload(); 
+          }, 2000);
+        }
+          
       } catch (error) {
         this.FailMessage =  error.message;
-        setTimeout(() => {
-        this.UpdateMessage = '';
-        window.location.reload(); 
-      }, 2000);
+          setTimeout(() => {
+          this.UpdateMessage = '';
+          window.location.reload(); 
+        }, 2000);
       }
     },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
       const dataTable = document.querySelector('#data-table');
       const ws = XLSX.utils.table_to_sheet(dataTable);
-
-      // Convert the worksheet to JSON to manipulate columns easily
       const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-      // Remove the "BQ Qty" column from each row
       const updatedData = jsonData.map(row => {
-        // The "BQ Qty" column is the 8th column (index 7)
         if (Array.isArray(row) && row.length > 8) {
-          row.splice(8, 1); // Remove the 9th column
+          row.splice(8, 1); 
         }
         return row;
       });
 
-      // Create a new worksheet with the updated data
       const updatedWs = XLSX.utils.aoa_to_sheet(updatedData);
       XLSX.utils.book_append_sheet(wb, updatedWs, 'Table Data');
-      XLSX.writeFile(wb, 'table_data.xlsx');
+      XLSX.writeFile(wb, 'quotation.xlsx');
     }
   }
 };

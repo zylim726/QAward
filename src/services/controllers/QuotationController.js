@@ -1,6 +1,6 @@
 import { axios, config } from "@/services";
 
-const QuotaionController = {
+const QuotationController = {
   async addQuotation(QuotationData) {
     try {
         const apiHost = config.getHost();
@@ -11,7 +11,7 @@ const QuotaionController = {
         });
 
         const calculateSubcon = getSubcon.data.data;
-
+   
         if (calculateSubcon.length > 0) {
             const promises = calculateSubcon.map(async (item) => {
                 try {
@@ -54,7 +54,7 @@ const QuotaionController = {
         const messages = [];
         const cqId = approvalDataArray[0].cqId;
         
-        const response = await axios.post(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
             remarks: remarksData,
             status: 'Waiting Approval',
         }, { headers });
@@ -69,7 +69,78 @@ const QuotaionController = {
         throw error;
     }
   },
+  async getCQApproval(){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const ProjectId = localStorage.getItem('projectId');
+        
+        const response = await axios.get(`${apiHost}/project_approval/showByProject/${ProjectId}`, { headers });
+
+        return response.data.data;
+
+    } catch (error) {
+        throw error;
+    }
+  },
+  async addCQApproval(approvalDataToSubmit){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const dataToSubmitFiltered = approvalDataToSubmit.filter(data => data.SubconListId !== undefined);
+        const messages = [];
+
+        for (const data of dataToSubmitFiltered) {
+            const response = await axios.post(`${apiHost}/cq_approval/add`, {
+                approval_remarks: data.remark,
+                approval_status: 'Approval',
+                call_for_quotation_id: data.cqId,
+                call_for_quotation_subcon_list_id: data.SubconListId,
+                system_user_id: data.userId
+            }, { headers });
+
+            messages.push(response.data.message);
+        }
+        
+        return messages;
+
+    } catch (error) {
+        throw error;
+    }
+  },
+  async rejectedQuotation(cqId){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+
+        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+            status: 'Pending',
+        }, { headers });
+
+    
+        return response.data.message;
+
+    } catch (error) {
+        throw error;
+    }
+  },
+  async approvalQuotation(cqId){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+
+        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+            status: 'Approval',
+        }, { headers });
+
+    
+        return response.data.message;
+
+    } catch (error) {
+        throw error;
+    }
+  },
 };
 
-export default QuotaionController;
+export default QuotationController;
 

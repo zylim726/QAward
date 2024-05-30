@@ -54,16 +54,16 @@ export default {
         const SuccessMessage = await QuotationController.addApproval(remarksData, approvalData);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
-        this.$emit('editMessage', Message); // Emit the message
-        this.closesubmitModal(); // Close the modal
+        this.$emit('editMessage', Message); 
+        this.closesubmitModal(); 
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
-        this.scrollToTop(); // Call the method to scroll to the top
+        this.scrollToTop(); 
       }
     },
     scrollToTop() {
-      window.scrollTo(0, 0); // Scroll to the top of the window
+      window.scrollTo(0, 0); 
     }
   }
 };

@@ -33,6 +33,9 @@
                     ></a
                   >
                 </div>
+                <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
+                  <md-icon class="mdIcon">system_update_alt</md-icon>
+                </button>
               </div>
               <div class="table-container" style="min-height: 100px;max-height: 600px;">
                 <table>
@@ -61,11 +64,12 @@
                       <th style="text-align: center">Status</th>
                     </tr>
                     <tr>
-                      <th colspan="9"></th>
-                      <th>Mr Lim</th>
-                      <th>Mr Khew</th>
-                      <th>Mr Chuah</th>
-                      <th colspan="11"></th>
+                      <th></th>
+                      <th colspan="8"></th>
+                      <th>CALL DB</th>
+                      <th>CallL</th>
+                      <th>CALL</th>
+                      <th colspan="19"></th>
                     </tr>
                   </thead>
                   
@@ -136,10 +140,10 @@
 </template>
 
 <script>
+const XLSX = require('xlsx');
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { EditCQ,DeleteCQ }  from "@/components";
-import {  Error } from "@/services";
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
@@ -194,6 +198,24 @@ export default {
     await this.checkPermission();
   },
   methods: {
+    downloadExcelTemplate() {
+      const wb = XLSX.utils.book_new();
+      
+      const table = document.querySelector('table');
+      const clonedTable = table.cloneNode(true);
+
+      clonedTable.querySelectorAll('tr').forEach(row => {
+        row.deleteCell(0);
+      });
+
+      const ths = clonedTable.querySelectorAll('thead th');
+      ths[8].setAttribute('colspan', '3'); 
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+
+      XLSX.writeFile(wb, 'summary.xlsx');
+    },
     async accessCQ() {
       try {
         const processedData = await CallofQuotationController.accessCQ();

@@ -122,6 +122,42 @@ const DescriptionController = {
       
     }
   },
+  async editQuotation(dataToSave,discount) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+      const messageArray = [];
+
+      console.log('getAPI',dataToSave);
+      
+      console.log('discount',discount);
+
+      for (const data of dataToSave){
+        const CQListresponse = await axios.put(`${apiHost}/call_for_quotation_subcon_list/edit/${data.subconListId}`, 
+        {
+          discount : discount,
+
+        }, { headers, });
+
+        const Quoteresponse = await axios.put(`${apiHost}/quotation/edit/${data.quotationId}`, 
+        {
+          quote_rate: data.rate,
+
+        }, { headers, });
+
+        messageArray.push(Quoteresponse.data.message);
+        
+      }
+      
+      return messageArray;
+
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
+    }
+  }
 };
 
 export default DescriptionController;
