@@ -37,7 +37,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-'+formIndex">
-                    <template v-if="formData.quotation.length <= 1">
+                    <template v-if="formData.quotation.length <= 0 || formData.quotation[0].total_quote_amount === 0">
                       <td><b>{{ formIndex + 1 }}</b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
@@ -115,6 +115,8 @@ export default {
           const getQuotation = formData.quotation;
           this.Unittype = cqUnitType;
 
+      
+       
           // Filter quotations based on subconId for each formData
           const filteredQuotations = getQuotation.filter(quotationRate =>
             String(quotationRate.Call_For_Quotation_Subcon_List.subcon_id) === String(subconId)
@@ -125,6 +127,8 @@ export default {
           if (filteredQuotations.length > 0) {
             this.QuotationName = filteredQuotations;
           }
+
+          console.log('this quotation',this.QuotationName);
         });
 
       } catch (error) {

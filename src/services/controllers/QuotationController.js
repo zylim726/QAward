@@ -133,7 +133,6 @@ const QuotationController = {
             status: 'Approval',
         }, { headers });
 
-    
         return response.data.message;
 
     } catch (error) {

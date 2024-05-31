@@ -95,8 +95,8 @@
                               <li>
                                 <a :href="'/comparison?cqID=' + callQuotation.id">Subcon Comparison</a>
                               </li>
-                              <li><button class="transparentButton"  v-if="hasAccess" @click="editCallQuotation(callQuotation.id)" style="margin-left: -6px;">Edit</button></li>
-                              <li><button class="transparentButton"  v-if="hasAccess" @click="deleteCallQuotation(callQuotation.id)" style="margin-left: -6px;">Delete</button></li>
+                              <li><button class="transparentButton"  v-if="hasAccess && callQuotation.status === 'Pending'" @click="editCallQuotation(callQuotation.id)" style="margin-left: -6px;">Edit Call for Quotation</button></li>
+                              <li><button class="transparentButton"  v-if="hasAccess && callQuotation.status === 'Pending'" @click="deleteCallQuotation(callQuotation.id)" style="margin-left: -6px;">Delete</button></li>
                             </ul>
                           </drop-down>
                         </li>
@@ -149,7 +149,7 @@ import { checkAccess } from "@/services/axios/accessControl.js";
 export default {
   components: {
     EditCQ,
-    DeleteCQ
+    DeleteCQ,
   },
   data() {
     return {
@@ -163,6 +163,7 @@ export default {
       showModal: false,
       deleteId: null,
       editId: null,
+      editUTId: null,
       UpdateMessage: null,
       FailMessage: null,
       item: null,
@@ -220,6 +221,7 @@ export default {
       try {
         const processedData = await CallofQuotationController.accessCQ();
         if (processedData.length > 0) {
+          console.log('Call for quotation',processedData);
           this.callQuotation = processedData;
         } else {
           this.errorMessage = "An error occurred while fetching projects.";

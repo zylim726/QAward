@@ -10,8 +10,8 @@
       </div>
       <div class="filter-container">
         <a href="revision"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
-        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Add Quotation</button></a>
-        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Add Description</button></a>
+        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
+        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px">
           <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
         </button>
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="table-container">
-      <table class="nested-table" id="data-table">
+      <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr>
             <th scope="col">Action</th>
@@ -38,8 +38,8 @@
             </template>
             <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
               {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
-              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id">
-                  <button type="button" class="transparentButton" >
+              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
+                  <button type="button" class="transparentButton"  >
                     <md-icon style="color:orange;font-size: 34px !important;">edit_note</md-icon>
                   </button>
               </a>
@@ -64,19 +64,26 @@
       <br />
     </div>
     <div v-for="(project, index) in projectData" :key="index">
-      <template v-if="project.status === 'Pending' && QuotationName.length > 0">
+      <template v-if="project.status === 'Pending' && QuotationName.length > 1">
         <div class="confirmation-message">
           <p>Are you sure you want to submit the quotation?</p>
           <button class="btn-save" @click="submitQuotation">Submit</button>
         </div>
       </template>
-      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0">
+      <div>
+      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && cmAccessApproval">
         <div class="confirmation-message">
           <p>Is this quotation acceptable for approval?</p>
           <button class="btn-save" @click="approvalQuotation">Approval</button>
-          <button class="btn-save" @click="rejectedQuotation" >Rejected</button>
+          <button class="btn-save" @click="rejectedQuotation">Rejected</button>
         </div>
-      </template> 
+      </template>
+      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && !cmAccessApproval ">
+        <div class="confirmation-message">
+          <p>Waiting CM Approval or Rejected Quotation.</p>
+        </div>
+      </template>
+    </div>
     <template v-if="project.status === 'Approval' && QuotationName.length > 0">
       <div class="cqapprovalBox-container">
         <template v-if="cqApprovalData.length === 0">
@@ -91,7 +98,7 @@
           <div class="row" v-for="(approvalData, index) in cqApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
             <div class="cqbox">
               <div class="left-container">
-                <div class="md-card-avatar">
+                <div class="md-card-avatar" style="margin-bottom: 160px;">
                   <img class="img" src="@/assets/img/admin.png" />
                 </div>
               </div>
@@ -101,13 +108,24 @@
                   <p class="user-access">Level: {{ user.accesslevel }}</p>
                 </div>
                 <p style="margin: 8px 0 10px;">Quotation:</p>
-                <select v-model="selectedQuotations[index]" class="quotation-select">
-                  <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
-                    {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
-                  </option>
-                </select>
-                <p style="margin: 8px 0 10px;">Remarks:</p>
-                <textarea v-model="remarks[approvalData.id]" class="remarks-textarea"></textarea>
+                <div v-if="(localItem && localItem.userid && approvalData.system_user_id === localItem.userid) || hasAccess">
+                  <select v-model="selectedQuotations[index]" class="quotation-select">
+                    <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
+                      {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
+                    </option>
+                  </select>
+                  <p style="margin: 8px 0 10px;">Remarks:</p>
+                  <textarea v-model="remarks[index]" class="remarks-textarea"></textarea>
+                </div>
+                <div v-else>
+                  <select v-model="selectedQuotations[index]" class="quotation-select">
+                    <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
+                      {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
+                    </option>
+                  </select>
+                  <p style="margin: 8px 0 10px;">Remarks:</p>
+                  <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
+                </div>
               </div>
             </div>
           </div>
@@ -122,18 +140,19 @@
 </template>
 
 <script>
+const XLSX = require('xlsx');
 import { ref } from 'vue';
 import DescriptionController from '@/services/controllers/DescriptionController.js';
 import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
 import EditDescription from '@/components/Pop-Up-Modal/EditDescription.vue';
 import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
-import * as XLSX from 'xlsx';
+import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
     EditDescription,
-    SubmitModal,
+    SubmitModal
   },
   props: {
     cqId: {
@@ -160,6 +179,9 @@ export default {
       projectData: [],
       selectedQuotations: {},
       remarks: {},
+      hasAccess: false,
+      cmAccessApproval: false,
+      localItem: null,
     };
   },
   watch: {
@@ -167,7 +189,7 @@ export default {
       this.getDescription(newValue, this.isHide);
       this.getCQApproval();
       this.getProject(newValue);
-      this.getCQdetailsApproval(newValue);
+      this.checkPermission();
     },
   },
   computed: {
@@ -183,9 +205,23 @@ export default {
     },
     filteredQuotationName() {
       return this.QuotationName.filter(quotationData => quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1);
+    },
+    isPending() {
+      return this.projectData.some(project => project.status === 'Pending');
     }
   },
   methods: {
+    async checkPermission() {
+      try {
+        const permission = await checkAccess(); 
+        const accessIds = ['Admin Approval','Add-Edit-Remove CQ'];
+        const cmapproval = ['CM Approval'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+        this.cmAccessApproval = cmapproval.some(id => permission.includes(id));
+      } catch (error) {
+        this.FailMessage = 'Error checking permission:', error;
+      }
+    },
     getRowData(rowIndex) {
       const start = rowIndex * 4;
       const end = start + 4;
@@ -193,15 +229,18 @@ export default {
     },
     async submitAdminApproval() {
       const approvalDataToSubmit = this.cqApprovalData.map((approvalData, index) => {
-        const selectedSubconListId = this.selectedQuotations[index];
-
-        return {
-          cqId: this.cqId,
-          userId: approvalData.system_user_id,
-          SubconListId: selectedSubconListId,
-          remark: this.remarks[approvalData.id]
-        };
-      });
+          const selectedSubconListId = this.selectedQuotations[index];
+          const remark = this.remarks[index];
+          if (selectedSubconListId && remark) {
+            return {
+              cqId: this.cqId, 
+              userId: approvalData.system_user_id,
+              SubconListId: selectedSubconListId,
+              remark: remark
+            };
+          }
+          return null;
+        }).filter(data => data !== null);
 
       try {
         const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
@@ -209,7 +248,7 @@ export default {
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;
       } catch (error) {
-        console.error('Error while submitting approval data:', error);
+        this.FailMessage = 'Error while submitting approval data:', error;
       }
     },
     editDescription(id) {
@@ -332,6 +371,7 @@ export default {
               });
             }
           }
+          
           let bqTotalAmountTDs = '';
           let adjTotalAmountTDs = '';
           let discountGivenTDs = '';
@@ -340,6 +380,7 @@ export default {
           let winnerTDs = '';
           let rateTDs = '';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
+            console.log('subconAmount',subconAmount);
             bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
             adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
             discountGivenTDs += `<td colspan="2" >${subconAmount  [0].discount_given}</td>`;
@@ -349,43 +390,50 @@ export default {
             rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
           }
 
-          const getHideHTML = isHide ? '' : `<td colspan="4"></td>`;
+          const getHideHTML = isHide ? '' : `<td colspan="3"></td>`;
         
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7"><b>BQ Total Amount (RM)</b></td>
+              <td colspan="6"><b>BQ Total Amount (RM)</b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7"><b>ADJ Total Amount (RM)</b></td>
+              <td colspan="6"><b>ADJ Total Amount (RM)</b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7" ><b>Discount Given (RM)</b></td>
+              <td colspan="6" ><b>Discount Given (RM)</b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7" ><b>After Discount Given (RM)</b></td>
+              <td colspan="6" ><b>After Discount Given (RM)</b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7" ><b>Total Saving / Overrun (RM)</b></td>
+              <td colspan="6" ><b>Total Saving / Overrun (RM)</b></td>
               ${overrumTDs}
             </tr>
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7" ></td>
+              <td colspan="6" ></td>
               ${rateTDs}
             </tr>
             <tr>
+              <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="7" ></td>
+              <td colspan="6" ></td>
               ${winnerTDs}
             </tr>
           `;
@@ -404,6 +452,20 @@ export default {
       try {
         const response = await QuotationController.getCQApproval();
         this.cqApprovalData = response;
+
+       response.forEach((approval, index) => {
+        this.$set(this.selectedQuotations, index, approval.selectedQuotationId || '');
+
+        const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
+          cqApproval => cqApproval.system_user_id === approval.system_user_id
+        );
+
+        if (matchingCqApproval) {
+          this.$set(this.remarks, index, matchingCqApproval.approval_remarks || '');
+        } else {
+          this.$set(this.remarks, index, '');
+        }
+      });
       } catch (error) {
         this.FailMessage = 'Error fetching CQ Approval data:', error;
       }
@@ -417,22 +479,31 @@ export default {
     },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
-      const clonedTable = document.querySelector('#data-table').cloneNode(true);
+      const clonedTable = this.$refs.dataTable.cloneNode(true);
 
-      clonedTable.querySelectorAll('.edit_note').forEach(icon => {
-        icon.parentNode.removeChild(icon);
-      });
+      clonedTable.querySelectorAll('thead th:first-child').forEach(th => th.remove());
+      clonedTable.querySelectorAll('tbody td:first-child').forEach(td => td.remove());
+      clonedTable.querySelectorAll('tfoot td:first-child').forEach(td => td.remove());
 
       clonedTable.querySelectorAll('tfoot tr').forEach(row => {
         const firstCell = row.cells[0];
         if (firstCell && firstCell.getAttribute('colspan') === '7') {
-          firstCell.setAttribute('colspan', '7');
+          firstCell.setAttribute('colspan', '6'); 
         }
+      });
+
+      const hiddenElements = clonedTable.querySelectorAll('[style*="display: none"]');
+      hiddenElements.forEach(element => {
+        element.style.display = '';
       });
 
       const ws = XLSX.utils.table_to_sheet(clonedTable);
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
       XLSX.writeFile(wb, 'comparisonTable.xlsx');
+
+      hiddenElements.forEach(element => {
+        element.style.display = 'none';
+      });
     },
     EditMessage(message) {
       this.UpdateMessage = message;
@@ -470,52 +541,23 @@ export default {
       }, 2000);
       }
     },
-    generateExcelTemplate() {
-      const wb = XLSX.utils.book_new();
-      const clonedTable = document.querySelector('#data-table').cloneNode(true);
-
-      clonedTable.querySelectorAll('.edit_note').forEach(icon => {
-        icon.parentNode.removeChild(icon);
-      });
-
-      clonedTable.querySelectorAll('tfoot tr').forEach(row => {
-        const firstCell = row.cells[0];
-        if (firstCell && firstCell.getAttribute('colspan') === '7') {
-          firstCell.setAttribute('colspan', '7');
-        }
-      });
-
-      const ws = XLSX.utils.table_to_sheet(clonedTable);
-      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
-
-      const todayDate = new Date().toISOString().split('T')[0]; // Get today's date in yyyy-mm-dd format
-      const filename = `revision-${todayDate}.xlsx`;
-
-      // Save the Excel file and trigger download
-      XLSX.writeFile(wb, filename);
-
-      return filename;
-    },
-    async approvalQuotation() {
+    async approvalQuotation(){
       try {
-        const filename = this.generateExcelTemplate();
-        console.log('filename',filename);
-       // this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId, filename); // Pass the filename to the API
-        console.log('Update Message', this.UpdateMessage);
-        // setTimeout(() => {
-        //   this.UpdateMessage = '';
-        //   window.scrollTo(0, 0);
-        //   window.location.reload();
-        // }, 2000);
+        this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId);
+        setTimeout(() => {
+        this.UpdateMessage = '';
+        window.scrollTo(0, 0);
+        window.location.reload();
+      }, 2000);
       } catch (error) {
-        // this.FailMessage = "Error updating access permission: " + error.message;
-        // setTimeout(() => {
-        //   this.UpdateMessage = '';
-        //   window.scrollTo(0, 0);
-        //   window.location.reload();
-        // }, 2000);
+        this.FailMessage = "Error updating access permission: " + error.errorMessage;
+        setTimeout(() => {
+        this.UpdateMessage = '';
+        window.scrollTo(0, 0);
+        window.location.reload();
+      }, 2000);
       }
-    },
+    }
   },
 };
 </script>
@@ -530,9 +572,7 @@ export default {
   border-right: 1px solid #ddd;
 }
 
-.cqapprovalBox-container {
-  display: flex; 
-}
+
 
 .img {
   width: 100px  !important;
@@ -541,69 +581,7 @@ export default {
   object-fit: cover;
 }
 
-.cqbox {
-  display: flex;
-  border: 1px solid orange;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #fef4e4;
-  margin-bottom: 15px;
-  width: 100%;
-  box-shadow: 0 2px 4px #;
-}
 
-.left-container {
-  flex: 0 0 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.md-card-avatar img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
-
-.right-container {
-  flex: 1;
-  padding-left: 20px;
-}
-
-.user-info {
-  margin-bottom: 10px;
-}
-
-.user-name, .user-access {
-  margin: 8px 0 10px;
-}
-
-.remarks-textarea {
-  width: 100%;
-  height: 80px;
-  margin-bottom: 15px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  font-size: 14px;
-}
-
-.quotation-select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  background-color: #fff;
-  appearance: none;
-  cursor: pointer;
-}
-
-.quotation-select:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
 
 
 

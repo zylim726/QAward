@@ -14,7 +14,7 @@
         <md-card>
           <md-card-content>
             <div class="table-container" style="    margin-top: 0px !important;">
-              <table class="nested-table" id="data-table">
+              <table  class="nested-table" id="data-table" ref="dataTable">
                 <thead>
                   <tr>
                     <th scope="col">Item</th>
@@ -29,9 +29,9 @@
                     <th scope="col">BQ Qty</th>
                     <th scope="col">(ADJ) QTY</th>
                     <th style="text-align: center;">
+                      <p>Selected Subcon</p>
                       <select v-model="selectedOption">
-                        <option value="" disabled selected>Select Subcon</option>
-                        <option v-for="(subconData, index) in columnKTitle" :key="index">{{ subconData.name }}</option>
+                        <option v-for="(subconData, index) in columnKTitle" :key="index" required>{{ subconData.name }}</option>
                       </select>
 
                     </th>
@@ -102,7 +102,7 @@ export default {
     async accessSubcon(){
       try {
         const processedData = await SubconController.accessSubcon();
-        this.columnKTitle = processedData;
+        this.columnKTitle = processedData.filter(subcon => subcon.id !== 1);
       } catch (error) {
         this.errorMessage = "Error fetching subcon data: " + error.errorMessage;
       }
@@ -226,7 +226,6 @@ export default {
           `;
           tableBody.appendChild(head2Row);
   
-         console.log('this',this.selectedOption);
           if (columnKData[columnKDataIndex] !== '') {
             this.QuotationDataArray.push({
               description_id: formData.id,
@@ -253,15 +252,14 @@ export default {
     },
     async saveData(QuotationData) {
       try {
-        if (QuotationData.rateData === QuotationData.countData) {
-
+         if (QuotationData.rateData === QuotationData.countData && QuotationData.quotationName.length > 0 && QuotationData.rateData != 0) {
           this.UpdateMessage = await QuotationController.addQuotation(QuotationData);
             setTimeout(() => {
             this.UpdateMessage = '';
             window.location.reload(); 
           }, 2000);
         }else {
-          this.FailMessage = "Error: Rate data is empty";
+          this.FailMessage = "Error: Some data is empty";
           setTimeout(() => {
             this.UpdateMessage = '';
             window.location.reload(); 
@@ -277,22 +275,48 @@ export default {
       }
     },
     downloadExcelTemplate() {
-      const wb = XLSX.utils.book_new();
-      const dataTable = document.querySelector('#data-table');
-      const ws = XLSX.utils.table_to_sheet(dataTable);
-      const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+  const wb = XLSX.utils.book_new();
+  const dataTable = this.$refs.dataTable;
 
-      const updatedData = jsonData.map(row => {
-        if (Array.isArray(row) && row.length > 8) {
-          row.splice(8, 1); 
-        }
-        return row;
-      });
+  if (!dataTable) {
+    console.error("Data table reference not found.");
+    return;
+  }
 
-      const updatedWs = XLSX.utils.aoa_to_sheet(updatedData);
-      XLSX.utils.book_append_sheet(wb, updatedWs, 'Table Data');
-      XLSX.writeFile(wb, 'quotation.xlsx');
-    }
+  const clonedTable = dataTable.cloneNode(true);
+
+  if (!clonedTable) {
+    console.error("Cloned table not created.");
+    return;
+  }
+
+  // Show hidden elements before exporting
+  const hiddenElements = clonedTable.querySelectorAll('[style*="display: none"]');
+  hiddenElements.forEach(element => {
+    element.style.display = '';
+  });
+
+  // Remove BQ QTY cells from the table
+  clonedTable.querySelectorAll('td:nth-child(9), th:nth-child(9)').forEach(cell => {
+    cell.parentNode.removeChild(cell);
+  });
+
+  // Remove IDs to avoid duplicate elements in the document
+  clonedTable.querySelectorAll('[id]').forEach(element => {
+    element.removeAttribute('id');
+  });
+
+  const ws = XLSX.utils.table_to_sheet(clonedTable);
+  XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+  XLSX.writeFile(wb, 'comparisonTable.xlsx');
+
+  // Restore hidden elements after exporting
+  hiddenElements.forEach(element => {
+    element.style.display = 'none';
+  });
+},
+
+
   }
 };
 </script>

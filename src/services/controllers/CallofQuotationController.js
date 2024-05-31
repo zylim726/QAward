@@ -54,22 +54,31 @@ const CallofQuotationController = {
       
     }
   },
-  async editCQ(id, updatedData) {
+  async editCQ(id, updatedData, updatedUnit) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-       
-        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${id}`, {
-          trade_category: updatedData.trade_category, 
-          trade: updatedData.trade, 
-          trade_location1: updatedData.trade_location1, 
-          actual_calling_quotation_date: updatedData.actual_calling_quotation_date, 
-          awading_target_date: updatedData.awading_target_date, 
-          budget_amount: updatedData.budget_amount,
-          remarks: updatedData.remarks
-        }, { headers });
+        
+        const [unitResponse, cfqResponse] = await Promise.all([
+          axios.put(`${apiHost}/cq_unit_type/edit/${updatedUnit.id}`, {
+            type: updatedUnit.type, 
+            quantity: updatedUnit.quantity, 
+          }, { headers }),
+          axios.put(`${apiHost}/call_for_quotation/edit/${id}`, {
+            trade_category: updatedData.trade_category, 
+            trade: updatedData.trade, 
+            trade_location1: updatedData.trade_location1, 
+            actual_calling_quotation_date: updatedData.actual_calling_quotation_date, 
+            awading_target_date: updatedData.awading_target_date, 
+            budget_amount: updatedData.budget_amount,
+            remarks: updatedData.remarks
+          }, { headers })
+        ]);
 
-        return response.data.message;
+        let combinedMessage = `${unitResponse.data.message} ${cfqResponse.data.message}`;
+        const uniqueMessages = new Set(combinedMessage.split(' '));
+        combinedMessage = Array.from(uniqueMessages).join(' ');
+        return combinedMessage;
     } catch (error) {
         const errorMessage = error.response.data.message;
         throw { errorMessage };

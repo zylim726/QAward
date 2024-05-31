@@ -1,67 +1,85 @@
 <template>
   <div class="modal" :class="{ 'is-active': editModal }">
     <div class="modal-background" @click="closeEditModal"></div>
-    <div class="modal-content" style="width: 30%">
-      <div class="box">
+    <div class="modal-content">
+      <div class="box" style="width: 100% !important;">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
         <hr style="margin-top: -10px" />
         <br />
-        <p>Trade Category : </p>
-        <input
-            type="text"
-            v-model="processedData[0].trade_category"
-            placeholder="Category"
-            class="typeInput"
-        />
-        <p>Trade : </p>
-        <input
-          type="text"
-          v-model="processedData[0].trade"
-          placeholder="Trade"
-          class="typeInput"
-        />
-        <p>Location 1 : </p>
-        <input
-          type="text"
-          v-model="processedData[0].trade_location1"
-          placeholder="Location 1"
-          class="typeInput"
-        />
-        <p>Budget Amount : </p>
-        <input
-          type="text"
-          v-model="processedData[0].budget_amount"
-          placeholder="AA Budget Amount"
-          class="typeInput"
-        />
-        <p>Actual Calling Quotation Date : </p>
-        <input
-          type="date"
-          v-model="processedData[0].actual_calling_quotation_date"
-          placeholder="Actuall Calling Quotation Date"
-          class="typeInput"
-        />
-        <p>Awading Target Date : </p>
-        <input
-          type="date"
-          v-model="processedData[0].awading_target_date"
-          placeholder="Awading Target Date"
-          class="typeInput"
-        />
-        <p>Remarks : </p>
-        <input
-          type="text"
-          v-model="processedData[0].remarks"
-          placeholder="Remarks"
-          class="typeInput"
-        />
+        <div class="form-container">
+          <div class="left-box">
+            <p>Trade Category : </p>
+            <input
+              type="text"
+              v-model="cquotationData.trade_category"
+              placeholder="Category"
+              class="typeInput"
+            />
+            <p>Trade : </p>
+            <input
+              type="text"
+              v-model="cquotationData.trade"
+              placeholder="Trade"
+              class="typeInput"
+            />
+            <p>Location 1 : </p>
+            <input
+              type="text"
+              v-model="cquotationData.trade_location1"
+              placeholder="Location 1"
+              class="typeInput"
+            />
+            <p>Budget Amount : </p>
+            <input
+              type="text"
+              v-model="cquotationData.budget_amount"
+              placeholder="AA Budget Amount"
+              class="typeInput"
+            />
+            <p>Actual Calling Quotation Date : </p>
+            <input
+              type="date"
+              v-model="cquotationData.actual_calling_quotation_date"
+              placeholder="Actual Calling Quotation Date"
+              class="typeInput"
+            />
+            <p>Remarks : </p>
+            <input
+              type="text"
+              v-model="cquotationData.remarks"
+              placeholder="Remarks"
+              class="typeInput"
+            />
+          </div>
+          <div class="right-box">
+            <div v-for="(unit, index) in unitResult" :key="index">
+              <p>Unit Type {{ index + 1 }} : </p>
+              <input
+                type="text"
+                v-model="unit.type"
+                placeholder="Unit Type"
+                class="typeInput"
+              />
+              <p>Unit Quantity : </p>
+              <input
+                type="text"
+                v-model="unit.quantity"
+                placeholder="Unit Quantity"
+                class="typeInput"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="button-container">
+          <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal">Save</button>
+          <button class="btn-save" aria-label="close" @click.stop="closeEditModal">Close</button>
+        </div>
       </div>
-      <button class="btn-save" aria-label="close" @click.stop="closeEditModal">Close</button>
-      <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal()">Save</button>
     </div>
   </div>
 </template>
+
 
 <script>
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
@@ -74,7 +92,8 @@ export default {
   },
   data() {
     return {
-      processedData: "",
+      processedData: [],
+      unitResult:[],
     };
   },
   mounted() {
@@ -87,37 +106,60 @@ export default {
       }
     }
   },
+  computed: {
+    cquotationData() {
+      return this.processedData.find((_, index) => index === 0) || {};
+    }
+  },
   methods: {
     closeEditModal() {
       this.$emit("close");
     },
     saveAndCloseModal() {
-      const id = this.processedData[0].id; 
-      const updatedData = { ...this.processedData[0] };
-      this.editCQ(id, updatedData); 
+      this.processedData.forEach(item => {
+        const updatedData = { ...item };
+        this.unitResult.forEach(unit => {
+          const updatedUnit = { ...unit };
+          this.editCQ(item.id, updatedData, updatedUnit); 
+        });
+        this.editCQ(item.id, updatedData); 
+      });
+      
       this.closeEditModal();
     },
     async getDetailCQ(id) {
       try {
-        this.processedData = await CallofQuotationController.getDetailCQ(id);
+        const result = await CallofQuotationController.getDetailCQ(id);
+        result.forEach(data => {
+          this.processedData.push(data);
+        });
+        this.processElement();
+
+        this.unitResult = await CallofQuotationController.getUnittype(id);
+        console.log('unitResult',this.unitResult);
 
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage = "Error retrieving details: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       }
     },
-    async editCQ(id, updatedData) {
+    processElement() {
+      const Element = this.processedData.find((_, index) => index === 0);
+      if (Element) {
+        Object.keys(Element).forEach(key => {
+        });
+      }
+    },
+    async editCQ(id, updatedData, updatedUnit) {
       try {
-        this.UpdateMessage = await CallofQuotationController.editCQ(id, updatedData);
-        this.$emit('editMessage', this.UpdateMessage);
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000); 
+        const UpdateMessage = await CallofQuotationController.editCQ(id, updatedData, updatedUnit);
+        this.$emit('editMessage', UpdateMessage);
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage = "Error updating data: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       }
     }
-  },
+  }
 };
 </script>
+
