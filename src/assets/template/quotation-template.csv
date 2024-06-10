@@ -1,9 +1,0 @@
-Item,Element,Sub Element,Sub Sub Element,Description,Unit,Type A1,Type E1,Type C1,BQ Qty,ADJ Qty,QTY,Vendor,Rate
-1,Element,Sub Element,WATERPROOFING,EXTERNAL FLOOR FINISHES,,,,,,,,,
-1.1,,,,Work in Connection With Waterproofing,,,,,,,,,
-1.1.1,,,,Laid on concrete floors (RC Coping at Carporch & AC Ledge),m2,10.9,21.9,18.9,,,24539.9,AA Cost,11.9
-1.1.2,,,,Laid on concrete floors (RC Coping at Carporch & AC Ledge),m3,10.9,21.9,18.9,,,24539.9,AA Cost,8.9
-1,Element,Sub Element,WATERPROOFING,EXTERNAL FLOOR FINISHES,,,,,,,,,
-"1,1",,,,Work in Connection With Waterproofing,,,,,,,,,
-"1,1,1",,,,Laid on concrete floors (RC Coping at Carporch & AC Ledge),m2,10.9,21.9,18.9,,,24539.9,Wekwork,8.9
-1.1.2,,,,Laid on concrete floors (RC Coping at Carporch & AC Ledge),m3,10.9,21.9,18.9,,,24539.9,Wekwork,9.9

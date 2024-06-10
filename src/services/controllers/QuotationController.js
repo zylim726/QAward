@@ -139,6 +139,26 @@ const QuotationController = {
         throw error;
     }
   },
+  async removeSubcon(deleteId) {
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        let messages = [];
+        for (let i = 0; i < deleteId.length; i++) {
+            let nestedArray = deleteId[i]; 
+
+            for (let j = 0; j < nestedArray.length; j++) {
+                let element = nestedArray[j];
+                const response =  await axios.delete(`${apiHost}/quotation/removeByCallForQuotationSubconList/${element}`, { headers });
+                messages.push(response.data.message);
+            }
+        }
+        return messages;
+    } catch (error) {
+        throw error;
+    }
+  }
+  
 };
 
 export default QuotationController;

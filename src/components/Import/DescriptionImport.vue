@@ -62,7 +62,6 @@
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import DescriptionController from "@/services/controllers/DescriptionController.js";
-import csvDescriptionData from "@/assets/template/description-template.js";
 
 export default {
   props: {
@@ -148,20 +147,15 @@ export default {
           }
         });
 
-        let headersCSV = headers.join(',');
+        const headersCSV = headers.join(',');
 
-        csvDescriptionData.forEach((rowData) => {
-          headersCSV += '\n' + rowData.join(',');
-        });
-
-        const blob = new Blob([headersCSV], { type: 'text/csv' });
-
+        const csvContent = "data:text/csv;charset=utf-8," + headersCSV;
+        const encodedUri = encodeURI(csvContent);
         const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'description_template.csv'; 
-
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "description_template.csv");
+        document.body.appendChild(link); // Required for Firefox
         link.click();
-
         link.remove();
       } catch (error) {
         console.error('Error exporting table headers:', error);

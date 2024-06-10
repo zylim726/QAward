@@ -74,7 +74,7 @@
 <script>
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import csvLaData from "@/assets/template/la-template.js";
+
 
 export default {
   props: {
@@ -127,30 +127,14 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-      let csv = 'category,trade,location 1,Budget Amount,Actuall Calling Quotation Date,Awading Target Date,Remarks\n';
+        let csv = 'Category,Trade,Location 1,Budget Amount,Actual Calling Quotation Date,Awaiting Target Date,Remarks\n';
 
-      csvLaData.forEach(function(row) {
-          // Convert dates to desired format (e.g., YYYY-MM-DD)
-          const formattedRow = row.map((value, index) => {
-              // Check if the value is a date (assuming date values are in the 5th and 6th columns)
-              if (index === 4 || index === 5) { // Adjust the indices based on the position of date columns
-                  const dateParts = value.split('/');
-                  // Reformat the date to YYYY-MM-DD format
-                  return `${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`;
-              } else {
-                  return value;
-              }
-          });
-          csv += formattedRow.join(',');
-          csv += '\n';
-      });
+        const hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        hiddenElement.target = '_blank';
 
-      const hiddenElement = document.createElement('a');
-      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-      hiddenElement.target = '_blank';
-
-      hiddenElement.download = 'La_template.csv';
-      hiddenElement.click();
+        hiddenElement.download = 'La_template.csv';
+        hiddenElement.click();
     },
     async saveData() {
       const selectedFormData = this.formDataList.filter(formData => formData.selected);
@@ -167,7 +151,7 @@ export default {
       }));
 
       try {
-        const Message = await CallofQuotationController.addCQ(selectedFormData, transformedCQImport);
+       const Message = await CallofQuotationController.addCQ(selectedFormData, transformedCQImport);
         const UpdateMessage = Message[0]; 
         this.$emit('message', UpdateMessage);
 

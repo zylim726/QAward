@@ -111,6 +111,7 @@ const CallofQuotationController = {
       const messages = [];
   
       for (const formData of combinedCQData) {
+        console.log('formData',formData.CallingQuotationDate);
         const cqResponse = await axios.post(`${apiHost}/call_for_quotation/add`, {
           trade_category: formData.tradeCategory,
           trade: formData.trade,

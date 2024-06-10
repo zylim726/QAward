@@ -37,12 +37,15 @@
               <th scope="col">(ADJ) QTY</th>
             </template>
             <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
-              {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
+              {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}<br>
               <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
                   <button type="button" class="transparentButton"  >
-                    <md-icon style="color:orange;font-size: 34px !important;">edit_note</md-icon>
+                    <md-icon style="color:orange;margin-left: 10px;margin-top: 10px;">edit_note</md-icon>
                   </button>
               </a>
+              <button style="margin-left: -20px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)" >
+                <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
+              </button>
               </th>
           </tr>
           <tr>
@@ -136,6 +139,7 @@
   </div> 
     <EditDescription :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
+    <DelSubcon :del-modal="delModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
 
@@ -147,12 +151,14 @@ import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
 import EditDescription from '@/components/Pop-Up-Modal/EditDescription.vue';
 import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
+import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
     EditDescription,
-    SubmitModal
+    SubmitModal,
+    DelSubcon 
   },
   props: {
     cqId: {
@@ -169,6 +175,8 @@ export default {
       isHide: true,
       errorMessage: '',
       editModal: false,
+      delModal: false,
+      deleteId: [],
       editId: null,
       submitModal: false,
       submitId: null,
@@ -261,6 +269,33 @@ export default {
     closesubmitModal() {
       this.submitModal = false;
     },
+    deleteSubcon(id) {
+
+      const matchedSubcons = [];
+      for (const getQuote of this.processedData) {
+        const quotation = getQuote.quotation;
+        const filteredQuotationIds = [];
+        for (const quote of quotation) {
+          if (quote.Call_For_Quotation_Subcon_List.subcon_id === id) {
+            filteredQuotationIds.push(quote.call_for_quotation_subcon_list_id);
+          }
+        }
+        if (filteredQuotationIds.length > 0) {
+          matchedSubcons.push(filteredQuotationIds);
+        }
+      }
+      if (matchedSubcons) {
+        this.deleteId = matchedSubcons;
+        console.log('check deleteId',matchedSubcons);
+        this.delModal = true;
+      } else {
+        console.error('No matching subcon_id found.');
+      }
+      this.delModal = true;
+    },
+    closedelModal() {
+      this.delModal = false;
+    },
     toggleFilter() {
       this.isHide = !this.isHide;
       this.getDescription(this.cqId, this.isHide);
@@ -271,7 +306,7 @@ export default {
     async getDescription(id, isHide) {
       try {
         let processedData = await DescriptionController.getNewDescription(id);
-
+        console.log('processedData',processedData);
         if (!Array.isArray(processedData)) {
           processedData = [];
         }
@@ -317,7 +352,7 @@ export default {
               head2Counter++;
     
               this.QuotationName = getQuotation;
-
+              
               let quotationTDs = '';
               for (const quotationRate of getQuotation) {
                 const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
@@ -380,7 +415,6 @@ export default {
           let winnerTDs = '';
           let rateTDs = '';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
-            console.log('subconAmount',subconAmount);
             bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
             adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
             discountGivenTDs += `<td colspan="2" >${subconAmount  [0].discount_given}</td>`;
@@ -467,7 +501,7 @@ export default {
         }
       });
       } catch (error) {
-        this.FailMessage = 'Error fetching CQ Approval data:', error;
+      
       }
     },
     async getProject(id) {

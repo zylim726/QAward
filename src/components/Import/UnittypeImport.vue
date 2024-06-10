@@ -69,7 +69,6 @@
 
 <script>
 import Import from "papaparse";
-import csvUnitData from "@/assets/template/unittype-template.js";
 
 export default {
   props: {
@@ -135,11 +134,6 @@ export default {
     downloadExcelTemplate() {
 
     let csv = 'Unit Type,Unit Type Quantity,ADJ Factor\n';
-
-    csvUnitData.forEach(function(row) {
-      csv += row.join(',');
-      csv += '\n';
-    });
 
     const hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);

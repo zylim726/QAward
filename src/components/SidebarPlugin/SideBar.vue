@@ -37,7 +37,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Subcon Comparison",
+      default: "QAward",
     },
     sidebarBackgroundImage: {
       type: String,
