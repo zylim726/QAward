@@ -59,7 +59,7 @@
                       <td>{{ formData.bq_quantity }}</td>
                       <td>{{ formData.adj_quantity }}</td>
                       <td v-for="(quotationData, qIndex) in QuotationName" :key="'rate-'+formIndex+'-'+qIndex" style="text-align: center;">
-                        <input type="number" v-model="RateInput[formData.id]"  />
+                        <input type="number" v-model="RateInput[formData.id]"   />
                       </td>
                     </template>
                   </tr>
@@ -115,20 +115,20 @@ export default {
           const getQuotation = formData.quotation;
           this.Unittype = cqUnitType;
 
-      
-       
-          // Filter quotations based on subconId for each formData
           const filteredQuotations = getQuotation.filter(quotationRate =>
             String(quotationRate.Call_For_Quotation_Subcon_List.subcon_id) === String(subconId)
           );
 
-          console.log('Filtered Quotations:', filteredQuotations);
 
           if (filteredQuotations.length > 0) {
             this.QuotationName = filteredQuotations;
+
+            filteredQuotations.forEach(quotation => {
+              this.$set(this.RateInput, formData.id, quotation.quote_rate || '');
+            });
           }
 
-          console.log('this quotation',this.QuotationName);
+          console.log('this RateInput',this.RateInput);
         });
 
       } catch (error) {
@@ -159,10 +159,8 @@ export default {
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;
-        setTimeout(() => {
-          this.UpdateMessage = '';
-          window.scrollTo(0, 0);
-        }, 2000);
+        this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId } }); // use actual route name and pass the query parameter
+
       } catch (error) {
         this.FailMessage = "Failed to save data.";
       }

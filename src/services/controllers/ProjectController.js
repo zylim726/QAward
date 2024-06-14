@@ -113,7 +113,8 @@ const ProjectController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
-      const response = await axios.post(
+      const messages = [];
+      const QRresponse = await axios.post(
         `${apiHost}/project/add`,
         {
           name: subconData.name,
@@ -123,7 +124,22 @@ const ProjectController = {
         },
         { headers }
       );
-      return response.data.message;
+
+      for (let unitType of subconData.unitTypes) {
+        const response = await axios.post(
+          `${apiHost}/project_unit_type/add`,
+          {
+            unit_type: unitType.unit_type,
+            quantity: unitType.quantity,
+            adj_factor: unitType.adj_factor,
+            project_id: QRresponse.data.data.id,
+          },
+          { headers }
+        );
+        messages.push(response.data.message);
+      }
+
+      return messages;
     } catch (error) {
       const errorMessage = error.response.data.message;
       throw { errorMessage };
@@ -146,10 +162,27 @@ const ProjectController = {
       
     }
   },
+  async getUnitTypes(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+      const response = await axios.get(`${apiHost}/project_unit_type/showByProject/${id}`, {
+        headers,
+      });
+      return response.data.data;
+      
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
+    }
+  },
   async editProjs(id, updatedData) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
+        const messages = [];
 
         const response = await axios.put(`${apiHost}/project/edit/${id}`, {
           name: updatedData.name,
@@ -157,7 +190,21 @@ const ProjectController = {
           code: updatedData.code,
           area: updatedData.area,
         }, { headers });
-        return response.data.message;
+
+        for (let unitType of updatedData.unitTypes) {
+          const unitReponse = await axios.put(
+            `${apiHost}/project_unit_type/edit/${unitType.id}`,
+            {
+              unit_type: unitType.unit_type,
+              quantity: unitType.quantity,
+              adj_factor: unitType.adj_factor,
+            },
+            { headers }
+          );
+          messages.push(unitReponse.data.message);
+        }
+
+        return messages;
     } catch (error) {
         const errorMessage = error.response.data.message;
         throw { errorMessage };
@@ -167,7 +214,9 @@ const ProjectController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
-
+      const UnitResponse = await axios.delete(`${apiHost}/project_unit_type/removeByProject/${id}`, {
+        headers,
+      });
       const response = await axios.delete(`${apiHost}/project/remove/${id}`, {
         headers,
       });

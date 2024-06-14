@@ -9,7 +9,7 @@
         </form>
       </div>
       <div class="filter-container">
-        <a href="revision"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
+        <!-- <a href="revision"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a> -->
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px">
@@ -24,6 +24,23 @@
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr>
+            <th colspan="8"></th>
+            <template v-if="!isHide">
+              <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
+              <th colspan="1"></th>
+            </template>
+            <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
+              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
+                  <button type="button" class="transparentButton"  >
+                    <md-icon style="color:orange;margin-left: 10px;margin-top: 10px;">edit_note</md-icon>
+                  </button>
+              </a>
+              <button style="margin-left: -20px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)" v-if="isPending" >
+                <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
+              </button>
+            </th>
+          </tr>
+          <tr>
             <th scope="col">Action</th>
             <th scope="col">Item</th>
             <th scope="col">Element</th>
@@ -34,26 +51,18 @@
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
               <th scope="col">BQ QTY</th>
-              <th scope="col">(ADJ) QTY</th>
             </template>
+            <th scope="col">(ADJ) QTY</th>
             <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
               {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}<br>
-              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
-                  <button type="button" class="transparentButton"  >
-                    <md-icon style="color:orange;margin-left: 10px;margin-top: 10px;">edit_note</md-icon>
-                  </button>
-              </a>
-              <button style="margin-left: -20px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)" >
-                <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
-              </button>
-              </th>
+            </th>
           </tr>
           <tr>
             <th></th>
-            <th colspan="6"></th>
+            <th colspan="7"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
-              <th colspan="2"></th>
+              <th colspan="1"></th>
             </template>
             <th v-for="(header, index) in generatedHeaders" :key="index" style="text-align: center;border-left:1px solid #ddd !important;border-right:1px solid #ddd !important">{{ header }}</th>
           </tr>
@@ -69,7 +78,8 @@
     <div v-for="(project, index) in projectData" :key="index">
       <template v-if="project.status === 'Pending' && QuotationName.length > 1">
         <div class="confirmation-message">
-          <p>Are you sure you want to submit the quotation?</p>
+          <p>Are you sure want to submit Cost Comparison?</p>
+          <!--remarks by this no need approval ,so when submit then pass to CM approval-->
           <button class="btn-save" @click="submitQuotation">Submit</button>
         </div>
       </template>
@@ -77,7 +87,9 @@
       <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && cmAccessApproval">
         <div class="confirmation-message">
           <p>Is this quotation acceptable for approval?</p>
+          <!--CM approval need to submit the approvalForm ,and upload one time revision-->
           <button class="btn-save" @click="approvalQuotation">Approval</button>
+          <!--If CM rejected, need to go back pending -->
           <button class="btn-save" @click="rejectedQuotation">Rejected</button>
         </div>
       </template>
@@ -110,7 +122,7 @@
                   <p class="user-name">Name: {{ user.name }}</p>
                   <p class="user-access">Level: {{ user.accesslevel }}</p>
                 </div>
-                <p style="margin: 8px 0 10px;">Quotation:</p>
+                <p style="margin: 8px 0 10px;">Recommend Award To:</p>
                 <div v-if="(localItem && localItem.userid && approvalData.system_user_id === localItem.userid) || hasAccess">
                   <select v-model="selectedQuotations[index]" class="quotation-select">
                     <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
@@ -286,7 +298,6 @@ export default {
       }
       if (matchedSubcons) {
         this.deleteId = matchedSubcons;
-        console.log('check deleteId',matchedSubcons);
         this.delModal = true;
       } else {
         console.error('No matching subcon_id found.');
@@ -307,6 +318,7 @@ export default {
       try {
         let processedData = await DescriptionController.getNewDescription(id);
         console.log('processedData',processedData);
+        const projectStatus = this.projectData;
         if (!Array.isArray(processedData)) {
           processedData = [];
         }
@@ -332,7 +344,7 @@ export default {
               head1Counter++;
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                <td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>
+                 ${projectStatus === 'Pending' ? `<td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>` : `<td></td>`}
                 <td><b>${head1Counter}</b></td>
                 <td><b>${formData.element || ''}</b></td>
                 <td><b>${formData.sub_element || ''}</b></td>
@@ -341,10 +353,12 @@ export default {
               `;
               tableBody.appendChild(head1Row);
 
-              head1Row.querySelector('.edit-button').addEventListener('click', (event) => {
-                const formId = event.target.dataset.formid;
-                this.editDescription(formId);
-              });
+              if (projectStatus === 'Pending') {
+                head1Row.querySelector('.edit-button').addEventListener('click', (event) => {
+                  const formId = event.target.dataset.formid;
+                  this.editDescription(formId);
+                });
+              }
               head2Counter = 0;
             }
 
@@ -357,7 +371,7 @@ export default {
               for (const quotationRate of getQuotation) {
                 const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
                 const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-      
+
                 this.totalQuotationData = totalQuotation;
 
                 if (!totalQuotationAmounts[SubconId]) {
@@ -383,12 +397,12 @@ export default {
                 unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
               });
 
-              const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td><td>${formData.adj_quantity}</td>`;
+              const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td>`;
               const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
       
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
-                <td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>
+                ${projectStatus === 'Pending' ? `<td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>` : `<td></td>`}
                 <td>${head1Counter}.${head2Counter}</td>
                 <td>${formData.element || ''}</td>
                 <td>${formData.sub_element || ''}</td>
@@ -397,16 +411,23 @@ export default {
                 <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
+                <td>${formData.adj_quantity}</td>
                 ${quotationTDs}
               `;
               tableBody.appendChild(head2Row);
-              head2Row.querySelector('.edit-button').addEventListener('click', (event) => {
-                const formId = event.target.dataset.formid;
-                this.editDescription(formId);
-              });
+              if (projectStatus === 'Pending') {
+                head2Row.querySelector('.edit-button').addEventListener('click', (event) => {
+                  const formId = event.target.dataset.formid;
+                  this.editDescription(formId);
+                });
+              }
             }
           }
-          
+
+          const UnitType = this.Unittype;
+          const numberOfArrays = UnitType.length;
+          const GetHidenumber = numberOfArrays + 1;
+
           let bqTotalAmountTDs = '';
           let adjTotalAmountTDs = '';
           let discountGivenTDs = '';
@@ -415,59 +436,66 @@ export default {
           let winnerTDs = '';
           let rateTDs = '';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
+            if (subconAmount[0].subcon_id !== 1) {
+              discountGivenTDs += `<td colspan="2">${subconAmount[0].discount_given}</td>`;
+              afterADJDiscountTDs += `<td colspan="2">${subconAmount[0].afterADJDiscount_give}</td>`;
+              overrumTDs += `<td colspan="2">${subconAmount[0].adj_totalSaving}</td>`;
+            }else{
+              discountGivenTDs += `<td colspan="2"></td>`;
+              afterADJDiscountTDs += `<td colspan="2"></td>`;
+              overrumTDs += `<td colspan="2"></td>`;
+            }
             bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
             adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
-            discountGivenTDs += `<td colspan="2" >${subconAmount  [0].discount_given}</td>`;
-            afterADJDiscountTDs += `<td colspan="2" >${subconAmount[0].afterADJDiscount_give}</td>`;
-            overrumTDs += `<td colspan="2" >${subconAmount[0].adj_totalSaving}</td>`;
             winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}</b></td>`;
             rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
           }
+          
 
-          const getHideHTML = isHide ? '' : `<td colspan="3"></td>`;
+          const getHideHTML = isHide ? '' : `<td colspan="${GetHidenumber}"></td>`;
         
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6"><b>BQ Total Amount (RM)</b></td>
+              <td colspan="7"><b>BQ Total Amount (RM)</b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6"><b>ADJ Total Amount (RM)</b></td>
+              <td colspan="7"><b>ADJ Total Amount (RM)</b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6" ><b>Discount Given (RM)</b></td>
+              <td colspan="7" ><b>Discount Given (RM)</b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6" ><b>After Discount Given (RM)</b></td>
+              <td colspan="7" ><b>After Discount Given (RM)</b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6" ><b>Total Saving / Overrun (RM)</b></td>
+              <td colspan="7" ><b>Total Saving / Overrun (RM)</b></td>
               ${overrumTDs}
             </tr>
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6" ></td>
+              <td colspan="7" ></td>
               ${rateTDs}
             </tr>
             <tr>
               <td style="border-right:0px solid white !important" ></td>
               ${getHideHTML}
-              <td colspan="6" ></td>
+              <td colspan="7" ></td>
               ${winnerTDs}
             </tr>
           `;
@@ -487,19 +515,20 @@ export default {
         const response = await QuotationController.getCQApproval();
         this.cqApprovalData = response;
 
-       response.forEach((approval, index) => {
-        this.$set(this.selectedQuotations, index, approval.selectedQuotationId || '');
+        response.forEach((approval, index) => {
+          //changes this when have quotation subcon list id 
+          this.$set(this.selectedQuotations, index, approval.id || '');
+        
+          const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
+            cqApproval => cqApproval.system_user_id === approval.system_user_id
+          );
 
-        const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
-          cqApproval => cqApproval.system_user_id === approval.system_user_id
-        );
-
-        if (matchingCqApproval) {
-          this.$set(this.remarks, index, matchingCqApproval.approval_remarks || '');
-        } else {
-          this.$set(this.remarks, index, '');
-        }
-      });
+          if (matchingCqApproval) {
+            this.$set(this.remarks, index, matchingCqApproval.p || '');
+          } else {
+            this.$set(this.remarks, index, '');
+          }
+        });
       } catch (error) {
       
       }

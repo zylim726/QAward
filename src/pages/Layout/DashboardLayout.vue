@@ -9,7 +9,7 @@
 
       <sidebar-link class="navbar-link" to="/callquotation">
         <md-icon>check_circle_outline</md-icon>
-        <p class="nav-item">Call for Quotation</p>
+        <p class="nav-item">Comparison Summary</p>
       </sidebar-link>
 
       <h4 class="menutitle">Master</h4>

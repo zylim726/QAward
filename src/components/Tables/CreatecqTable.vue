@@ -37,17 +37,6 @@
       </div>
 
       <div class="form-group">
-        <label><b>Budget Amount:</b></label>
-        <input
-        v-model="module.budgetAmount"
-          type="number"
-          class="form-control"
-          placeholder="Enter Budget Amount"
-          required
-        />
-      </div>
-
-      <div class="form-group">
         <label><b>Actuall Calling Quotation Date:</b></label>
         <input  v-model="module.callingquotationDate" type="date" class="form-control" required />
       </div>

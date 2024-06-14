@@ -102,6 +102,24 @@ const CallofQuotationController = {
       
     }
   },
+  async getUTypes() {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+      const projectId = localStorage.getItem('projectId');
+      const response = await axios.get(`${apiHost}/project_unit_type/showByProject/${projectId}`, {
+        headers,
+      });
+ 
+      return response.data.data;
+
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
+    }
+  },
   async addCQ(selectedFormData, transformedCQImport) {
     try {
       const apiHost = config.getHost();
@@ -111,14 +129,12 @@ const CallofQuotationController = {
       const messages = [];
   
       for (const formData of combinedCQData) {
-        console.log('formData',formData.CallingQuotationDate);
         const cqResponse = await axios.post(`${apiHost}/call_for_quotation/add`, {
           trade_category: formData.tradeCategory,
           trade: formData.trade,
           trade_location1: formData.location,
           actual_calling_quotation_date: formData.CallingQuotationDate,
           awading_target_date: formData.awadingtaget,
-          budget_amount: formData.budgetAmount,
           remarks: formData.remarks,
           status: 'Pending',
           project_id: projectId
@@ -135,31 +151,28 @@ const CallofQuotationController = {
       throw { errorMessage };
     }
   },
-  async addUnit(ids, selectedUnit) {
+  async addUnit(callIds, selectedUnitTypes) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         let latestMessage = ''; 
         
-        for (const innerRow of selectedUnit) {
-          for (const object of innerRow) {
-            for (const id of ids) {
-                try {
-                    const cqResponse = await axios.post(`${apiHost}/cq_unit_type/add`, {
-                        type: object.name,
-                        adj_factor: object.adjFactor,
-                        quantity: object.quantity,
-                        call_for_quotation_id: id 
-                    }, {
-                        headers,
-                    });
-                    
-                    latestMessage = cqResponse.data.message;
-                } catch (error) {
-                    const errorMessage = error.response.data.message;
-                    throw errorMessage;
-                }
-            }
+        for (const object of selectedUnitTypes) {
+          for (const id of callIds) {
+              try {
+                  const cqResponse = await axios.post(`${apiHost}/cq_unit_type/add`, {
+                      type: object.unit_type,
+                      adj_factor: object.adj_factor,
+                      quantity: object.quantity,
+                      call_for_quotation_id: id 
+                  }, {
+                      headers,
+                  });
+                  latestMessage = cqResponse.data.message;
+              } catch (error) {
+                  const errorMessage = error.response.data.message;
+                  throw errorMessage;
+              }
           }
         }
 

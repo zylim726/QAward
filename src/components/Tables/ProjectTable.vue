@@ -41,7 +41,7 @@
             <td>{{ projects.regno }}</td>
             <td style="text-align: center">
               <button class="transparentButton"  @click="editProj(projects.id)" style="margin-left: -6px;"><md-icon style="color: orange !important;">edit</md-icon></button>
-              <button class="transparentButton"  @click="deleteSub(projects.id)" style="margin-left: -6px;"><md-icon style="color: orange !important;">delete</md-icon></button>
+
             </td>
           </tr>
         </tbody>
@@ -57,7 +57,7 @@
       :id="editId"
       title="Edit Project"
     />
-    <DeleteProject :delete-project="showDeleteModal" @deletemessage="DeleteMessage" @deletefail-message="DeleteErrorMessage" @close="closeDeleteModal" :id="deleteId" title="Delete Project"></DeleteProject>
+
   </div>
 </template>
 
@@ -65,13 +65,13 @@
 import ProjectController from "@/services/controllers/ProjectController.js";
 import Createproject from "@/components/Pop-Up-Modal/Createproject.vue";
 import EditProject from "@/components/Pop-Up-Modal/EditProject.vue";
-import DeleteProject from "@/components/Pop-Up-Modal/DeleteProject.vue";
+
 
 export default {
   components: {
     Createproject,
     EditProject,
-    DeleteProject 
+     
   },
   data() {
     return {
@@ -82,9 +82,7 @@ export default {
       FailMessage: null,
       showModal: false,
       showEditModal: false,
-      showDeleteModal: false,
       editId: null,
-      deleteId: null
     };
   },
   mounted() {
@@ -113,13 +111,6 @@ export default {
     closeEditModal() {
       this.showEditModal = false;
     },
-    deleteSub(projectId) {
-      this.deleteId = projectId;
-      this.showDeleteModal = true;
-    },
-    closeDeleteModal() {
-      this.showDeleteModal = false;
-    },
     openModal() {
       this.showModal = true;
     },
@@ -140,18 +131,6 @@ export default {
       }, 2000);
     },
     EditErrorMessage(message) {
-      this.FailMessage = message;
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 2000);
-    },
-    DeleteMessage(message) {
-      this.UpdateMessage = message;
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 2000);
-    },
-    DeleteErrorMessage(message) {
       this.FailMessage = message;
       setTimeout(() => {
         this.UpdateMessage = '';

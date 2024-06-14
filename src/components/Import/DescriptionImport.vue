@@ -94,7 +94,8 @@ export default {
         const processedData = await CallofQuotationController.getUnittype(id);
         this.Unittype = processedData;
       } catch (error) {
-        console.error('Error fetching Unittype:', error);
+        const FailMessage = 'Error fetching Unittype:'+ error;
+        this.$emit('fail-message', FailMessage);
       }
     },
     DescriptionUpload(event) {
@@ -121,10 +122,7 @@ export default {
       }
     },
     shouldDisplayCheckbox(row) {
-      const lastColumnIndex = this.filteredColumns.length - 1;
-      const lastColumnName = this.filteredColumns[lastColumnIndex]; 
-      const lastColumnValue = row[lastColumnName]; 
-      return lastColumnValue && lastColumnValue.length > 0;
+     return true;
     },
     displayValue(value, key) {
       if (typeof value === "boolean") {
@@ -158,21 +156,23 @@ export default {
         link.click();
         link.remove();
       } catch (error) {
-        console.error('Error exporting table headers:', error);
+        const FailMessage = "Error exporting table headers:"+ error;
+        this.$emit('fail-message', FailMessage);
       }
     },
     async saveData() {
       const cqId = this.cqId;
       const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
       const unittype = this.Unittype;
-
+      
       const matchedData = selectImportData.map(object => {
         const matchedValues = {};
         unittype.forEach(unit => {
-            if (object.hasOwnProperty(unit.type)) {
-                matchedValues[unit.id] = object[unit.type];
-            }
+          if (object.hasOwnProperty(unit.type)) {
+            matchedValues[unit.id] = object[unit.type];
+          }
         });
+
 
         const hasMatches = Object.keys(matchedValues).length > 0;
 
@@ -200,38 +200,7 @@ export default {
                 this.importedData.splice(index, 1);
             }
         });
-
-      //Filter out rows from this.importedData with Type "HEAD1" or "HEAD2" and update typeHeadData
-      const typeHead1 = this.importedData
-        .filter(row => {
-            const type = row["Type"];
-            if (type === "HEAD1") {
-                const index = this.importedData.indexOf(row);
-                if (index !== -1) {
-                    this.importedData.splice(index, 1);
-                }
-                return false; 
-            }
-            return true; 
-        })
-        .map(row => ({ ...row }));
-
-        const typeHead2 = this.importedData
-        .filter(row => {
-            const type = row["Type"];
-            if (type === "HEAD2") {
-                const index = this.importedData.indexOf(row);
-                if (index !== -1) {
-                    this.importedData.splice(index, 1);
-                }
-                return false; 
-            }
-            return true; 
-        })
-        .map(row => ({ ...row }));
-
-
-
+  
         this.selectAll = false;
 
       } catch (error) {

@@ -32,6 +32,14 @@
               <table class="nested-table" id="data-table" ref="dataTable">
                 <thead>
                   <tr>
+                    <th colspan="6"></th>
+                    <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
+                    <md-icon style="color: red;">priority_high</md-icon>
+                    </th>
+                    <th scope="col"><md-icon style="color: red;">priority_high</md-icon></th>
+                    <th></th>
+                  </tr>
+                  <tr>
                     <th scope="col">Item</th>
                     <th scope="col">Element</th>
                     <th scope="col">Sub Element</th>
@@ -39,19 +47,17 @@
                     <th scope="col">Description</th>
                     <th scope="col">Unit</th>
                     <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
-                      {{ unitdata.cqUnitType.type }}({{ unitdata.cqUnitType.quantity }})
+                    {{ unitdata.cqUnitType.type }}({{ unitdata.cqUnitType.quantity }})
                     </th>
-                    <th scope="col">BQ Qty</th>
-                    <th scope="col">(ADJ) QTY</th>
+                    <th scope="col">Qty</th>
                     <th style="text-align: center;">{{ selectedSubconName }}
                     </th>
                   </tr>
                   <tr>
-                    <th colspan="6"></th>
+                    <th></th><th></th><th></th><th></th><th></th><th></th>
                     <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
                       
                     </th>
-                    <th scope="col"></th>
                     <th scope="col"></th>
                     <th scope="col">Rate</th>
                   </tr>
@@ -77,6 +83,7 @@ const XLSX = require('xlsx');
 import DescriptionController from "@/services/controllers/DescriptionController.js";
 import QuotationController from "@/services/controllers/QuotationController.js";
 import SubconController from "@/services/controllers/SubconController.js";
+import ExcelJS from "exceljs";
 
 export default {
   data() {
@@ -118,7 +125,6 @@ export default {
       if (this.selectedOption) {
         this.selectedSubconName = this.selectedOption;
         this.isModalVisible = false;
-        console.log('Selected Subcon:', this.selectedSubconName);
       }
     },
     async accessSubcon() {
@@ -133,6 +139,7 @@ export default {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
+        console.log('processedData',processedData);
         this.cqUnit = processedData[0].cqUnitType || [];
       } catch (error) {
         console.error('Error fetching Description:', error);
@@ -232,7 +239,7 @@ export default {
 
           let unitQuantityTDs = '';
           cqUnitType.forEach(cqUnit => {
-            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
+            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adjQty}</td>`;
           });
 
           const head2Row = document.createElement('tr');
@@ -244,7 +251,6 @@ export default {
             <td style="padding-left:60px !important;">${formData.description_item}</td>
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
-            <td>${formData.bq_quantity}</td>
             <td>${formData.adj_quantity}</td>
             <td style="text-align:center;">${columnKData[columnKDataIndex] !== undefined ? columnKData[columnKDataIndex] : ''}</td>
           `;
@@ -276,9 +282,9 @@ export default {
     },
     async saveData(QuotationData) {
       try {
-        console.log('get quotation',QuotationData);
-        if (QuotationData.rateData === QuotationData.countData && QuotationData.quotationName.length > 0 && QuotationData.rateData != 0) {
-          this.UpdateMessage = await QuotationController.addQuotation(QuotationData);
+        const SubConName = this.selectedSubconName;
+        if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
+           this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName);
           setTimeout(() => {
             this.UpdateMessage = '';
             window.location.reload();
@@ -300,48 +306,73 @@ export default {
       }
     },
     downloadExcelTemplate() {
-  const wb = XLSX.utils.book_new();
-  const dataTable = this.$refs.dataTable;
+      const dataTable = this.$refs.dataTable;
 
-  if (!dataTable) {
-    console.error("Data table reference not found.");
-    return;
-  }
+      if (!dataTable) {
+        console.error("Data table reference not found.");
+        return;
+      }
 
-  const clonedTable = dataTable.cloneNode(true);
+      const clonedTable = dataTable.cloneNode(true);
 
-  if (!clonedTable) {
-    console.error("Cloned table not created.");
-    return;
-  }
+      if (!clonedTable) {
+        console.error("Cloned table not created.");
+        return;
+      }
 
-  // Find the index of the "BQ Qty" column header
-  const headerRow = clonedTable.querySelector('thead tr');
-  let bqQtyIndex = -1;
-  headerRow.childNodes.forEach((cell, index) => {
-    if (cell.textContent.trim() === 'BQ Qty') {
-      bqQtyIndex = index;
-      return;
+      // Remove IDs to avoid duplicate elements in the document
+      clonedTable.querySelectorAll('[id]').forEach(element => {
+        element.removeAttribute('id');
+      });
+
+      // Create a new workbook and add a worksheet
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sheet1');
+
+      // Add table rows to the worksheet, skipping the first row
+      const rows = clonedTable.querySelectorAll('tr');
+      rows.forEach((row, index) => {
+        if (index === 0) return; // Skip the first row
+        const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
+        worksheet.addRow(cells);
+      });
+
+      // Lock cells with text or numbers and leave blank cells unlocked
+      worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          if (cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+            cell.protection = { locked: true };  
+          } else {
+            cell.protection = { locked: false };  
+          }
+        });
+      });
+
+      // Protect the sheet
+      worksheet.protect('yourPassword', {
+        selectLockedCells: false,
+        selectUnlockedCells: true,
+        formatCells: false,
+        formatColumns: false,
+        formatRows: false,
+        insertColumns: false,
+        insertRows: false,
+        insertHyperlinks: false,
+        deleteColumns: false,
+        deleteRows: false
+      });
+
+      // Write the workbook to a file
+      workbook.xlsx.writeBuffer().then(buffer => {
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Quotation.xlsx';
+        link.click();
+      }).catch(err => {
+        console.error(err);
+      });
     }
-  });
-
-  if (bqQtyIndex !== -1) {
-    // Remove the "BQ Qty" column from the table
-    clonedTable.querySelectorAll(`td:nth-child(${bqQtyIndex + 1}), th:nth-child(${bqQtyIndex + 1})`).forEach(cell => {
-      cell.parentNode.removeChild(cell);
-    });
-  }
-
-  // Remove IDs to avoid duplicate elements in the document
-  clonedTable.querySelectorAll('[id]').forEach(element => {
-    element.removeAttribute('id');
-  });
-
-  const ws = XLSX.utils.table_to_sheet(clonedTable);
-  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-  XLSX.writeFile(wb, 'testingComparison.xlsx');
-},
-
   },
 };
 </script>
@@ -367,22 +398,5 @@ export default {
   height: 160px;
 }
 
-.btn-confirm {
-  background-color: orange;
-    color: white;
-    border: none;
-    padding: 5px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-top: 3px;
-    margin-left: 25px;
-}
 
-.dropdownSubcon {
-  border: 1px solid orange;
-  width: 40%;
-  height: 21%;
-  border-radius: 6px;
-}
 </style>

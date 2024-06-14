@@ -34,7 +34,7 @@ const routes = [
 
       {
         path: "callquotation",
-        name: "Call For Quotation",
+        name: "Comparison Summary",
         component: Callquotation,
         meta: { requiresAuth: true },
       },

@@ -1,16 +1,18 @@
 import { axios, config } from "@/services";
 
 const QuotationController = {
-  async addQuotation(QuotationData) {
+  async addQuotation(QuotationData,SubConName) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
+        console.log('SubConName',SubConName);
 
-        const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${QuotationData.quotationName}`, {
+        const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${SubConName}`, {
             headers,
         });
 
-        const calculateSubcon = getSubcon.data.data;
+         const calculateSubcon = getSubcon.data.data;
+
    
         if (calculateSubcon.length > 0) {
             const promises = calculateSubcon.map(async (item) => {

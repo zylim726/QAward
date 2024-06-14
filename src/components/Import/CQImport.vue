@@ -34,9 +34,8 @@
             <th scope="col">Category</th>
             <th scope="col">Trade</th>
             <th scope="col">Location 1</th>
-            <th scope="col">Budget Amount</th>
-            <th scope="col">Actual Calling Quotation Date</th>
-            <th scope="col">Awading Target Date</th>
+            <th scope="col">Actual Calling Quotation Date  (yyyy-mm-dd)</th>
+            <th scope="col">Awading Target Date  (yyyy-mm-dd)</th>
             <th scope="col">Remarks</th>
           </tr>
         </thead>
@@ -46,7 +45,6 @@
             <td>{{ formData.tradeCategory }}</td>
             <td>{{ formData.trade }}</td>
             <td>{{ formData.location }}</td>
-            <td>{{ formData.budgetAmount }}</td>
             <td>{{ formData.callingquotationDate }}</td>
             <td>{{ formData.awadingtaget }}</td>
             <td>{{ formData.remarks }}</td>
@@ -127,7 +125,7 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-        let csv = 'Category,Trade,Location 1,Budget Amount,Actual Calling Quotation Date,Awaiting Target Date,Remarks\n';
+        let csv = 'Category,Trade,Location 1,Actual Calling Quotation Date  (yyyy-mm-dd),Awaiting Target Date  (yyyy-mm-dd),Remarks\n';
 
         const hiddenElement = document.createElement('a');
         hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
@@ -144,7 +142,6 @@ export default {
         tradeCategory: unit["category"],
         trade: unit["trade"],
         location: unit["location 1"],
-        budgetAmount: unit["AA Budget Amount"],
         CallingQuotationDate: unit["Actuall Calling Quotation Date"],
         awadingtaget: unit["Awading Target Date"],
         remarks: unit["Remarks"],

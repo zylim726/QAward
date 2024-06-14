@@ -227,7 +227,7 @@ export default {
           this.errorMessage = "An error occurred while fetching projects.";
         }
       } catch (error) {
-        this.errorMessage = "Error fetching data: " + error.errorMessage;
+        this.errorMessage = "No more projects.";
       }
     },
     closeOtherDropDowns(clickedItem) {
