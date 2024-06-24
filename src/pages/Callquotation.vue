@@ -26,22 +26,28 @@
                   </form>
                 </div>
 
+              
                 <div class="filter-container" style="margin-right: -15px">
-                  <a href="createcq" v-if="hasAccess"
-                    ><md-icon class="mdIcon" style="margin-right: 15px"
-                      >add</md-icon
-                    ></a
+                  <a href="createcq" v-if="hasAccess">
+                    <div class="tooltip">
+                      <span class="tooltiptext">Created Comparison Summary</span>
+                    <md-icon class="mdIcon" style="margin-right: 15px"
+                      >add</md-icon></div>
+                    </a
                   >
                 </div>
                 <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
-                  <md-icon class="mdIcon">system_update_alt</md-icon>
+                    <div class="tooltip">
+                    <span class="tooltiptext">Export Comparison Summary</span>
+                    <md-icon class="mdIcon">system_update_alt</md-icon>
+                    </div>
                 </button>
               </div>
               <div class="table-container" style="min-height: 100px;max-height: 600px;">
                 <table>
                   <thead>
                     <tr>
-                      <th>Actions</th>
+                      <th>Action</th>
                       <th>ID</th>
                       <th>Category</th>
                       <th>Trade</th>
@@ -50,7 +56,12 @@
                       <th>Actual Calling Quotation Date</th>
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
-                      <th colspan="3" style="text-align: center">Check By</th>
+                      <th>Check By</th>
+                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0">
+                        Approval By
+                      </th>
+                      <th v-else>Approval By
+                      </th>
                       <th>Awarding Target Date</th>
                       <th>Remarks</th>
                       <th>Awarded to</th>
@@ -61,67 +72,56 @@
                       <th>Subcontract Amount (RM)</th>
                       <th>Subcontract (ADJ) Amount (RM)</th>
                       <th>Cost Saving / (Overrun) (RM)</th>
+                      <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <th>CALL DB</th>
-                      <th>CallL</th>
-                      <th>CALL</th>
-                      <th colspan="19"></th>
+                      <th></th>
+                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0">
+                        {{ callQuotation.cqApproval[0]?.system_user_id }}
+                      </th>
+                      <th v-else> {{ '' }}
+                      </th>
+                      <th colspan="20"></th>
                     </tr>
                   </thead>
                   
                   <tbody>
                     <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
-                      <td>
-                        <li class="md-list-item">
-                          <drop-down
-                            @dropdown-clicked="closeOtherDropDowns(item)"
-                          >
-                            <md-button
-                              slot="title"
-                              class="md-button md-just-icon md-simple"
-                              data-toggle="dropdown"
-                            >
-                              <md-icon>more_vert</md-icon>
-                            </md-button>
-                            <ul
-                              class="dropdown-menu dropdown-menu-left"
-                              style="margin-left: 48px !important"
-                            >
-                              <li>
-                                <a :href="'/comparison?cqID=' + callQuotation.id">Subcon Comparison</a>
-                              </li>
-                              <li><button class="transparentButton"  v-if="hasAccess && callQuotation.status === 'Pending'" @click="editCallQuotation(callQuotation.id)" style="margin-left: -6px;">Edit Call for Quotation</button></li>
-                              <li><button class="transparentButton"  v-if="hasAccess && callQuotation.status === 'Pending'" @click="deleteCallQuotation(callQuotation.id)" style="margin-left: -6px;">Delete</button></li>
-                            </ul>
-                          </drop-down>
-                        </li>
-                      </td>
+                      <td><a :href="'/comparison?cqID=' + callQuotation.id"><button class="transparentButton" >
+                        <div class="tooltip" style="margin-left: 5px !important;">
+                          <span class="tooltiptext">Go to see detail subcon comparison.</span>
+                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
+                      </a></td>
                       <td>{{ index + 1 }}</td>
                       <td>{{ callQuotation.tradeCategory }}</td>
                       <td>{{ callQuotation.trade }}</td>
                       <td>{{ callQuotation.location }}</td>
-                      <td></td>
-                      <td>{{ callQuotation.CallingQuotationDate }}</td>
+                      <td>{{ callQuotation.numberOfQuotations }}</td>
+                      <td>{{ callQuotation.CallingQuotationDate !== '0000-00-00' ? callQuotation.CallingQuotationDate : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
-                      <td>{{ callQuotation.actuallDoneDate }}</td>
+                      <td>{{ callQuotation.actuallDoneDate !== '0000-00-00' ? callQuotation.actuallDoneDate : '' }}
+                      </td>
                       <td></td>
-                      <td></td>
-                      <td></td>
-                      <td>{{ callQuotation.awadingtargetdate }}</td>
+                      <td v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0">
+                        {{ callQuotation.cqApproval[0]?.system_user_id }}
+                      </td>
+                      <td v-else> {{ '' }}
+                      </td>
+                      <td>{{ callQuotation.awadingtargetdate !== '0000-00-00' ? callQuotation.awadingtargetdate : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
                       <td></td>
                       <td></td>
                       <td></td>
                       <td>{{ callQuotation.budget_amount }}</td>
                       <td>{{ callQuotation.adj_budget_amount }}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>{{ callQuotation.subcontract_amount }}</td>
+                      <td>{{ callQuotation.adj_subcontract_amount}}</td>
+                      <td>{{ callQuotation.total_saving}}</td>
+                      <td>{{ callQuotation.provisional_sum}}</td>
                       <td>
                         <span class="notify-status">{{ callQuotation.status }}</span>
                       </td>
@@ -191,7 +191,7 @@ export default {
     if (projectName) {
       this.projectName = projectName;
     } else {
-      console.error('Project ID not found in localStorage');
+      this.errorMessage = "Project ID not found in localStorage";
     };
     this.accessCQ();
   },
@@ -200,23 +200,28 @@ export default {
   },
   methods: {
     downloadExcelTemplate() {
-      const wb = XLSX.utils.book_new();
-      
-      const table = document.querySelector('table');
-      const clonedTable = table.cloneNode(true);
+  const wb = XLSX.utils.book_new();
+  const table = document.querySelector('table');
+  const clonedTable = table.cloneNode(true);
 
-      clonedTable.querySelectorAll('tr').forEach(row => {
-        row.deleteCell(0);
-      });
+  // Remove first column from each row (Actions column)
+  clonedTable.querySelectorAll('tr').forEach(row => {
+    row.deleteCell(0);
+  });
 
-      const ths = clonedTable.querySelectorAll('thead th');
-      ths[8].setAttribute('colspan', '3'); 
-      const ws = XLSX.utils.table_to_sheet(clonedTable);
+  // Update table cells based on conditions
+  clonedTable.querySelectorAll('td').forEach(cell => {
+    // Replace cell content with empty string if it matches '0000-00-00'
+    if (cell.textContent.trim() === '0000-00-00') {
+      cell.textContent = '';
+    }
+  });
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+  const ws = XLSX.utils.table_to_sheet(clonedTable);
+  XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
 
-      XLSX.writeFile(wb, 'summary.xlsx');
-    },
+  XLSX.writeFile(wb, 'summary.xlsx');
+},
     async accessCQ() {
       try {
         const processedData = await CallofQuotationController.accessCQ();

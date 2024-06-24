@@ -87,6 +87,7 @@ export default {
   mounted() {
     this.accessProject();
   },
+  
   computed: {
     filterProject() {
       return this.projects.filter((project) => {

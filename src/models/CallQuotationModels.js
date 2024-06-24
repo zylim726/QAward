@@ -14,6 +14,8 @@ const CallQuotationModels = {
       }
     });
 
+      console.log('filteredData',filteredData);
+
     if (filteredData.length > 0) {
       const processedData = filteredData.map(config => ({
         id: config.id,
@@ -30,10 +32,19 @@ const CallQuotationModels = {
         remarks: config.remarks,
         budget_amount: config.budget_amount,
         adj_budget_amount: config.adj_budget_amount,
+        adj_subcontract_amount: config.adj_subcontract_amount,
+        numberOfQuotations: config.numberOfQuotations,
+        provisional_sum: config.provisional_sum,
+        subcontract_amount: config.subcontract_amount,
+        total_saving: config.total_saving,
         la_id: config.la_id,
         status: config.status,
         projectId: config.project_id,
-        message: response.message 
+        message: response.message,
+        cqSubconList: config.Call_For_Quotation_Subcon_Lists,
+        cqApproval: config.Cq_Approvals,
+        La: config.Las,
+
       }));
       
       return processedData;

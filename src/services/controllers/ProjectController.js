@@ -197,7 +197,7 @@ const ProjectController = {
             );
             messages.push(unitResponse.data.message);
           } else {
-            // Add new unit type
+          
             const unitResponse = await axios.post(
               `${apiHost}/project_unit_type/add`,
               {
