@@ -5,7 +5,7 @@
     <div class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
-          <input type="text" v-model="searchQuery" placeholder="Search Description....." />
+          <input type="text" v-model="searchQuery" @input="handleInputChange" placeholder="Search Description....." />
         </form>
       </div>
       <div class="filter-container">
@@ -13,10 +13,16 @@
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px">
-          <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
+          <div class="tooltip" >
+            <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
+            <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
+          </div>
         </button>
         <button type="button" class="transparentButton" style="margin-right: 10px" @click="downloadExcelTemplate">
-          <md-icon class="mdIcon">system_update_alt</md-icon>
+          <div class="tooltip" >
+            <span class="tooltiptext">Export Subcon Comparison to see more.</span>
+            <md-icon class="mdIcon">system_update_alt</md-icon>
+          </div>
         </button>
       </div>
     </div>
@@ -24,24 +30,44 @@
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr>
-            <th colspan="8"></th>
+            <th colspan="6"></th>
             <template v-if="!isHide">
-              <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
+              <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
               <th colspan="1"></th>
             </template>
+            <th>
+              <div class="tooltip" >
+                <span class="tooltiptext" style="margin-bottom: -127px !important;margin-left: -167px;width: 178px !important;">
+                  ADJ Quantity formula = (Unit Type Quantity x Description Quantity) x ADJ Factor</span>
+                <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
+              </div>
+            </th>
             <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
+              <div class="tooltip" >
+                <span class="tooltiptext" style="margin-bottom: -107px !important;margin-left: -167px;width: 178px !important;">
+                Formula Quotation rate = ADJ Quantity x Quotation Rate</span>
+                <md-icon style="color: red;margin-top: 10px;margin-right: -10px;"  v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1"> priority_high</md-icon>
+              </div>
               <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
-                  <button type="button" class="transparentButton"  >
-                    <md-icon style="color:orange;margin-left: 10px;margin-top: 10px;">edit_note</md-icon>
-                  </button>
+                <button type="button" class="transparentButton"  >
+                  <div class="tooltip" >
+                    <span class="tooltiptext" style="margin-bottom: -95px !important;margin-right: -6px;" >
+                    Edit Quotation Rate</span>
+                    <md-icon style="color:orange;margin-left: 26px;margin-top: 10px;">edit_note</md-icon>
+                  </div>
+                </button>
               </a>
-              <button style="margin-left: -20px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)" v-if="isPending" >
-                <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
+              <button style="margin-left: -9px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)"  
+              v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1">
+                <div class="tooltip" >
+                  <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
+                  Delete Quotation</span>
+                  <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
+                </div>
               </button>
             </th>
           </tr>
           <tr>
-            <th scope="col">Action</th>
             <th scope="col">Item</th>
             <th scope="col">Element</th>
             <th scope="col">Sub Element</th>
@@ -58,12 +84,12 @@
             </th>
           </tr>
           <tr>
-            <th></th>
-            <th colspan="7"></th>
+            <th colspan="6"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
               <th colspan="1"></th>
             </template>
+            <th></th>
             <th v-for="(header, index) in generatedHeaders" :key="index" style="text-align: center;border-left:1px solid #ddd !important;border-right:1px solid #ddd !important">{{ header }}</th>
           </tr>
         </thead>
@@ -79,21 +105,20 @@
       <template v-if="project.status === 'Pending' && QuotationName.length > 1">
         <div class="confirmation-message">
           <p>Are you sure want to submit Cost Comparison?</p>
-          <!--remarks by this no need approval ,so when submit then pass to CM approval-->
-          <button class="btn-save" @click="submitQuotation">Submit</button>
+          <button class="btn-save" @click="approvalQuotation">Submit</button>
         </div>
       </template>
       <div>
-      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && cmAccessApproval">
+      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
         <div class="confirmation-message">
           <p>Is this quotation acceptable for approval?</p>
           <!--CM approval need to submit the approvalForm ,and upload one time revision-->
-          <button class="btn-save" @click="approvalQuotation">Approval</button>
+          <button class="btn-save" @click="CMsubmitQuotation">Approval</button>
           <!--If CM rejected, need to go back pending -->
-          <button class="btn-save" @click="rejectedQuotation">Rejected</button>
+          <button class="btn-save" @click="CMrejectedQuotation">Rejected</button>
         </div>
       </template>
-      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && !cmAccessApproval ">
+      <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && !cmAccessApproval && !cmAccesslevel ">
         <div class="confirmation-message">
           <p>Waiting CM Approval or Rejected Quotation.</p>
         </div>
@@ -149,7 +174,6 @@
       <button class="btn-save" @click="submitAdminApproval">Submit</button><br>
     </template>
   </div> 
-    <EditDescription :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
     <DelSubcon :del-modal="delModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
@@ -161,14 +185,13 @@ import { ref } from 'vue';
 import DescriptionController from '@/services/controllers/DescriptionController.js';
 import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
-import EditDescription from '@/components/Pop-Up-Modal/EditDescription.vue';
 import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
+import _ from 'lodash';
 
 export default {
   components: {
-    EditDescription,
     SubmitModal,
     DelSubcon 
   },
@@ -212,6 +235,9 @@ export default {
       this.checkPermission();
     },
   },
+  mounted() {
+    this.getBuildFomula(); 
+  },
   computed: {
     generatedHeaders() {
       const headers = [];
@@ -228,6 +254,9 @@ export default {
     },
     isPending() {
       return this.projectData.some(project => project.status === 'Pending');
+    },
+    cmAccesslevel() {
+      return localStorage?.accesslevel === 'CM';
     }
   },
   methods: {
@@ -300,7 +329,7 @@ export default {
         this.deleteId = matchedSubcons;
         this.delModal = true;
       } else {
-        console.error('No matching subcon_id found.');
+        this.FailMessage = 'No matching subcon_id found.';
       }
       this.delModal = true;
     },
@@ -314,10 +343,25 @@ export default {
     filterTable(filterValue) {
       this.isHide = !this.isHide;
     },
+    handleInputChange: _.debounce(function(event) {
+      this.searchQuery = event.target.value;
+      this.getDescription(this.cqId, this.isHide);
+    }, 200), 
     async getDescription(id, isHide) {
       try {
         let processedData = await DescriptionController.getNewDescription(id);
-        console.log('processedData',processedData);
+    
+        const searchQuery = this.searchQuery.toLowerCase().trim();
+
+        if (searchQuery) {
+          processedData = processedData.filter(formData =>
+            formData.description_item.toLowerCase().includes(searchQuery) ||
+            formData.element.toLowerCase().includes(searchQuery) ||
+            formData.sub_element.toLowerCase().includes(searchQuery) ||
+            formData.description_sub_sub_element.toLowerCase().includes(searchQuery)
+          );
+        }
+
         const projectStatus = this.projectData;
         if (!Array.isArray(processedData)) {
           processedData = [];
@@ -339,12 +383,10 @@ export default {
             const cqUnitType = formData.cqUnitType;
             this.Unittype = cqUnitType;
             const getQuotation = formData.quotation;
-
             if (getQuotation.length <= 0 || getQuotation[0].total_quote_amount === 0) {
               head1Counter++;
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                 ${projectStatus === 'Pending' ? `<td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>` : `<td></td>`}
                 <td><b>${head1Counter}</b></td>
                 <td><b>${formData.element || ''}</b></td>
                 <td><b>${formData.sub_element || ''}</b></td>
@@ -353,12 +395,6 @@ export default {
               `;
               tableBody.appendChild(head1Row);
 
-              if (projectStatus === 'Pending') {
-                head1Row.querySelector('.edit-button').addEventListener('click', (event) => {
-                  const formId = event.target.dataset.formid;
-                  this.editDescription(formId);
-                });
-              }
               head2Counter = 0;
             }
 
@@ -402,7 +438,6 @@ export default {
       
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
-                ${projectStatus === 'Pending' ? `<td><button class="edit-button" data-formid="${formData.id}">Edit</button></td>` : `<td></td>`}
                 <td>${head1Counter}.${head2Counter}</td>
                 <td>${formData.element || ''}</td>
                 <td>${formData.sub_element || ''}</td>
@@ -415,12 +450,6 @@ export default {
                 ${quotationTDs}
               `;
               tableBody.appendChild(head2Row);
-              if (projectStatus === 'Pending') {
-                head2Row.querySelector('.edit-button').addEventListener('click', (event) => {
-                  const formId = event.target.dataset.formid;
-                  this.editDescription(formId);
-                });
-              }
             }
           }
 
@@ -435,68 +464,59 @@ export default {
           let overrumTDs = '';
           let winnerTDs = '';
           let rateTDs = '';
+          let remarks ='';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
             if (subconAmount[0].subcon_id !== 1) {
               discountGivenTDs += `<td colspan="2">${subconAmount[0].discount_given}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${subconAmount[0].afterADJDiscount_give}</td>`;
               overrumTDs += `<td colspan="2">${subconAmount[0].adj_totalSaving}</td>`;
+              winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}</b></td>`;
+              rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
             }else{
               discountGivenTDs += `<td colspan="2"></td>`;
               afterADJDiscountTDs += `<td colspan="2"></td>`;
               overrumTDs += `<td colspan="2"></td>`;
+              winnerTDs += `<td colspan="2" ><b></b></td>`;
+              rateTDs += `<td colspan="2" ></td>`;
             }
             bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
             adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
-            winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}</b></td>`;
-            rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
+            remarks += `<td colspan="2" >${subconAmount[0].remark}</td>`;
           }
           
-
-          const getHideHTML = isHide ? '' : `<td colspan="${GetHidenumber}"></td>`;
-        
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7"><b>BQ Total Amount (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>BQ Total Amount (RM)</b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7"><b>ADJ Total Amount (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>ADJ Total Amount (RM)</b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7" ><b>Discount Given (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Discount Given (RM)</b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7" ><b>After Discount Given (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>After Discount Given (RM)</b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7" ><b>Total Saving / Overrun (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Total Saving / Overrun (RM)</b></td>
               ${overrumTDs}
             </tr>
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7" ></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"></td>
               ${rateTDs}
             </tr>
             <tr>
-              <td style="border-right:0px solid white !important" ></td>
-              ${getHideHTML}
-              <td colspan="7" ></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"></td>
               ${winnerTDs}
+            </tr>
+            <tr>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}">Remarks</td>
+              ${remarks}  
             </tr>
           `;
           
@@ -506,7 +526,6 @@ export default {
         
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
         this.errorMessage = 'An error occurred while fetching data.';
       }
     },
@@ -542,28 +561,45 @@ export default {
     },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
-      const clonedTable = this.$refs.dataTable.cloneNode(true);
+      const originalTable = this.$refs.dataTable;
+      
+      // Clone the original table
+      const clonedTable = originalTable.cloneNode(true);
 
-      clonedTable.querySelectorAll('thead th:first-child').forEach(th => th.remove());
-      clonedTable.querySelectorAll('tbody td:first-child').forEach(td => td.remove());
-      clonedTable.querySelectorAll('tfoot td:first-child').forEach(td => td.remove());
+      // Remove the first row containing <th> elements from the cloned table
+      const firstRow = clonedTable.querySelector('thead tr');
+      if (firstRow) {
+        firstRow.parentNode.removeChild(firstRow);
+      }
 
-      clonedTable.querySelectorAll('tfoot tr').forEach(row => {
-        const firstCell = row.cells[0];
-        if (firstCell && firstCell.getAttribute('colspan') === '7') {
-          firstCell.setAttribute('colspan', '6'); 
-        }
-      });
+      // Remove the first row containing <td> elements from the cloned table body
+      const firstBodyRow = clonedTable.querySelector('tbody tr');
+      if (firstBodyRow) {
+        firstBodyRow.parentNode.removeChild(firstBodyRow);
+      }
 
+      // Remove the first row containing <td> elements from the cloned table footer
+      const firstFooterRow = clonedTable.querySelector('tfoot tr');
+      if (firstFooterRow) {
+        firstFooterRow.parentNode.removeChild(firstFooterRow);
+      }
+
+      // Handle hidden elements
       const hiddenElements = clonedTable.querySelectorAll('[style*="display: none"]');
       hiddenElements.forEach(element => {
         element.style.display = '';
       });
 
+      // Convert cloned table to worksheet
       const ws = XLSX.utils.table_to_sheet(clonedTable);
+      
+      // Append worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+      
+      // Write workbook to file
       XLSX.writeFile(wb, 'comparisonTable.xlsx');
 
+      // Re-hide hidden elements
       hiddenElements.forEach(element => {
         element.style.display = 'none';
       });
@@ -572,35 +608,37 @@ export default {
       this.UpdateMessage = message;
       setTimeout(() => {
         this.UpdateMessage = '';
-        window.scrollTo(0, 0);
-        window.location.reload();
+          window.scrollTo(0, 0);
+          window.location.reload();
       }, 2000);
     },
     EditErrorMessage(message) {
       this.FailMessage = message;
       setTimeout(() => {
         this.FailMessage = '';
-        window.scrollTo(0, 0);
-        window.location.reload();
+          window.scrollTo(0, 0);
+          window.location.reload();
       }, 2000);
     },
-    submitQuotation() {
+    CMsubmitQuotation() {
       this.submitModal = true;
     },
-    async rejectedQuotation(){
+    async CMrejectedQuotation(){
       try {
-        this.UpdateMessage = await QuotationController.rejectedQuotation(this.cqId); 
+        this.UpdateMessage = await QuotationController.CMrejectedQuotation(this.cqId); 
+        
+        window.scrollTo(0, 0);
         setTimeout(() => {
         this.UpdateMessage = '';
-        window.scrollTo(0, 0);
-        window.location.reload();
+          window.location.reload();
       }, 2000);
       } catch (error) {
-        this.FailMessage = "Error updating access permission: " + error.errorMessage;
+        this.FailMessage = "Error: " + error.errorMessage;
+        
+        window.scrollTo(0, 0);
         setTimeout(() => {
         this.UpdateMessage = '';
-        window.scrollTo(0, 0);
-        window.location.reload();
+          window.location.reload();
       }, 2000);
       }
     },
@@ -609,15 +647,15 @@ export default {
         this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId);
         setTimeout(() => {
         this.UpdateMessage = '';
-        window.scrollTo(0, 0);
-        window.location.reload();
+          window.scrollTo(0, 0);
+          window.location.reload();
       }, 2000);
       } catch (error) {
-        this.FailMessage = "Error updating access permission: " + error.errorMessage;
+        this.FailMessage = "Error: " + error.errorMessage;
         setTimeout(() => {
         this.UpdateMessage = '';
-        window.scrollTo(0, 0);
-        window.location.reload();
+          window.scrollTo(0, 0);
+          window.location.reload();
       }, 2000);
       }
     }
@@ -635,17 +673,11 @@ export default {
   border-right: 1px solid #ddd;
 }
 
-
-
 .img {
   width: 100px  !important;
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
 }
-
-
-
-
 
 </style>
