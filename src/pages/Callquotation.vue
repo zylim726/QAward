@@ -200,28 +200,28 @@ export default {
   },
   methods: {
     downloadExcelTemplate() {
-  const wb = XLSX.utils.book_new();
-  const table = document.querySelector('table');
-  const clonedTable = table.cloneNode(true);
+      const wb = XLSX.utils.book_new();
+      const table = document.querySelector('table');
+      const clonedTable = table.cloneNode(true);
 
-  // Remove first column from each row (Actions column)
-  clonedTable.querySelectorAll('tr').forEach(row => {
-    row.deleteCell(0);
-  });
+      // Remove first column from each row (Actions column)
+      clonedTable.querySelectorAll('tr').forEach(row => {
+        row.deleteCell(0);
+      });
 
-  // Update table cells based on conditions
-  clonedTable.querySelectorAll('td').forEach(cell => {
-    // Replace cell content with empty string if it matches '0000-00-00'
-    if (cell.textContent.trim() === '0000-00-00') {
-      cell.textContent = '';
-    }
-  });
+      // Update table cells based on conditions
+      clonedTable.querySelectorAll('td').forEach(cell => {
+        // Replace cell content with empty string if it matches '0000-00-00'
+        if (cell.textContent.trim() === '0000-00-00') {
+          cell.textContent = '';
+        }
+      });
 
-  const ws = XLSX.utils.table_to_sheet(clonedTable);
-  XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
+      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
 
-  XLSX.writeFile(wb, 'summary.xlsx');
-},
+      XLSX.writeFile(wb, 'summary.xlsx');
+    },
     async accessCQ() {
       try {
         const processedData = await CallofQuotationController.accessCQ();

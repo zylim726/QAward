@@ -5,7 +5,7 @@
 
     <div class="step-buttons">
       <button class="step-button" @click="activeStep = 1" :class="{ active: activeStep === 1 }">Step 1 : Create / Import Comparison Summary</button>
-      <button class="step-button" @click="activeStep = 2" :class="{ active: activeStep === 2 }">Step 2 : Create / Import Unit Type</button>
+      <button class="step-button" @click="activeStep = 2" :class="{ active: activeStep === 2 }">Step 2 : Map Unit Type</button>
     </div>
     <div class="md-layout" v-show="activeStep === 1">
       <div

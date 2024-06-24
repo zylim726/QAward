@@ -49,8 +49,8 @@
                   <th scope="col">Category</th>
                   <th scope="col">Trade</th>
                   <th scope="col">Location 1</th>
-                  <th scope="col">Actual Calling Quotation Date (yyyy-mm-dd)</th>
-                  <th scope="col">Awarding Target Date (yyyy-mm-dd)</th>
+                  <th scope="col">Actual Calling Quotation Date (mm/dd/yyyy)</th>
+                  <th scope="col">Awarding Target Date (mm/dd/yyyy)</th>
                   <th scope="col">Remarks</th>
                 </tr>
               </thead>
@@ -60,8 +60,8 @@
                   <td>{{ formData.tradeCategory }}</td>
                   <td>{{ formData.trade }}</td>
                   <td>{{ formData.location }}</td>
-                  <td>{{ formData.CallingQuotationDate }}</td>
-                  <td>{{ formData.awadingtargetdate }}</td>
+                  <td>{{ displayDate(formData.CallingQuotationDate) }}</td>
+                  <td>{{ displayDate(formData.awadingtargetdate) }}</td>
                   <td>{{ formData.remarks }}</td>
                 </tr>
               </tbody>
@@ -89,8 +89,8 @@ export default {
   },
   data() {
     return {
-      selectAllUnitTypes: false,
-      selectAllCallQuotation: false,
+      selectAllUnitTypes: true,
+      selectAllCallQuotation: true,
       UnitTypes: [],
       callQuotation: []
     };
@@ -125,7 +125,10 @@ export default {
       try {
         const processedData = await CallofQuotationController.getUTypes();
         if (processedData.length > 0) {
-          this.UnitTypes = processedData;
+          this.UnitTypes = processedData.map(unitType => ({
+            ...unitType,
+            selected: true // Set selected to true by default
+          }));
         } else {
           this.errorMessage = "An error occurred while fetching unit types.";
         }
@@ -137,8 +140,10 @@ export default {
       try {
         const processedData = await CallofQuotationController.getCQ();
         if (processedData.length > 0) {
-          this.callQuotation = processedData;
-          console.log('this callquotation',this.callQuotation);
+          this.callQuotation = processedData.map(cq => ({
+            ...cq,
+            selected: true // Set selected to true by default
+          }));
         } else {
           this.errorMessage = "An error occurred while fetching call quotations.";
         }
@@ -174,6 +179,16 @@ export default {
         this.errorMessage = "Error fetching data: " + error.errorMessage;
       }
     },
+    displayDate(dateStr) {
+      if (dateStr === "0000-00-00") {
+        return ""; 
+      }
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const [year, month, day] = dateStr.split('-');
+        return `${month}/${day}/${year}`;
+      }
+      return dateStr; 
+    },
     getSelectedUnitTypes() {
       return this.UnitTypes.filter(formData => formData.selected);
     },
@@ -183,4 +198,3 @@ export default {
   },
 };
 </script>
-

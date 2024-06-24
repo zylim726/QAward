@@ -12,7 +12,7 @@ const CallofQuotationController = {
         headers,
       });
 
-      
+
       const processedData = CallQuotationModels.processResponseData(response.data);
     
       return processedData;
@@ -90,7 +90,7 @@ const CallofQuotationController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
       const projectId = localStorage.getItem('projectId');
-      const response = await axios.get(`${apiHost}/call_for_quotation/showByProject/${projectId}`, {
+      const response = await axios.get(`${apiHost}/call_for_quotation/noUnitType/${projectId}`, {
         headers,
       });
 
@@ -128,13 +128,13 @@ const CallofQuotationController = {
       const combinedCQData = [...selectedFormData, ...transformedCQImport];
       const projectId = localStorage.getItem('projectId');
       const messages = [];
-  
+    
       for (const formData of combinedCQData) {
         const cqResponse = await axios.post(`${apiHost}/call_for_quotation/add`, {
           trade_category: formData.tradeCategory,
           trade: formData.trade,
           trade_location1: formData.location,
-          actual_calling_quotation_date: formData.CallingQuotationDate,
+          actual_calling_quotation_date: formData.callingquotationDate,
           awading_target_date: formData.awadingtaget,
           remarks: formData.remarks,
           status: 'Pending',
