@@ -92,8 +92,8 @@
                     <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td><a :href="'/comparison?cqID=' + callQuotation.id"><button class="transparentButton" >
-                        <div class="tooltip" style="margin-left: 5px !important;">
-                          <span class="tooltiptext">Go to see detail subcon comparison.</span>
+                        <div class="tooltip" >
+                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
                         <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
                       </a></td>
                       <td>{{ index + 1 }}</td>
@@ -134,22 +134,19 @@
         </md-card>
       </div>
     </div>
-    <EditCQ :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId"  title="Edit Call of Quotation"></EditCQ>
-    <DeleteCQ :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage" @close="closeModal" :id="deleteId" title="Delete Call of Quotation"></DeleteCQ>
-  </div>
+    </div>
 </template>
 
 <script>
 const XLSX = require('xlsx');
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import { EditCQ,DeleteCQ }  from "@/components";
+
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
-    EditCQ,
-    DeleteCQ,
+  
   },
   data() {
     return {
@@ -159,11 +156,6 @@ export default {
       projectName: "",
       errorMessage: "",
       callQuotation: [],
-      editModal: false,
-      showModal: false,
-      deleteId: null,
-      editId: null,
-      editUTId: null,
       UpdateMessage: null,
       FailMessage: null,
       item: null,
@@ -240,44 +232,6 @@ export default {
         this.openedDropdown.dropdown.closeDropDown();
       }
       this.openedDropdown = clickedItem;
-    },
-    editCallQuotation(id) {
-      this.editId = id;
-      this.editModal = true;
-    },
-    closeEditModal() {
-      this.editModal = false;
-    },
-    deleteCallQuotation(id) {
-      this.deleteId = id;
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-    },
-    ModalMessage(message) {
-      this.UpdateMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 1000);
-    },
-    ModalErrorMessage(message) {
-      this.FailMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 1000);
-    },
-    EditMessage(message) {
-      this.UpdateMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 2000);
-    },
-    EditErrorMessage(message) {
-      this.FailMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 2000);
     },
     async checkPermission() {
       try {

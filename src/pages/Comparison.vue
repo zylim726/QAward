@@ -1,5 +1,36 @@
 <template>
   <div class="content">
+    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+    <div v-if="isModalVisible" class="modal-overlay">
+      <div class="modal-content" style="max-height: 350px;">
+        <h1 class="titleHeader">Select Unit Type</h1><br>
+        <table class="project-table">
+              <thead>
+                <tr>
+                  <th scope="col">
+                  </th>
+                  <th scope="col">Unit Type</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">ADJ Factor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="UnitTypes.length === 0">
+                  <td colspan="4" class="no-data" style="text-align: center;" >No Unit Types available. Please set up Unit Types in the Project Setup</td>
+                </tr>
+                <tr v-for="(formData, index) in UnitTypes" :key="'unit_' + index" :class="{ 'selected-row': formData.selected }">
+                  <td><input type="checkbox" v-model="formData.selected"></td>
+                  <td>{{ formData.unit_type }}</td>
+                  <td>{{ formData.quantity }}</td>
+                  <td>{{ formData.adj_factor }}</td>
+                </tr>
+              </tbody>
+            </table>
+        <button class="btn-confirm" style="margin-left: 89%;margin-top: 18px;"  @click="confirmSubconSelection">Submit</button>
+      </div>
+    </div>
+
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
         <md-card style="height: 70%">
@@ -9,32 +40,40 @@
               <h3 class="titleHeader">{{ projectName }}</h3>
             </div>
 
-            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-16">
+            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Category :</h6>
               <h3 class="titleHeader">{{ callQuotation.trade_category }}</h3>
             </div>
 
-            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-16">
+            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Trade :</h6>
               <h3 class="titleHeader">{{ callQuotation.trade }}</h3>
             </div>
 
-            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-16">
+            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Location 1 :</h6>
               <h3 class="titleHeader">{{ callQuotation.trade_location1 }}</h3>
             </div>
-            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-16">
+            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Prepare :</h6>
               <h3 class="titleHeader">{{ callQuotation.updated_by }}</h3>
             </div>
-            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-16">
-              <h6>Date :</h6>
+            <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
+              <h6>Awading Target Data :</h6>
               <h3 class="titleHeader">{{ callQuotation.awading_target_date }}</h3>
             </div>
+            <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
+                <div class="tooltip">
+                  <span class="tooltiptext">Edit Unit Type</span>
+                  <md-icon style="color: orange;">edit_square</md-icon></div></button>
+              <br>
+              <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
+                <div class="tooltip">
+                  <span class="tooltiptext">Delete Comparison Summary</span>
+                  <md-icon style="color: orange;">delete</md-icon></div></button>
           </div>
         </md-card>
       </div>
-
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
         <md-card style="height: 97%">
           <md-card-content style="line-height: 16px !important;">
@@ -43,6 +82,8 @@
         </md-card>
       </div>
     </div>
+    <EditCQ :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId"  title="Edit Call of Quotation"></EditCQ>
+    <DeleteCQ :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage" @close="closeModal" :id="deleteId" title="Delete Call of Quotation"></DeleteCQ>
   </div>
 </template>
 
@@ -50,18 +91,28 @@
 import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { Error } from "@/services";
+import { EditCQ,DeleteCQ }  from "@/components";
 
 export default {
   components: {
     ComparisonTable,
+    EditCQ,
+    DeleteCQ,
   },
   data() {
     return {
       showModal: false,
       callQuotation: {},
-      errorMessage: "",
       projectName: "",
       cqId: 0,
+      isModalVisible: false,
+      UnitTypes: [],
+      UpdateMessage: null,
+      FailMessage: null,
+      editModal: false,
+      deleteId: null,
+      editId: null,
+      editUTId: null,
     };
   },
   mounted() {
@@ -69,16 +120,84 @@ export default {
     if (projectName) {
       this.projectName = projectName;
     } else {
-      console.error('Project ID not found in localStorage');
     };
     const Id = this.$route.query.cqID;
     this.cqId = Id;
     this.getDetailCQ(Id);
+    this.getCQUnitType(Id);
+    this.getUTypes(); 
   },
   methods: {
+    editCallQuotation(id) {
+      this.editId = id;
+      this.editModal = true;
+    },
+    closeEditModal() {
+      this.editModal = false;
+    },
+    deleteCallQuotation(id) {
+      this.deleteId = id;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
+    ModalMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 1000);
+    },
+    ModalErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 1000);
+    },
+    EditMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    EditErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    async getUTypes() {
+      try {
+        const processedData = await CallofQuotationController.getUTypes();
+        console.log('processedData', processedData); // Log the processedData
+        if (processedData.length > 0) {
+          this.UnitTypes = processedData.map(unitType => ({
+            ...unitType,
+            selected: true 
+          }));
+        } else {
+          this.FailMessage = "No unit types available. Please set up unit types in the Project Setup.";
+        }
+      } catch (error) {
+        this.handleFetchError(error); 
+      }
+    },
+    async getCQUnitType(Id) {
+      try {
+        const processedData = await CallofQuotationController.getUnittype(Id);
+        if (processedData && processedData.length <= 0) {
+          this.isModalVisible = true;
+        }
+      } catch (error) {
+        if (error.errorMessage === undefined) {
+          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+        } else {
+          this.FailMessage = "Error fetching data: " + error.errorMessage;
+        }
+      }
+    },
     async getDetailCQ(Id) {
       try {
-        
         const processedData = await CallofQuotationController.getDetailCQ(Id);
         this.callQuotation = processedData[0];
         if (processedData && processedData.data) {
@@ -89,20 +208,45 @@ export default {
               break;
             }
           }
-        } else {
-          this.errorMessage = "An error occurred while fetching projects.";
-        }
+        } 
       } catch (error) {
         if (error.errorMessage === undefined) {
-          this.errorMessage = "Error fetching data: " + Error.getMessage(504);
+          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
         } else {
-          this.errorMessage = "Error fetching data: " + error.errorMessage;
+          this.FailMessage = "Error fetching data: " + error.errorMessage;
         }
+      }
+    },
+    async confirmSubconSelection() {
+      try {
+        const cqId = this.$route.query.cqID;
+        const selectedUnitTypes = this.UnitTypes.filter(unitType => unitType.selected);
+        const processedData = await CallofQuotationController.comparisonAddCQunit(cqId,selectedUnitTypes);
+        this.UpdateMessage = processedData; 
+        setTimeout(() => {
+          this.UpdateMessage = '';
+          window.location.reload(0);
+        }, 1000);
+      } catch (error) {
+        if (error.errorMessage === undefined) {
+          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+        } else {
+          this.FailMessage = "Error fetching data: " + error.errorMessage;
+        }
+      }
+      
+    },
+    handleFetchError(error) {
+      if (error.errorMessage === undefined) {
+        this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+      } else {
+        this.FailMessage = "Error fetching data: " + error.errorMessage;
       }
     },
   },
 };
 </script>
+
 
 <style>
 .comparison-title {
@@ -131,4 +275,23 @@ export default {
 .row h6 {
   margin-right: 10px; 
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  text-align: center;
+  width: 500px;
+}
+
 </style>

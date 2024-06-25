@@ -30,10 +30,11 @@ const CallofQuotationController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
 
-      const response = await axios.delete(`${apiHost}/call_for_quotation/remove/${id}`, {
+      const getCQResponse = await axios.delete(`${apiHost}/cq_unit_type/removeByCallForQuotation/${id}`, {
         headers,
       });
-      return response.data.message;
+
+      return getCQResponse.data.message;
     } catch (error) {
       const errorMessage = error.response.data.message;
       throw { errorMessage };
@@ -71,7 +72,6 @@ const CallofQuotationController = {
             trade_location1: updatedData.trade_location1, 
             actual_calling_quotation_date: updatedData.actual_calling_quotation_date, 
             awading_target_date: updatedData.awading_target_date, 
-            budget_amount: updatedData.budget_amount,
             remarks: updatedData.remarks
           }, { headers })
         ]);
@@ -111,7 +111,7 @@ const CallofQuotationController = {
       const response = await axios.get(`${apiHost}/project_unit_type/showByProject/${projectId}`, {
         headers,
       });
- 
+
       return response.data.data;
 
     } catch (error) {
@@ -183,6 +183,35 @@ const CallofQuotationController = {
         throw errorMessage; 
     }
   },
+  async comparisonAddCQunit(cqId, selectedUnitTypes) {
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        let latestMessage = ''; 
+        
+        for (const object of selectedUnitTypes) {
+          try {
+              const cqResponse = await axios.post(`${apiHost}/cq_unit_type/add`, {
+                  type: object.unit_type,
+                  adj_factor: object.adj_factor,
+                  quantity: object.quantity,
+                  call_for_quotation_id: cqId 
+              }, {
+                  headers,
+              });
+              latestMessage = cqResponse.data.message;
+          } catch (error) {
+              const errorMessage = error.response.data.message;
+              throw errorMessage;
+          }
+        }
+
+        return latestMessage; 
+    } catch (error) {
+        const errorMessage = error.response.data.message;
+        throw errorMessage; 
+    }
+  },
   async getUnittype(id) {
     try {
       const apiHost = config.getHost();
@@ -192,6 +221,7 @@ const CallofQuotationController = {
         headers,
       });
        const processedData = UnittypeModels.processResponseData(response.data);
+
        return processedData;
       
     } catch (error) {
