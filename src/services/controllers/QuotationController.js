@@ -10,39 +10,52 @@ const QuotationController = {
             headers,
         });
 
-         const calculateSubcon = getSubcon.data.data;
-
-   
+        const calculateSubcon = getSubcon.data.data;
+        let SubconListId = "";
+        let subconIdToRetrieve = null;
+         
         if (calculateSubcon.length > 0) {
-            const promises = calculateSubcon.map(async (item) => {
+
+            const checkingSubconList = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, {
+                headers,
+            });
+            
+            const GetSubconId = checkingSubconList.data.data;
+            const SubconId = calculateSubcon[0].id;
+            
+            for (const subcon of GetSubconId) {
+                if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(QuotationData.cqId)) {
+                    subconIdToRetrieve = subcon.id;
+                    break; 
+                }
+            }
+            
+            if (subconIdToRetrieve === null) {
                 try {
                     const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
+                        discount: 0.00,
                         call_for_quotation_id: QuotationData.cqId,
-                        subcon_id: item.id
-                    }, {
-                        headers,
-                    });
-
-                    const cqSubcon = cqSubconResponse.data.data;
-
-                    const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
-                        quote_rate: QuotationData.rate,
-                        call_for_quotation_subcon_list_id: cqSubcon.id,
-                        description_id: QuotationData.description_id
-                    }, {
-                        headers,
-                    });
-                    return quotationResponse.data.message;
+                        subcon_id: SubconId 
+                    }, { headers });
+            
+                    SubconListId = cqSubconResponse.data.data.id;
 
                 } catch (error) {
-                    const errorMessage = error.quotationData.data.message;
-                    throw { errorMessage };
+                  throw error
                 }
+            } else {
+                SubconListId = subconIdToRetrieve;
+            }
+
+            const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
+                quote_rate: QuotationData.rate,
+                call_for_quotation_subcon_list_id: SubconListId,
+                description_id: QuotationData.description_id
+            }, {
+                headers,
             });
-
-            const responses = await Promise.all(promises);
-
-            return responses.join(', '); 
+            return quotationResponse.data.message;
+            
         } 
     } catch (error) {
         throw error;

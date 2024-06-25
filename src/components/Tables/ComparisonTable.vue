@@ -175,7 +175,7 @@
     </template>
   </div> 
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
-    <DelSubcon :del-modal="delModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
+    <DelSubcon :del-modal="delModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
 
@@ -305,7 +305,7 @@ export default {
       this.editModal = true;
     },
     closeEditModal() {
-      this.editModal = false;
+      this.delModal = false;
     },
     closesubmitModal() {
       this.submitModal = false;
