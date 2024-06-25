@@ -139,19 +139,25 @@ const QuotationController = {
         const dataToSubmitFiltered = approvalDataToSubmit.filter(data => data.SubconListId !== undefined);
         const messages = [];
 
+        console.log('dataToSubmit',dataToSubmitFiltered);
+
+       
         for (const data of dataToSubmitFiltered) {
             const response = await axios.post(`${apiHost}/cq_approval/add`, {
                 approval_remarks: data.remark,
                 approval_status: 'Approval',
+                approval_type: 'Admin Approval',
                 call_for_quotation_id: data.cqId,
                 call_for_quotation_subcon_list_id: data.SubconListId,
                 system_user_id: data.userId
             }, { headers });
 
+            console.log('response',response);
+
             messages.push(response.data.message);
         }
         
-        return messages;
+         return messages;
 
     } catch (error) {
         throw error;
