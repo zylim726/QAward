@@ -60,8 +60,8 @@ export default {
              window.location.reload();
         }, 1000); 
       } catch (error) {
-        const FailMessage = "Error : " + error.errorMessage;
-        this.$emit('editfail-message', FailMessage);
+        // const FailMessage = "Error : " + error.errorMessage;
+        // this.$emit('editfail-message', FailMessage);
       }
     }
   },

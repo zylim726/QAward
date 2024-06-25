@@ -49,7 +49,7 @@
                 <thead>
                   <tr>
                     <th colspan="6"></th>
-                    <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="te    xt-align: center;">
+                    <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
                       <div class="tooltip" >
                         <span class="tooltiptext" style="bottom: -127px;">Using adj factor to calculate quantity.</span>
                         <md-icon style="color: red;">priority_high</md-icon></div>
@@ -88,6 +88,18 @@
                 </tbody>
               </table>
             </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <div style="display: flex; align-items: center;">
+                <label for="discount" style="margin-right: 5px;">Discount:</label>
+                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" min="0" />
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <div style="display: flex; align-items: center;">
+                <label for="remarks" style="margin-right: 5px;">Remarks:</label>
+                <input type="text" id="remarks" v-model.number="remarks" style="width: 94%;" />
+              </div>
+            </div>
             <br>
             <button type="submit" class="btn-save" @click="saveAllData">Submit</button>
             <br>
@@ -121,6 +133,8 @@ export default {
       searchTerm: '',
       QuotationDataArray: [],
       isModalVisible: false,
+      remarks: "",
+      discount: 0,
     };
   },
   mounted() {
@@ -311,6 +325,8 @@ export default {
     async saveData(QuotationData) {
       try {
         const SubConName = this.selectedSubconName;
+        const Discount = this.discount;
+        const Remarks = this.remarks;
         if (QuotationData.rate < 0){
           this.FailMessage = "Error: Rate data cannot have negative.";
           setTimeout(() => {
@@ -319,7 +335,7 @@ export default {
           }, 2000);
         }
         if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-           this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName);
+           this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks);
            setTimeout(() => {
             this.UpdateMessage = '';
           }, 2000);

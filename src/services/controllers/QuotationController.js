@@ -1,7 +1,7 @@
 import { axios, config } from "@/services";
 
 const QuotationController = {
-  async addQuotation(QuotationData,SubConName) {
+  async addQuotation(QuotationData,SubConName,Discount,Remarks) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
@@ -33,7 +33,8 @@ const QuotationController = {
             if (subconIdToRetrieve === null) {
                 try {
                     const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
-                        discount: 0.00,
+                        discount: Discount,
+                        remark: Remarks,
                         call_for_quotation_id: QuotationData.cqId,
                         subcon_id: SubconId 
                     }, { headers });
@@ -61,7 +62,7 @@ const QuotationController = {
         throw error;
     }
   },
-  async addApproval(remarksData, approvalDataArray){
+  async CMsubmitQuotation(remarksData, approvalDataArray){
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
@@ -122,7 +123,7 @@ const QuotationController = {
         throw error;
     }
   },
-  async rejectedQuotation(cqId){
+  async CMrejectedQuotation(cqId){
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
@@ -144,7 +145,7 @@ const QuotationController = {
         const headers = config.getHeadersWithToken();
 
         const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-            status: 'Approval',
+            status: 'Waiting Approval',
         }, { headers });
 
         return response.data.message;
