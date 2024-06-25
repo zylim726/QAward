@@ -1,7 +1,7 @@
 import { axios, config } from "@/services";
 
 const QuotationController = {
-  async addQuotation(QuotationData,SubConName,Discount,Remarks) {
+  async addQuotation(QuotationData,SubConName,Discount,Remarks,documents) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
@@ -9,6 +9,8 @@ const QuotationController = {
         const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${SubConName}`, {
             headers,
         });
+
+        console.log('documents',documents);
 
         const calculateSubcon = getSubcon.data.data;
         let SubconListId = "";
@@ -48,14 +50,33 @@ const QuotationController = {
                 SubconListId = subconIdToRetrieve;
             }
 
-            const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
-                quote_rate: QuotationData.rate,
-                call_for_quotation_subcon_list_id: SubconListId,
-                description_id: QuotationData.description_id
-            }, {
-                headers,
-            });
-            return quotationResponse.data.message;
+            console.log('subconLIst',SubconListId);
+
+             // Prepare FormData for file upload
+             const formData = new FormData();
+             formData.append('file', documents.get('file'));
+             formData.append('data-table', 'call_for_quotation_subcon_list');
+             formData.append('data-table-id', SubconListId);
+             formData.append('name', quotation.xlsx);
+ 
+             // Make API call to upload the file
+             const response = await axios.post(`${apiHost}/document/importExcel`, formData, {
+                 headers: {
+                     'Content-Type': 'multipart/form-data',
+                     ...headers,
+                 },
+             });
+ 
+             console.log('File upload response:', response.data);
+
+            // const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
+            //     quote_rate: QuotationData.rate,
+            //     call_for_quotation_subcon_list_id: SubconListId,
+            //     description_id: QuotationData.description_id
+            // }, {
+            //     headers,
+            // });
+            // return quotationResponse.data.message;
             
         } 
     } catch (error) {
@@ -91,6 +112,19 @@ const QuotationController = {
         const ProjectId = localStorage.getItem('projectId');
         
         const response = await axios.get(`${apiHost}/project_approval/showByProject/${ProjectId}`, { headers });
+
+        return response.data.data;
+
+    } catch (error) {
+        throw error;
+    }
+  },
+  async getCMcqApproval(id){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        
+        const response = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${id}`, { headers });
 
         return response.data.data;
 
@@ -139,6 +173,19 @@ const QuotationController = {
         throw error;
     }
   },
+  async getCMSubmit(){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+
+        const response = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, { headers });
+    
+        return response.data.data;
+
+    } catch (error) {
+        throw error;
+    }
+  },
   async approvalQuotation(cqId){
     try {
         const apiHost = config.getHost();
@@ -146,6 +193,32 @@ const QuotationController = {
 
         const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
             status: 'Waiting Approval',
+        }, { headers });
+
+        return response.data.message;
+
+    } catch (error) {
+        throw error;
+    }
+  },
+  async addApproval(remarksData, selectedQuotation, CQid){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const Userid = localStorage.getItem('userid');
+
+        const getComparisonSummary = await axios.put(`${apiHost}/call_for_quotation/edit/${CQid}`, {
+            status: 'Approval',
+        }, { headers });
+
+ 
+        const response = await axios.post(`${apiHost}/cq_approval/add`, {
+            approval_remarks: remarksData,
+            approval_status: 'Approval',
+            approval_type: 'CM Approval',
+            call_for_quotation_id: CQid,
+            call_for_quotation_subcon_list_id: selectedQuotation,
+            system_user_id: Userid
         }, { headers });
 
         return response.data.message;

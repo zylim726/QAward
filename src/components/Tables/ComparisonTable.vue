@@ -125,10 +125,25 @@
       </template>
     </div>
     <template v-if="project.status === 'Approval' && QuotationName.length > 0">
+      <div class="cmApprovalMessage-container" v-if="cqApprovalData.length >= 0">
+        <br>
+        <h3 class="titleHeader" style="margin-left: 20px;">CM Approval Feedback : </h3>
+        <div class="cmApprovalMessage" v-for="(cmapproval, index) in cmCQapproval" :key="index">
+          <p class="cmApprovalP">CM Approval :  
+            <h3 class="cmApprovalH3">{{  cmapproval.user[0].name }}</h3>
+          </p>
+          <p class="cmApprovalP">Recommend Award To:  
+            <h3 class="cmApprovalH3">{{ cmapproval.call_for_quotation_subcon_list_id }}</h3>
+          </p>
+          <p class="cmApprovalP"> Remarks :  
+            <h3 class="cmApprovalH3">{{ cmapproval.approval_remarks }}</h3>
+          </p>
+        </div>
+      </div>
       <div class="cqapprovalBox-container">
         <template v-if="cqApprovalData.length === 0">
           <div class="confirmation-message" style="width: 100% !important;">
-            <p>Please go to project control and get admin approval.</p>
+            <p>Please go to project control set up admin approval.</p>
             <a href="projectcontrol">
               <button class="btn-save">Project Control</button>
             </a>
@@ -148,19 +163,19 @@
                   <p class="user-access">Level: {{ user.accesslevel }}</p>
                 </div>
                 <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                <div v-if="(localItem && localItem.userid && approvalData.system_user_id === localItem.userid) || hasAccess">
+                <div v-if="approvalData.system_user_id === Number(getUserIdLocal) || hasAccess">
                   <select v-model="selectedQuotations[index]" class="quotation-select">
-                    <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
-                      {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
+                    <option v-for="(quotationData, qIndex) in approvalData.callForQuotation[0].Call_For_Quotation_Subcon_Lists" :key="qIndex" :value="quotationData.subcon_id">
+                      {{ quotationData.subcon_id }}
                     </option>
                   </select>
                   <p style="margin: 8px 0 10px;">Remarks:</p>
                   <textarea v-model="remarks[index]" class="remarks-textarea"></textarea>
                 </div>
                 <div v-else>
-                  <select v-model="selectedQuotations[index]" class="quotation-select">
-                    <option v-for="(quotationData, qIndex) in filteredQuotationName" :key="qIndex" :value="quotationData.call_for_quotation_subcon_list_id">
-                      {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}
+                  <select v-model="selectedQuotations[index]" class="quotation-select" :disabled="true">
+                    <option v-for="(quotationData, qIndex) in approvalData.callForQuotation[0].Call_For_Quotation_Subcon_Lists" :key="qIndex" :value="quotationData.subcon_id">
+                      {{ quotationData.subcon_id }}
                     </option>
                   </select>
                   <p style="margin: 8px 0 10px;">Remarks:</p>
@@ -224,7 +239,7 @@ export default {
       remarks: {},
       hasAccess: false,
       cmAccessApproval: false,
-      localItem: null,
+      cmCQapproval:[],
     };
   },
   watch: {
@@ -233,10 +248,8 @@ export default {
       this.getCQApproval();
       this.getProject(newValue);
       this.checkPermission();
+      this.getCMcqApproval(newValue);
     },
-  },
-  mounted() {
-    this.getBuildFomula(); 
   },
   computed: {
     generatedHeaders() {
@@ -249,17 +262,20 @@ export default {
     latestApprovalData() {
       return this.ApprovalDataArray[this.ApprovalDataArray.length - 1];
     },
-    filteredQuotationName() {
-      return this.QuotationName.filter(quotationData => quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1);
-    },
     isPending() {
       return this.projectData.some(project => project.status === 'Pending');
     },
     cmAccesslevel() {
       return localStorage?.accesslevel === 'CM';
+    },
+    getUserIdLocal() {
+      return localStorage.getItem('userid');
     }
   },
   methods: {
+    CMsubmitQuotation() {
+      this.submitModal = true;
+    },
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
@@ -311,12 +327,12 @@ export default {
       this.submitModal = false;
     },
     deleteSubcon(id) {
-
       const matchedSubcons = [];
       for (const getQuote of this.processedData) {
         const quotation = getQuote.quotation;
         const filteredQuotationIds = [];
         for (const quote of quotation) {
+        
           if (quote.Call_For_Quotation_Subcon_List.subcon_id === id) {
             filteredQuotationIds.push(quote.call_for_quotation_subcon_list_id);
           }
@@ -350,9 +366,10 @@ export default {
     async getDescription(id, isHide) {
       try {
         let processedData = await DescriptionController.getNewDescription(id);
-    
         const searchQuery = this.searchQuery.toLowerCase().trim();
 
+        this.ApprovalDataArray.push(Number(id));
+  
         if (searchQuery) {
           processedData = processedData.filter(formData =>
             formData.description_item.toLowerCase().includes(searchQuery) ||
@@ -375,7 +392,7 @@ export default {
 
           let head1Counter = 0;
           let head2Counter = 0;
-          let ApprovalDataArray = [];
+          
 
           const totalQuotationAmounts = {};
 
@@ -419,12 +436,12 @@ export default {
                   };
                 }
 
-                if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
-                this.ApprovalDataArray.push({
-                  cqId: id,
-                  callSubconId: quotationRate.call_for_quotation_subcon_list_id
-                });
-                }
+                // if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
+                // this.ApprovalDataArray.push({
+                //   cqId: id
+                // });
+                // }
+
                 quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
                                 <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
               }
@@ -481,7 +498,7 @@ export default {
             }
             bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
             adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
-            remarks += `<td colspan="2" >${subconAmount[0].remark}</td>`;
+            remarks += `<td colspan="2">${subconAmount[0].remark ? subconAmount[0].remark : ''}</td>`;
           }
           
           const tableFoot = document.querySelector('.nested-table tfoot');
@@ -534,21 +551,52 @@ export default {
         const response = await QuotationController.getCQApproval();
         this.cqApprovalData = response;
 
-        response.forEach((approval, index) => {
-          this.$set(this.selectedQuotations, index, approval.id || '');
-        
-          const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
-            cqApproval => cqApproval.system_user_id === approval.system_user_id
-          );
+        // Flag to track if remarks are entered for the current approval
+        let remarksEntered = false;
 
-          if (matchingCqApproval) {
-            this.$set(this.remarks, index, matchingCqApproval.p || '');
+        response.forEach((approval, index) => {
+          const GetSubconList = approval.callForQuotation[0].Call_For_Quotation_Subcon_Lists;
+          GetSubconList.forEach((subconData, subconIndex) => {
+            this.$set(this.selectedQuotations, subconIndex, subconData.subcon_id || '');
+          });
+
+          // Check if remarks are already entered for this approval
+          if (approval.cqApproval && approval.cqApproval.approval_remarks) {
+            remarksEntered = true;
+          }
+
+          // Enable input only if remarks are entered for the previous approval
+          const enableInput = remarksEntered || index === 0;
+
+          if (enableInput) {
+            // Find the matching Cq_Approval and set the remarks
+            const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
+              cqApproval => cqApproval.system_user_id === approval.system_user_id
+            );
+
+            if (matchingCqApproval) {
+              this.$set(this.remarks, index, matchingCqApproval.p || '');
+            } else {
+              this.$set(this.remarks, index, '');
+            }
           } else {
+            // Disable input if remarks are not entered for the previous approval
             this.$set(this.remarks, index, '');
           }
         });
+
       } catch (error) {
       
+      }
+    },
+    async getCMcqApproval(id) {
+      try {
+        const response = await QuotationController.getCMcqApproval(id);
+
+        this.cmCQapproval = response.filter(approval => approval.approval_type === 'CM Approval');
+
+      } catch (error) {
+        his.FailMessage = 'Error:', error;
       }
     },
     async getProject(id) {
@@ -618,9 +666,6 @@ export default {
           window.scrollTo(0, 0);
           window.location.reload();
       }, 2000);
-    },
-    CMsubmitQuotation() {
-      this.submitModal = true;
     },
     async CMrejectedQuotation(){
       try {

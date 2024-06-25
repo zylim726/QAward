@@ -671,3 +671,28 @@ background-color: #f8d7da;
   visibility: visible;
   opacity: 1;
 }
+
+
+.cmApprovalMessage-container{
+  width: 98.6% ;
+  height: 150px;
+  margin-top: 15px;
+}
+
+.cmApprovalMessage{
+  margin-left: 20%;
+  line-height: 22px;
+  margin-top: -33px;
+
+}
+
+.cmApprovalP{
+  display: contents;
+  font-size: 15px;
+}
+
+.cmApprovalH3{
+  display: contents;
+  color: orange;
+  font-size: 18px;
+}
