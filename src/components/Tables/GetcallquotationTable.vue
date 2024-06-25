@@ -127,7 +127,7 @@ export default {
         if (processedData.length > 0) {
           this.UnitTypes = processedData.map(unitType => ({
             ...unitType,
-            selected: true // Set selected to true by default
+            selected: true 
           }));
         } else {
           this.errorMessage = "An error occurred while fetching unit types.";
@@ -142,7 +142,7 @@ export default {
         if (processedData.length > 0) {
           this.callQuotation = processedData.map(cq => ({
             ...cq,
-            selected: true // Set selected to true by default
+            selected: true 
           }));
         } else {
           this.errorMessage = "An error occurred while fetching call quotations.";

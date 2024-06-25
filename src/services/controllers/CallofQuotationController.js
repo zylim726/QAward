@@ -216,7 +216,6 @@ const CallofQuotationController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
-
       const response = await axios.get(`${apiHost}/cq_unit_type/showByCallForQuotation/${id}`, {
         headers,
       });

@@ -2,7 +2,7 @@
   <div class="content">
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
-    <div v-if="isModalVisible" class="modal-overlay">
+    <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
       <div class="modal-content" style="max-height: 350px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
         <table class="project-table">
@@ -106,6 +106,7 @@ export default {
       projectName: "",
       cqId: 0,
       isModalVisible: false,
+      CQunitType:[],
       UnitTypes: [],
       UpdateMessage: null,
       FailMessage: null,
@@ -123,8 +124,8 @@ export default {
     };
     const Id = this.$route.query.cqID;
     this.cqId = Id;
-    this.getDetailCQ(Id);
-    this.getCQUnitType(Id);
+    this.getDetailCQ(this.cqId);
+    this.getCQUnitType(this.cqId);
     this.getUTypes(); 
   },
   methods: {
@@ -166,36 +167,6 @@ export default {
         this.UpdateMessage = '';
       }, 2000);
     },
-    async getUTypes() {
-      try {
-        const processedData = await CallofQuotationController.getUTypes();
-        console.log('processedData', processedData); // Log the processedData
-        if (processedData.length > 0) {
-          this.UnitTypes = processedData.map(unitType => ({
-            ...unitType,
-            selected: true 
-          }));
-        } else {
-          this.FailMessage = "No unit types available. Please set up unit types in the Project Setup.";
-        }
-      } catch (error) {
-        this.handleFetchError(error); 
-      }
-    },
-    async getCQUnitType(Id) {
-      try {
-        const processedData = await CallofQuotationController.getUnittype(Id);
-        if (processedData && processedData.length <= 0) {
-          this.isModalVisible = true;
-        }
-      } catch (error) {
-        if (error.errorMessage === undefined) {
-          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
-        } else {
-          this.FailMessage = "Error fetching data: " + error.errorMessage;
-        }
-      }
-    },
     async getDetailCQ(Id) {
       try {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
@@ -215,6 +186,36 @@ export default {
         } else {
           this.FailMessage = "Error fetching data: " + error.errorMessage;
         }
+      }
+    },
+    async getCQUnitType(Id) {
+      try {
+        const processedData = await CallofQuotationController.getUnittype(Id);
+        this.CQunitType = processedData;
+        if (processedData && processedData.length <= 0) {
+          this.isModalVisible = true;
+        }
+      } catch (error) {
+        if (error.errorMessage === undefined) {
+          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+        } else {
+          this.FailMessage = "Error fetching data: " + error.errorMessage;
+        }
+      }
+    },
+    async getUTypes() {
+      try {
+        const processedData = await CallofQuotationController.getUTypes();
+        if (processedData.length > 0) {
+          this.UnitTypes = processedData.map(unitType => ({
+            ...unitType,
+            selected: true 
+          }));
+        } else {
+          this.FailMessage = "No unit types available. Please set up unit types in the Project Setup.";
+        }
+      } catch (error) {
+        this.handleFetchError(error); 
       }
     },
     async confirmSubconSelection() {

@@ -535,7 +535,6 @@ export default {
         this.cqApprovalData = response;
 
         response.forEach((approval, index) => {
-          //changes this when have quotation subcon list id 
           this.$set(this.selectedQuotations, index, approval.id || '');
         
           const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
@@ -597,7 +596,7 @@ export default {
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
       
       // Write workbook to file
-      XLSX.writeFile(wb, 'comparisonTable.xlsx');
+      XLSX.writeFile(wb, 'subconComparison.xlsx');
 
       // Re-hide hidden elements
       hiddenElements.forEach(element => {

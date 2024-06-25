@@ -5,7 +5,6 @@ const QuotationController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        console.log('SubConName',SubConName);
 
         const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${SubConName}`, {
             headers,

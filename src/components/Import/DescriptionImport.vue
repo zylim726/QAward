@@ -5,12 +5,17 @@
       style="margin-right: 10px; float: right"
       class="file-label"
     >
-      <md-icon class="mdIcon">upload_file</md-icon>
-      <!-- Set multiple attribute to enable multiple file selection -->
+      <div class="tooltip" >
+        <span class="tooltiptext" >Upload your BQ Description.</span>
+        <md-icon class="mdIcon">upload_file</md-icon>
+      </div>
       <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
     </label>
     <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px; float: right">
-      <md-icon class="mdIcon">download_for_offline</md-icon>
+      <div class="tooltip" >
+        <span class="tooltiptext" >Download BQ Template and field in data.</span>
+        <md-icon class="mdIcon">download_for_offline</md-icon>
+      </div>
     </button>
     <div class="projectTable-container">
       <table class="project-table">
@@ -30,7 +35,7 @@
             <th scope="col">Sub Sub Element</th>
             <th scope="col">Description </th>
             <th scope="col">Unit </th>
-            <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.type }}</th>
+            <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" >{{ unitdata.type }} ({{unitdata.quantity}})</th>
             <th scope="col">Budget Rate </th>
           </tr>
         </thead>
@@ -38,9 +43,7 @@
           <tr
             v-for="(row, index) in importedData"
             :key="index"
-            :class="{ 'selected-row': row.selected }"
-          >
-            <!-- Modified to conditionally display the checkbox -->
+            :class="{ 'selected-row': row.selected }">
             <td v-if="shouldDisplayCheckbox(row)">
               <label class="control control--checkbox">
                 <input type="checkbox" v-model="row.selected" />
@@ -75,7 +78,7 @@ export default {
       importedData: [],
       Unittype: [],
       columnTitles: [],
-      selectAll: false,
+      selectAll: true,
     };
   },
   computed: {
@@ -111,8 +114,19 @@ export default {
       }
     },
     importData(data) {
-      this.importedData = [...this.importedData, ...data];
-      this.columnTitles = Object.keys(this.importedData[0]);
+      const filteredData = data.filter(row => {
+        return Object.values(row).some(value => value !== '');
+      });
+
+      filteredData.forEach(row => {
+        row.selected = true; 
+      });
+
+      this.importedData = [...this.importedData, ...filteredData];
+
+      if (this.importedData.length > 0) {
+        this.columnTitles = Object.keys(this.importedData[0]);
+      }
     },
     selectAllRows() {
       if (this.importedData.length > 0) {
@@ -139,7 +153,6 @@ export default {
         const thElements = document.querySelectorAll('thead th');
 
         thElements.forEach((th) => {
-          // Exclude the checkbox column
           if (th.textContent.trim() !== "") {
             headers.push(th.textContent.trim());
           }
@@ -152,7 +165,7 @@ export default {
         const link = document.createElement('a');
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", "description_template.csv");
-        document.body.appendChild(link); // Required for Firefox
+        document.body.appendChild(link);
         link.click();
         link.remove();
       } catch (error) {
@@ -168,11 +181,33 @@ export default {
       const matchedData = selectImportData.map(object => {
         const matchedValues = {};
         unittype.forEach(unit => {
-          if (object.hasOwnProperty(unit.type)) {
-            matchedValues[unit.id] = object[unit.type];
+          const combineObjects = `${unit.type} (${unit.quantity})`;
+          if (object.hasOwnProperty(combineObjects)) {
+            matchedValues[unit.id] = `${object[combineObjects]}`;
           }
         });
 
+        if (object["Budget Rate"] < 0) {
+          this.$emit('fail-message', "Budget Rate cannot be negative.");
+        }
+
+        for (const key in matchedValues) {
+          if (matchedValues[key] < 0) {
+              this.$emit('fail-message', "Unit type quantity cannot have negative amounts.");
+          }
+        }
+
+
+        if (object["Unit"] !== "") {
+          if (object["Budget Rate"] === "") {
+            this.$emit('fail-message', "Budget Rate cannot be empty data.");
+          }
+          for (const key in matchedValues) {
+            if (matchedValues[key] === "") {
+                this.$emit('fail-message', "Unit type quantity cannot be empty data.");
+            }
+          }
+        }
 
         const hasMatches = Object.keys(matchedValues).length > 0;
 
@@ -192,16 +227,7 @@ export default {
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.$emit('message', Message);
-        
-        // Remove elements from selectImportData
-        selectImportData.forEach(importedRow => {
-            const index = this.importedData.indexOf(importedRow);
-            if (index !== -1) {
-                this.importedData.splice(index, 1);
-            }
-        });
-  
-        this.selectAll = false;
+        this.$router.push({ path: '/comparison', query: { cqID: cqId } });
 
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;
