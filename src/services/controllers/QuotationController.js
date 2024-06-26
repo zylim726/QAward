@@ -1,17 +1,17 @@
-import { axios, config } from "@/services";
+import {  config } from "@/services";
+import axios from 'axios';
 
 const QuotationController = {
-  async addQuotation(QuotationData,SubConName,Discount,Remarks,documents) {
+  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-
+        const token = localStorage.getItem('token');
         const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${SubConName}`, {
             headers,
         });
 
-        console.log('documents',documents);
-
+        
         const calculateSubcon = getSubcon.data.data;
         let SubconListId = "";
         let subconIdToRetrieve = null;
@@ -33,6 +33,7 @@ const QuotationController = {
             }
             
             if (subconIdToRetrieve === null) {
+                
                 try {
                     const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
                         discount: Discount,
@@ -42,6 +43,27 @@ const QuotationController = {
                     }, { headers });
             
                     SubconListId = cqSubconResponse.data.data.id;
+                 
+
+                    const formData = new FormData();
+                    formData.append('file', Documents.file);
+                    formData.append('data-table', 'call_for_quotation_subcon_list');
+                    formData.append('data-table-id', SubconListId);
+                    formData.append('description', 'update quotation description');
+                    formData.append('name', 'quotation.xlsx');
+
+                    // Perform the axios request
+                    const response = await axios.post(
+                        `${apiHost}/document/importExcel`, 
+                        formData, 
+                        { 
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                                Authorization: `Bearer ${token}`,
+                            }
+                        }
+                    );
+            
 
                 } catch (error) {
                   throw error
@@ -50,33 +72,15 @@ const QuotationController = {
                 SubconListId = subconIdToRetrieve;
             }
 
-            console.log('subconLIst',SubconListId);
-
-             // Prepare FormData for file upload
-             const formData = new FormData();
-             formData.append('file', documents.get('file'));
-             formData.append('data-table', 'call_for_quotation_subcon_list');
-             formData.append('data-table-id', SubconListId);
-             formData.append('name', quotation.xlsx);
- 
-             // Make API call to upload the file
-             const response = await axios.post(`${apiHost}/document/importExcel`, formData, {
-                 headers: {
-                     'Content-Type': 'multipart/form-data',
-                     ...headers,
-                 },
-             });
- 
-             console.log('File upload response:', response.data);
-
-            // const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
-            //     quote_rate: QuotationData.rate,
-            //     call_for_quotation_subcon_list_id: SubconListId,
-            //     description_id: QuotationData.description_id
-            // }, {
-            //     headers,
-            // });
-            // return quotationResponse.data.message;
+        
+            const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
+                quote_rate: QuotationData.rate,
+                call_for_quotation_subcon_list_id: SubconListId,
+                description_id: QuotationData.description_id
+            }, {
+                headers,
+            });
+           return quotationResponse.data.message;
             
         } 
     } catch (error) {

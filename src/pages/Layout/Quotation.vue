@@ -100,10 +100,10 @@
                 <input type="text" id="remarks" v-model.number="remarks" style="width: 94%;" />
               </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-              <div style="display: flex; align-items: center;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: -13px;">
+              <div>
                 <label for="documents" style="margin-right: 5px;">Documents:</label>
-                <input type="file" id="documents" @change="handleFileUpload" multiple />
+                <input type="file" @change="handleFileChange">
               </div>
             </div>
             <br>
@@ -141,7 +141,7 @@ export default {
       isModalVisible: false,
       remarks: "",
       discount: 0,
-      documents:[],
+      documents: {},
     };
   },
   mounted() {
@@ -171,13 +171,9 @@ export default {
     }
   },
   methods: {
-    handleFileUpload(event) {
-      this.documents = [];
-
-      const files = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        this.documents.push(files[i]);
-      }
+    handleFileChange(event) {
+      this.documents.file = event.target.files[0];
+      
     },
     confirmSubconSelection() {
       if (this.selectedOption) {
@@ -338,47 +334,51 @@ export default {
       }
     },
     async saveData(QuotationData) {
-      try {
-        const SubConName = this.selectedSubconName;
-        const Discount = this.discount;
-        const Remarks = this.remarks;
-        const documents = this.documents;
-     
-        if (QuotationData.rate < 0){
-          this.FailMessage = "Error: Rate data cannot have negative.";
-          setTimeout(() => {
-            this.UpdateMessage = '';
-            window.location.reload();
-          }, 2000);
+        try {
+            const SubConName = this.selectedSubconName;
+            const Discount = this.discount;
+            const Remarks = this.remarks;
+            const Documents = this.documents;
+
+           
+            //Uncomment and adjust validation if needed
+            if (QuotationData.rate < 0){
+              this.FailMessage = "Error: Rate data cannot have negative.";
+              setTimeout(() => {
+                this.UpdateMessage = '';
+                window.location.reload();
+              }, 2000);
+            }
+
+            if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
+             
+              this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents);
+              setTimeout(() => {
+                this.UpdateMessage = '';
+              }, 2500);
+              const routeData = this.$router.resolve({
+                  name: 'Subcon Comparison',
+                  query: { cqID: this.$route.query.cqId }
+              });
+
+              window.open(routeData.href, '_blank');
+            } else {
+              this.FailMessage = "Error: Rate data is empty";
+              setTimeout(() => {
+                this.UpdateMessage = '';
+                window.location.reload();
+              }, 2000);
+            }
+
+
+        } catch (error) {
+            // this.FailMessage = error.message;
+            // setTimeout(() => {
+            //   this.UpdateMessage = '';
+            //   window.location.reload();
+            // }, 2000);
+
         }
-
-      
-        if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-           this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,documents);
-          //  setTimeout(() => {
-          //   this.UpdateMessage = '';
-          // }, 2000);
-          // const routeData = this.$router.resolve({
-          //     name: 'Subcon Comparison',
-          //     query: { cqID: this.$route.query.cqId }
-          // });
-
-          //window.open(routeData.href, '_blank');
-        } else {
-          // this.FailMessage = "Error: Rate data is empty";
-          // setTimeout(() => {
-          //   this.UpdateMessage = '';
-          //   window.location.reload();
-          // }, 2000);
-        }
-
-      } catch (error) {
-        // this.FailMessage = error.message;
-        // setTimeout(() => {
-        //   this.UpdateMessage = '';
-        //   window.location.reload();
-        // }, 2000);
-      }
     },
     downloadExcelTemplate() {
       const dataTable = this.$refs.dataTable;

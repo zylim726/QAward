@@ -312,12 +312,12 @@ export default {
 
       try {
         const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
-        // const concatenatedMessage = SuccessMessage.join(', ');
-        // const Message = concatenatedMessage.split(',')[0].trim();
-        // this.UpdateMessage = Message;
+        const concatenatedMessage = SuccessMessage.join(', ');
+        const Message = concatenatedMessage.split(',')[0].trim();
+        this.UpdateMessage = Message;
       } catch (error) {
    
-        //this.FailMessage = 'Error while submitting approval data:', error;
+        this.FailMessage = 'Error while submitting approval data:', error;
       }
     },
     editDescription(id) {
