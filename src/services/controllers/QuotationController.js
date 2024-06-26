@@ -2,7 +2,7 @@ import {  config } from "@/services";
 import axios from 'axios';
 
 const QuotationController = {
-  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents) {
+  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
@@ -15,6 +15,7 @@ const QuotationController = {
         const calculateSubcon = getSubcon.data.data;
         let SubconListId = "";
         let subconIdToRetrieve = null;
+        const messages = [];
          
         if (calculateSubcon.length > 0) {
 
@@ -26,44 +27,23 @@ const QuotationController = {
             const SubconId = calculateSubcon[0].id;
             
             for (const subcon of GetSubconId) {
-                if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(QuotationData.cqId)) {
+                if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(id)) {
                     subconIdToRetrieve = subcon.id;
                     break; 
                 }
             }
-            
+
             if (subconIdToRetrieve === null) {
                 
                 try {
                     const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
                         discount: Discount,
                         remark: Remarks,
-                        call_for_quotation_id: QuotationData.cqId,
+                        call_for_quotation_id: id,
                         subcon_id: SubconId 
                     }, { headers });
             
                     SubconListId = cqSubconResponse.data.data.id;
-                 
-
-                    const formData = new FormData();
-                    formData.append('file', Documents.file);
-                    formData.append('data-table', 'call_for_quotation_subcon_list');
-                    formData.append('data-table-id', SubconListId);
-                    formData.append('description', 'update quotation description');
-                    formData.append('name', 'quotation.xlsx');
-
-                    // Perform the axios request
-                    const response = await axios.post(
-                        `${apiHost}/document/importExcel`, 
-                        formData, 
-                        { 
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                                Authorization: `Bearer ${token}`,
-                            }
-                        }
-                    );
-            
 
                 } catch (error) {
                   throw error
@@ -72,16 +52,45 @@ const QuotationController = {
                 SubconListId = subconIdToRetrieve;
             }
 
+            const formData = new FormData();
+            formData.append('file', Documents.file);
+            formData.append('data-table', 'call_for_quotation_subcon_list');
+            formData.append('data-table-id', SubconListId);
+            formData.append('description', 'update quotation description');
+            formData.append('name', 'quotation.xlsx');
+
+            // Perform the axios request
+            const response = await axios.post(
+                `${apiHost}/document/importExcel`, 
+                formData, 
+                { 
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`,
+                    }
+                }
+            );
         
-            const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
-                quote_rate: QuotationData.rate,
-                call_for_quotation_subcon_list_id: SubconListId,
-                description_id: QuotationData.description_id
-            }, {
-                headers,
-            });
-           return quotationResponse.data.message;
-            
+            for (const quotation of QuotationData) {
+     
+                try {
+                    const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
+                        quote_rate: quotation.rate,
+                        call_for_quotation_subcon_list_id: SubconListId,
+                        description_id: quotation.description_id
+                    }, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+    
+                    messages.push(quotationResponse.data.message);
+                } catch (quotationError) {
+                    throw quotationError;
+                }
+            }
+
+            return messages;
         } 
     } catch (error) {
         throw error;
@@ -241,17 +250,11 @@ const QuotationController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        let messages = [];
-        for (let i = 0; i < deleteId.length; i++) {
-            let nestedArray = deleteId[i]; 
-
-            for (let j = 0; j < nestedArray.length; j++) {
-                let element = nestedArray[j];
-                const response =  await axios.delete(`${apiHost}/quotation/removeByCallForQuotationSubconList/${element}`, { headers });
-                messages.push(response.data.message);
-            }
-        }
-        return messages;
+      
+        const response =  await axios.delete(`${apiHost}/quotation/removeByCallForQuotationSubconList/${deleteId}`, { headers });
+        const CQresponse =  await axios.delete(`${apiHost}/call_for_quotation_subcon_list/remove/${deleteId}`, { headers });
+       
+        return CQresponse.data.message;
     } catch (error) {
         throw error;
     }

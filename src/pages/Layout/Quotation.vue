@@ -316,7 +316,6 @@ export default {
               rateData: rateCount,
               quotationName: this.selectedSubconName,
               rate: columnKData[columnKDataIndex],
-              cqId: id
             });
           }
 
@@ -326,33 +325,37 @@ export default {
     },
     async saveAllData() {
       try {
-        for (const QuotationData of this.QuotationDataArray) {
-          await this.saveData(QuotationData);
-        }
+        await this.saveData(this.QuotationDataArray,this.$route.query.cqId);
+        
       } catch (error) {
         this.$emit('fail-message', error.message);
       }
     },
-    async saveData(QuotationData) {
+    async saveData(QuotationData,id) {
         try {
             const SubConName = this.selectedSubconName;
             const Discount = this.discount;
             const Remarks = this.remarks;
             const Documents = this.documents;
 
-           
-            //Uncomment and adjust validation if needed
-            if (QuotationData.rate < 0){
-              this.FailMessage = "Error: Rate data cannot have negative.";
-              setTimeout(() => {
-                this.UpdateMessage = '';
-                window.location.reload();
-              }, 2000);
+            console.log('QuotationData',QuotationData);
+
+            const hasNegativeRate = QuotationData.some(data => data.rate < 0);
+            if (hasNegativeRate) {
+                this.FailMessage = "Error: Rate data cannot have negative values.";
+                setTimeout(() => {
+                    this.UpdateMessage = '';
+                    window.scrollTo(0, 0); 
+                    window.location.reload();
+                }, 2000);
+                return;
             }
 
             if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-             
-              this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents);
+              
+              const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
+              const concatenatedMessage = SuccessMessage.join(', ');
+              this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
               setTimeout(() => {
                 this.UpdateMessage = '';
               }, 2500);
@@ -361,7 +364,7 @@ export default {
                   query: { cqID: this.$route.query.cqId }
               });
 
-              window.open(routeData.href, '_blank');
+               window.open(routeData.href, '_blank');
             } else {
               this.FailMessage = "Error: Rate data is empty";
               setTimeout(() => {
@@ -372,12 +375,11 @@ export default {
 
 
         } catch (error) {
-            // this.FailMessage = error.message;
-            // setTimeout(() => {
-            //   this.UpdateMessage = '';
-            //   window.location.reload();
-            // }, 2000);
-
+            this.FailMessage = error.message;
+            setTimeout(() => {
+              this.UpdateMessage = '';
+              window.location.reload();
+            }, 2000);
         }
     },
     downloadExcelTemplate() {

@@ -51,17 +51,12 @@ export default {
     },
     async removeSubcon(id) {
       try {
-        const deleteId = id;
-        const SuccessMessage = await QuotationController.removeSubcon(deleteId);
-        const concatenatedMessage = SuccessMessage.join(', ');
-        const Message = concatenatedMessage.split(',')[0].trim();
-        this.$emit('editMessage', Message);
-        setTimeout(function() {
-             window.location.reload();
-        }, 1000); 
+        const deleteId = Number(id[0]);
+       const SuccessMessage = await QuotationController.removeSubcon(deleteId);
+        this.$emit('editSubconMessage', SuccessMessage); 
       } catch (error) {
-        // const FailMessage = "Error : " + error.errorMessage;
-        // this.$emit('editfail-message', FailMessage);
+        const FailMessage = "Error : " + error.errorMessage;
+        this.$emit('editfail-message', FailMessage);
       }
     }
   },

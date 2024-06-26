@@ -192,7 +192,7 @@
     </template>
   </div> 
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
-    <DelSubcon :del-modal="delModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
+    <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
 
@@ -663,6 +663,14 @@ export default {
       });
     },
     EditMessage(message) {
+      this.UpdateMessage = message;
+      setTimeout(() => {
+        this.UpdateMessage = '';
+          window.scrollTo(0, 0);
+          window.location.reload();
+      }, 2000);
+    },
+    EditSubconMessage(message) {
       this.UpdateMessage = message;
       setTimeout(() => {
         this.UpdateMessage = '';
