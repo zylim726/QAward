@@ -182,6 +182,7 @@ export default {
         });
 
          this.selectAll = false;
+         window.location.reload();
 
       } catch (error) {
         const FailMessage = "Error updating access permission: " + error.errorMessage;

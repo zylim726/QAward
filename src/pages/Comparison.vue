@@ -64,7 +64,7 @@
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
                 <div class="tooltip">
-                  <span class="tooltiptext">Edit Unit Type</span>
+                  <span class="tooltiptext">Edit Comparison Summary</span>
                   <md-icon style="color: orange;">edit_square</md-icon></div></button>
               <br>
               <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
@@ -82,8 +82,8 @@
         </md-card>
       </div>
     </div>
-    <EditCQ :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId"  title="Edit Call of Quotation"></EditCQ>
-    <DeleteCQ :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage" @close="closeModal" :id="deleteId" title="Delete Call of Quotation"></DeleteCQ>
+    <EditCQ :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId"  title="Edit Comparison Summary"></EditCQ>
+    <DeleteCQ :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage" @close="closeModal" :id="deleteId" title="Delete Comparison Summary"></DeleteCQ>
   </div>
 </template>
 

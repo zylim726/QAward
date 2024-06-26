@@ -59,11 +59,11 @@
           </div>
         </div>
         <div v-else>
-          <p>No unit types found.</p>
+          <p>No unit types found.</p><br><br><br>
         </div>
-        <br>
+        
         <!-- Buttons -->
-        <div class="form-group">
+        <div class="form-group" style="margin-top: -45px;">
           <button class="btn-save" aria-label="close" @click.stop="closeeditProj">Close</button>
           <button class="btn-save" aria-label="save" @click.stop="saveAndCloseModal()">Save</button>
           <button class="btn-save" aria-label="add" @click.stop="addUnitType()">Add Unit Type</button>
