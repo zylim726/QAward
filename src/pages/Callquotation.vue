@@ -57,7 +57,7 @@
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
                       <th>Check By</th>
-                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0">
+                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
                         Approval By
                       </th>
                       <th v-else>Approval By
@@ -78,11 +78,15 @@
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <th></th>
-                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0">
-                        {{ callQuotation.cqApproval[0]?.system_user_id }}
+                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'CM Approval'">
+                        {{ callQuotation.cqApproval[0].user[0].name  }}
                       </th>
-                      <th v-else> {{ '' }}
+                      <th v-else>CM
+                      </th>
+                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
+                        {{ callQuotation.cqApproval[0].user[0].name  }}
+                      </th>
+                      <th v-else>3
                       </th>
                       <th colspan="20"></th>
                     </tr>
@@ -105,9 +109,13 @@
                       <td>{{ callQuotation.createdby }}</td>
                       <td>{{ callQuotation.actuallDoneDate !== '0000-00-00' ? callQuotation.actuallDoneDate : '' }}
                       </td>
-                      <td></td>
-                      <td v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0">
-                        {{ callQuotation.cqApproval[0]?.system_user_id }}
+                      <td v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'CM Approval' ">
+                        {{ callQuotation.cqApproval[0].approval_remarks }}
+                      </td>
+                      <td v-else> {{ '' }}
+                      </td>
+                      <td v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
+                        {{ callQuotation.cqApproval[0].approval_remarks }}
                       </td>
                       <td v-else> {{ '' }}
                       </td>

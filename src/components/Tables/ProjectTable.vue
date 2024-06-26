@@ -41,7 +41,7 @@
             <td style="text-align: center">
               <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;">
                 <div class="tooltip">
-                  <span class="tooltiptext">Edit Unit Type</span>
+                  <span class="tooltiptext">Set Up Unit Type</span>
                   <md-icon style="color: orange !important;">edit</md-icon>
                 </div>
               </button>
@@ -59,7 +59,7 @@
       @editfail-message="EditErrorMessage"
       @close="closeEditModal"
       :id="editId"
-      title="Edit Project"
+      title="Set up unit type"
     />
   </div> 
 </template>

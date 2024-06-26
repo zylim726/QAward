@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="isLoading" class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="container" style="margin-top: 20px">
@@ -124,7 +127,7 @@
         </div>
       </template>
     </div>
-    <template v-if="project.status === 'Approval' && QuotationName.length > 0">
+    <template v-if="project.status === 'CM Approval' && QuotationName.length > 0">
       <div class="cmApprovalMessage-container" v-if="cqApprovalData.length >= 0">
         <br>
         <h3 class="titleHeader" style="margin-left: 20px;">CM Approval Feedback : </h3>
@@ -166,7 +169,7 @@
                   <p style="margin: 8px 0 10px;">Recommend Award To:</p>
                   <div v-if="index === currentApprovalIndex && (approvalData.system_user_id === Number(getUserIdLocal) || hasAccess )">
                     <select v-model="selectedQuotations[index]" class="quotation-select">
-                      <option v-for="(quotationData, qIndex) in approvalData.callForQuotation[0].Call_For_Quotation_Subcon_Lists" :key="qIndex" :value="quotationData.subcon_id">
+                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.subcon_id">
                         {{ quotationData.subcon_id }}
                       </option>
                     </select>
@@ -174,8 +177,8 @@
                     <textarea v-model="remarks[index]" class="remarks-textarea"></textarea>
                   </div>
                   <div v-else>
-                    <select v-model="selectedQuotations[subconIndex]" class="quotation-select" disabled>
-                      <option v-for="(quotationData, qIndex) in approvalData.callForQuotation[0].Call_For_Quotation_Subcon_Lists" :key="qIndex" :value="quotationData.subcon_id">
+                    <select v-model="selectedQuotations[index]" class="quotation-select" disabled>
+                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.subcon_id">
                         {{ quotationData.subcon_id }}
                       </option>
                     </select>
@@ -191,7 +194,8 @@
       <button class="btn-save" @click="submitAdminApproval">Submit</button><br>
     </template>
   </div> 
-    <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" title="Submit Approval" :ApprovalData="ApprovalDataArray"></SubmitModal>
+    <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
+    title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></SubmitModal>
     <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
@@ -207,6 +211,7 @@ import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
 
+
 export default {
   components: {
     SubmitModal,
@@ -220,6 +225,7 @@ export default {
   },
   data() {
     return {
+      documents: [],
       Unittype: [],
       QuotationName: [],
       show: ref(false),
@@ -242,12 +248,15 @@ export default {
       hasAccess: false,
       cmAccessApproval: false,
       cmCQapproval:[],
+      SubconListId:[],
+      excelFile: null,
+      isLoading: false,
     };
   },
   watch: {
     cqId(newValue, oldValue) {
       this.getDescription(newValue, this.isHide);
-      this.getCQApproval();
+      this.getCQApproval(newValue);
       this.getProject(newValue);
       this.checkPermission();
       this.getCMcqApproval(newValue);
@@ -275,7 +284,40 @@ export default {
     }
   },
   methods: {
+    generateExcelFile() {
+      // Create a new workbook
+      const wb = XLSX.utils.book_new();
+      
+      // Clone the original table
+      const originalTable = this.$refs.dataTable;
+      const clonedTable = originalTable.cloneNode(true);
+
+      // Remove headers from the cloned table (optional)
+      const firstRow = clonedTable.querySelector('thead tr');
+      if (firstRow) {
+        firstRow.parentNode.removeChild(firstRow);
+      }
+
+      // Convert cloned table to worksheet
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+
+      // Generate Excel file as ArrayBuffer
+      const excelFileContent = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+
+      // Convert ArrayBuffer to Blob
+      const blob = new Blob([excelFileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+      // Create a File from Blob
+      const excelFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+      // Return the File object
+      return excelFile;
+    },
     CMsubmitQuotation() {
+      this.excelFile = this.generateExcelFile();
       this.submitModal = true;
     },
     async checkPermission() {
@@ -309,7 +351,6 @@ export default {
           }
           return null;
         }).filter(data => data !== null);
-
       try {
         const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
         const concatenatedMessage = SuccessMessage.join(', ');
@@ -550,27 +591,35 @@ export default {
         this.errorMessage = 'An error occurred while fetching data.';
       }
     },
-    async getCQApproval() {
+    async getCQApproval(id) {
       try {
         const response = await QuotationController.getCQApproval();
         this.cqApprovalData = response;
-
+  
         response.forEach((approval, index) => {
-          const GetSubconList = approval.callForQuotation[0].Call_For_Quotation_Subcon_Lists;
-          GetSubconList.forEach((subconData, subconIndex) => {
-            this.$set(this.selectedQuotations, subconIndex, subconData.subcon_id || '');
+          const GetSubconList = approval.callForQuotation;
+          console.log('approval',approval);
+          GetSubconList.forEach((getCQ, cqIndex) => {
+            if(getCQ.id === Number(id)){
+              console.log('getCQ',getCQ);
+              const SubconListData = getCQ.Call_For_Quotation_Subcon_Lists;
+              this.SubconListId = SubconListData.filter(subconData => subconData.subcon_id !== 1);
+              SubconListData.forEach((subconData, subconIndex) => {
+                this.$set(this.selectedQuotations, index, subconData.subcon_id || '');
+              });
+
+              // Find the matching Cq_Approval and set the remarks
+              const matchingCqApproval = getCQ.Cq_Approvals.find(
+                cqApproval => cqApproval.system_user_id === approval.system_user_id
+              );
+
+              if (matchingCqApproval) {
+                this.$set(this.remarks, index, matchingCqApproval.p || '');
+              } else {
+                this.$set(this.remarks, index, '');
+              }
+            }
           });
-
-          // Find the matching Cq_Approval and set the remarks
-          const matchingCqApproval = approval.callForQuotation[0].Cq_Approvals.find(
-            cqApproval => cqApproval.system_user_id === approval.system_user_id
-          );
-
-          if (matchingCqApproval) {
-            this.$set(this.remarks, index, matchingCqApproval.p || '');
-          } else {
-            this.$set(this.remarks, index, '');
-          }
         });
 
         // Start with the first approval if it matches conditions
@@ -697,30 +746,62 @@ export default {
       }, 2000);
       } catch (error) {
         this.FailMessage = "Error: " + error.errorMessage;
-        
         window.scrollTo(0, 0);
-        setTimeout(() => {
-        this.UpdateMessage = '';
-          window.location.reload();
-      }, 2000);
+          setTimeout(() => {
+          this.UpdateMessage = '';
+            window.location.reload();
+        }, 2000);
       }
     },
     async approvalQuotation(){
       try {
-        this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId);
+        this.isLoading = true;
+        const wb = XLSX.utils.book_new();
+        const originalTable = this.$refs.dataTable;
+        const clonedTable = originalTable.cloneNode(true);
+
+        const firstRow = clonedTable.querySelector('thead tr');
+        if (firstRow) {
+          firstRow.parentNode.removeChild(firstRow);
+        }
+        const firstBodyRow = clonedTable.querySelector('tbody tr');
+        if (firstBodyRow) {
+          firstBodyRow.parentNode.removeChild(firstBodyRow);
+        }
+        const firstFooterRow = clonedTable.querySelector('tfoot tr');
+        if (firstFooterRow) {
+          firstFooterRow.parentNode.removeChild(firstFooterRow);
+        }
+
+        const ws = XLSX.utils.table_to_sheet(clonedTable);
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+
+        // Generate Excel file as ArrayBuffer
+        const excelFileContent = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+        // Convert ArrayBuffer to Blob
+        const blob = new Blob([excelFileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        // Create a File from Blob
+        const getDataFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+        this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId, getDataFile);
         setTimeout(() => {
-        this.UpdateMessage = '';
+          this.UpdateMessage = '';
           window.scrollTo(0, 0);
           window.location.reload();
-      }, 2000);
+        }, 2000);
+
       } catch (error) {
-        this.FailMessage = "Error: " + error.errorMessage;
+        this.isLoading = false;
+        this.FailMessage = 'Error: ' + error.message;
         setTimeout(() => {
-        this.UpdateMessage = '';
+          this.UpdateMessage = '';
           window.scrollTo(0, 0);
           window.location.reload();
-      }, 2000);
-      }
+        }, 2000);
+      } finally {
+      this.isLoading = false; 
+    }
     }
   },
 };

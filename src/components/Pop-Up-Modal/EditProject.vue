@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': editProject }">
     <div class="modal-background" @click="closeeditProj"></div>
-    <div class="modal-content" style="width: 30%; overflow-y: auto;">
+    <div class="modal-content" style="width: 35%; overflow-y: auto; max-height: 95% !important;">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
@@ -12,7 +12,7 @@
           <div class="form-group" v-for="(unitType, index) in unitTypes" :key="index" style="margin-bottom: 50px;">
             <div class="input-pair">
               <div class="input-group">
-                <label for="unitTypeInput">Unit Type :</label>
+                <label style="text-align: left;" for="unitTypeInput">Unit Type :</label>
                 <input
                   type="text"
                   id="unitTypeInput"
@@ -22,7 +22,7 @@
                 />
               </div>
               <div class="input-group">
-                <label for="adjFactorInput">Adj Factor :</label>
+                <label style="text-align: left;" for="adjFactorInput">Adj Factor :</label>
                 <input
                   type="number"
                   id="adjFactorInput"
@@ -37,7 +37,7 @@
             </div>
             <div class="input-pair">
               <div class="input-group">
-                <label for="quantityInput">Quantity :</label>
+                <label style="text-align: left;" for="quantityInput">Quantity :</label>
                 <input
                   type="number"
                   id="quantityInput"
@@ -48,7 +48,7 @@
                   @input="validateQuantity(index)"
                 />
               </div>
-              <button class="transparentButton" aria-label="delete" @click.stop="deleteUnitType(unitType.id)">
+              <button class="transparentButton" aria-label="delete" @click.stop="deleteUnitType(index, unitType.id)">
                 <div class="tooltip">
                   <span class="tooltiptext">Delete Unit Type</span>
                   <md-icon style="color: orange;">delete</md-icon>
@@ -61,14 +61,14 @@
         <div v-else>
           <p>No unit types found.</p>
         </div>
-        
+        <br>
         <!-- Buttons -->
         <div class="form-group">
           <button class="btn-save" aria-label="close" @click.stop="closeeditProj">Close</button>
           <button class="btn-save" aria-label="save" @click.stop="saveAndCloseModal()">Save</button>
           <button class="btn-save" aria-label="add" @click.stop="addUnitType()">Add Unit Type</button>
         </div>
-        
+        <br>
       </div>
     </div>
   </div>
@@ -135,17 +135,16 @@ export default {
         quantity: ''
       });
     },
-    async deleteUnitType(id) {
-      try {
-        await ProjectController.removeProject(id);
-        const index = this.unitTypes.findIndex(unitType => unitType.id === id);
-        if (index !== -1) {
-          this.unitTypes.splice(index, 1);
+    async deleteUnitType(index, id) {
+      if (id) {
+        try {
+          await ProjectController.removeProject(id);
+        } catch (error) {
+          const FailMessage = "Error deleting unit type: " + error.errorMessage;
+          this.$emit('fail-message', FailMessage);
         }
-      } catch (error) {
-        const FailMessage = "Error deleting unit type: " + error.errorMessage;
-        this.$emit('fail-message', FailMessage);
       }
+      this.unitTypes.splice(index, 1);
     },
     validateQuantity(index) {
       let quantity = parseFloat(this.unitTypes[index].quantity);

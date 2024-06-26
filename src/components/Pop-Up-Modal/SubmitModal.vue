@@ -35,7 +35,7 @@ export default {
   props: {
     submitModal: {
       type: Boolean,
-      required: true
+      required: true, 
     },
     title: {
       type: String,
@@ -43,6 +43,10 @@ export default {
     },
     ApprovalData: {
       type: Array,
+      required: true
+    },
+    excelFile: {
+      type: File,
       required: true
     }
   },
@@ -90,6 +94,7 @@ export default {
     async saveAndCloseModal(remarksData, selectedQuotation) {
       try {
         const CQid = this.ApprovalData;
+        const getFile = this.excelFile;
         const SuccessMessage = await QuotationController.addApproval(remarksData, selectedQuotation, CQid);
         this.$emit('editMessage', SuccessMessage); 
         this.closesubmitModal(); 
