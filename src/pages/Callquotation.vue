@@ -81,7 +81,7 @@
                       <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'CM Approval'">
                         {{ callQuotation.cqApproval[0].user[0].name  }}
                       </th>
-                      <th v-else>CM
+                      <th v-else>
                       </th>
                       <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
                         {{ callQuotation.cqApproval[0].user[0].name  }}

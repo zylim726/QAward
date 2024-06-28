@@ -47,7 +47,7 @@ export default {
     },
     excelFile: {
       type: File,
-      required: true
+      default: null
     }
   },
   data() {

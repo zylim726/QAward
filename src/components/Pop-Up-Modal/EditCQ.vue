@@ -15,6 +15,8 @@
               v-model="cquotationData.trade_category"
               placeholder="Category"
               class="typeInput"
+              readonly
+                style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Trade : </p>
             <input
@@ -22,6 +24,8 @@
               v-model="cquotationData.trade"
               placeholder="Trade"
               class="typeInput"
+              readonly
+                style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Location 1 : </p>
             <input
@@ -29,6 +33,8 @@
               v-model="cquotationData.trade_location1"
               placeholder="Location 1"
               class="typeInput"
+              readonly
+                style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Actual Calling Quotation Date : </p>
             <input
@@ -36,6 +42,8 @@
               v-model="cquotationData.actual_calling_quotation_date"
               placeholder="Actual Calling Quotation Date"
               class="typeInput"
+              readonly
+                style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Awarding Target Date : </p>
             <input
@@ -43,6 +51,8 @@
               v-model="cquotationData.awading_target_date"
               placeholder="Awarding Target Date"
               class="typeInput"
+              readonly
+                style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Remarks : </p>
             <input
@@ -60,6 +70,8 @@
                 v-model="unit.type"
                 placeholder="Unit Type"
                 class="typeInput"
+                readonly
+                style="background-color: #fef4e4;"
               />
               <p style="text-align: left;">Unit Quantity : </p>
               <input

@@ -114,11 +114,19 @@
       <div>
       <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
         <div class="confirmation-message">
-          <p>Is this quotation acceptable for approval?</p>
-          <!--CM approval need to submit the approvalForm ,and upload one time revision-->
-          <button class="btn-save" @click="CMsubmitQuotation">Approval</button>
-          <!--If CM rejected, need to go back pending -->
-          <button class="btn-save" @click="CMrejectedQuotation">Rejected</button>
+          <template v-if="cqApprovalData.length === 0" >
+            <p>Please CM go to project control set up admin approval.</p>
+            <a href="projectcontrol">
+              <button class="btn-save">Project Control</button>
+            </a>
+          </template>
+          <template v-else>
+            <p>Is this quotation acceptable for approval?</p>
+            <!--CM approval need to submit the approvalForm ,and upload one time revision-->
+            <button class="btn-save" @click="CMsubmitQuotation">Approval</button>
+            <!--If CM rejected, need to go back pending -->
+            <button class="btn-save" @click="CMrejectedQuotation">Rejected</button>
+          </template>
         </div>
       </template>
       <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 && !cmAccessApproval && !cmAccesslevel ">
@@ -127,34 +135,11 @@
         </div>
       </template>
     </div>
-    <template v-if="project.status === 'CM Approval' && QuotationName.length > 0">
-      <div class="cmApprovalMessage-container" v-if="cqApprovalData.length >= 0">
-        <br>
-        <h3 class="titleHeader" style="margin-left: 20px;">CM Approval Feedback : </h3>
-        <div class="cmApprovalMessage" v-for="(cmapproval, index) in cmCQapproval" :key="index">
-          <p class="cmApprovalP">CM Approval :  
-            <h3 class="cmApprovalH3">{{  cmapproval.user[0].name }}</h3>
-          </p>
-          <p class="cmApprovalP">Recommend Award To:  
-            <h3 class="cmApprovalH3">{{ cmapproval.call_for_quotation_subcon_list_id }}</h3>
-          </p>
-          <p class="cmApprovalP"> Remarks :  
-            <h3 class="cmApprovalH3">{{ cmapproval.approval_remarks }}</h3>
-          </p>
-        </div>
-      </div>
+    <template v-if="project.status === 'Waiting Admin Approval' && QuotationName.length > 0 ">
       <div class="cqapprovalBox-container">
-        <template v-if="cqApprovalData.length === 0">
-          <div class="confirmation-message" style="width: 100% !important;">
-            <p>Please go to project control set up admin approval.</p>
-            <a href="projectcontrol">
-              <button class="btn-save">Project Control</button>
-            </a>
-          </div>
-        </template>
-        <template v-else><br>
+        <template ><br>
           <div class="container" style="width: 100%;">
-            <div class="row" v-for="(approvalData, index) in cqApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
+            <div class="row"  v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
               <div class="cqbox">
                 <div class="left-container">
                   <div class="md-card-avatar" style="margin-bottom: 160px;">
@@ -162,24 +147,43 @@
                   </div>
                 </div>
                 <div class="right-container">
-                  <div v-for="user in approvalData.systemuser" :key="user.id" class="user-info">
+                  <div class="user-info">
+                    <p class="user-name">Name: {{  cmapproval.user[0].name }}</p>
+                    <p class="user-access">Level: CM</p>
+                  </div>
+                  <p style="margin: 8px 0 10px;">Recommend Award To:</p>
+                  <p  class="quotation-select" disabled>{{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}</p>
+                  <p style="margin: 8px 0 10px;">Remarks:</p>
+                  <p  class="quotation-select" disabled>{{ cmapproval.approval_remarks }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
+              <div class="cqbox">
+                <div class="left-container">
+                  <div class="md-card-avatar" style="margin-bottom: 160px;">
+                    <img class="img" src="@/assets/img/admin.png" />
+                  </div>
+                </div>
+                <div class="right-container">
+                  <div v-for="(user, userIndex) in approvalData.systemuser" :key="userIndex" class="user-info">
                     <p class="user-name">Name: {{ user.name }}</p>
                     <p class="user-access">Level: {{ user.accesslevel }}</p>
                   </div>
                   <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                  <div v-if="index === currentApprovalIndex && (approvalData.system_user_id === Number(getUserIdLocal) || hasAccess )">
-                    <select v-model="selectedQuotations[index]" class="quotation-select">
-                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.subcon_id">
-                        {{ quotationData.subcon_id }}
+                  <div v-if="(approvalData.system_user_id === Number(getUserIdLocal) || hasAccess) ">
+                    <select v-model="selectedQuotations[index]" class="quotation-select" >
+                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
+                        {{ quotationData.Subcon.name }}
                       </option>
                     </select>
                     <p style="margin: 8px 0 10px;">Remarks:</p>
-                    <textarea v-model="remarks[index]" class="remarks-textarea"></textarea>
+                    <textarea v-model="remarks[index]" class="remarks-textarea" ></textarea>
                   </div>
                   <div v-else>
                     <select v-model="selectedQuotations[index]" class="quotation-select" disabled>
-                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.subcon_id">
-                        {{ quotationData.subcon_id }}
+                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
+                        {{ quotationData.Subcon.name }} 
                       </option>
                     </select>
                     <p style="margin: 8px 0 10px;">Remarks:</p>
@@ -191,7 +195,7 @@
           </div>
         </template>
       </div>
-      <button class="btn-save" @click="submitAdminApproval">Submit</button><br>
+      <button class="btn-save" v-if="approvalData && isButtonVisible(approvalData)" @click="submitAdminApproval">Submit</button><br>
     </template>
   </div> 
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
@@ -263,6 +267,10 @@ export default {
     },
   },
   computed: {
+    filteredCQApprovalData() {
+      const cmSystemUserIds = this.cmCQapproval.map(approval => approval.system_user_id);
+      return this.cqApprovalData.filter(approval => !cmSystemUserIds.includes(approval.system_user_id));
+    },
     generatedHeaders() {
       const headers = [];
       for (let i = 0; i < this.QuotationName.length; i++) {
@@ -281,9 +289,12 @@ export default {
     },
     getUserIdLocal() {
       return localStorage.getItem('userid');
-    }
+    },
   },
   methods: {
+    isButtonVisible(approvalData) {
+      return approvalData.system_user_id === Number(this.getUserIdLocal) || this.hasAccess;
+    },
     generateExcelFile() {
       // Create a new workbook
       const wb = XLSX.utils.book_new();
@@ -317,7 +328,7 @@ export default {
       return excelFile;
     },
     CMsubmitQuotation() {
-      this.excelFile = this.generateExcelFile();
+      this.excelFile = this.generateExcelFile() || null;
       this.submitModal = true;
     },
     async checkPermission() {
@@ -338,26 +349,46 @@ export default {
       return this.cqApprovalData.slice(start, end);
     },
     async submitAdminApproval() {
-      const approvalDataToSubmit = this.cqApprovalData.map((approvalData, index) => {
-          const selectedSubconListId = this.selectedQuotations[index];
-          const remark = this.remarks[index];
-          if (selectedSubconListId && remark) {
-            return {
-              cqId: this.cqId, 
-              userId: approvalData.system_user_id,
-              SubconListId: selectedSubconListId,
-              remark: remark
-            };
+      const approvalDataToSubmit = [];
+        const uniqueEntries = new Set();
+
+        this.cqApprovalData.forEach((approvalData, index) => {
+          if (approvalData.callForQuotation[0].Call_For_Quotation_Subcon_Lists) {
+            approvalData.callForQuotation[0].Call_For_Quotation_Subcon_Lists.forEach((scList) => {
+              const selectedSubconListId = this.selectedQuotations[index];
+              const remark = this.remarks[index];
+
+              if (selectedSubconListId && remark) {
+                const entryKey = `${approvalData.system_user_id}_${selectedSubconListId}`;
+                if (!uniqueEntries.has(entryKey)) {
+                  approvalDataToSubmit.push({
+                    cqId: this.cqId,
+                    userId: approvalData.system_user_id,
+                    SubconListId: selectedSubconListId,
+                    callForQuotationListId: scList.id,
+                    remark: remark
+                  });
+                  uniqueEntries.add(entryKey);
+                }
+              }
+            });
           }
-          return null;
-        }).filter(data => data !== null);
+        });
+
       try {
-        const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
-        const concatenatedMessage = SuccessMessage.join(', ');
-        const Message = concatenatedMessage.split(',')[0].trim();
-        this.UpdateMessage = Message;
+         const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
+          const concatenatedMessage = SuccessMessage.join(', ');
+          const Message = concatenatedMessage.split(',')[0].trim();
+          this.UpdateMessage = Message;
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Optional: smooth scroll animation
+          });
+
+          setTimeout(() => {
+            this.UpdateMessage = '';
+          }, 1000);
       } catch (error) {
-   
         this.FailMessage = 'Error while submitting approval data:', error;
       }
     },
@@ -588,82 +619,55 @@ export default {
         
         }
       } catch (error) {
-        this.errorMessage = 'An error occurred while fetching data.';
+        this.errorMessage = 'An error for get description data.';
       }
     },
     async getCQApproval(id) {
       try {
         const response = await QuotationController.getCQApproval();
         this.cqApprovalData = response;
-  
+        console.log('cm cqApprovalData',this.cqApprovalData);
         response.forEach((approval, index) => {
           const GetSubconList = approval.callForQuotation;
-          console.log('approval',approval);
           GetSubconList.forEach((getCQ, cqIndex) => {
             if(getCQ.id === Number(id)){
-              console.log('getCQ',getCQ);
               const SubconListData = getCQ.Call_For_Quotation_Subcon_Lists;
               this.SubconListId = SubconListData.filter(subconData => subconData.subcon_id !== 1);
+
               SubconListData.forEach((subconData, subconIndex) => {
-                this.$set(this.selectedQuotations, index, subconData.subcon_id || '');
+              this.$set(this.selectedQuotations, cqIndex, subconData.Subcon.name || '');
+              const GetRemarksSubcon = subconData.Cq_Approvals;
+              GetRemarksSubcon.forEach((remarkData, remarksIndex) => {
+                if(remarkData.system_user_id === approval.system_user_id ){
+                  this.$set(this.remarks, index , '');
+                  
+                }
+              
               });
-
-              // Find the matching Cq_Approval and set the remarks
-              const matchingCqApproval = getCQ.Cq_Approvals.find(
-                cqApproval => cqApproval.system_user_id === approval.system_user_id
-              );
-
-              if (matchingCqApproval) {
-                this.$set(this.remarks, index, matchingCqApproval.p || '');
-              } else {
-                this.$set(this.remarks, index, '');
-              }
+            });
             }
           });
         });
-
-        // Start with the first approval if it matches conditions
-        this.currentApprovalIndex = 0;
-        if (!this.canWriteRemarks(this.cqApprovalData[0])) {
-          // Disable inputs if remarks cannot be written for the first approval
-          this.selectedQuotations[0] = '';
-          this.remarks[0] = '';
-        }
-
       } catch (error) {
         // Handle error
         console.error('Error fetching CQ approvals:', error);
       }
     },
-    canWriteRemarks(approval) {
-      // Check conditions if remarks can be written for this approval
-      return approval && (approval.system_user_id === Number(this.getUserIdLocal) || this.hasAccess);
-    },
-
-    nextApproval() {
-      // Move to the next approval for remarks input
-      this.currentApprovalIndex++;
-      if (!this.canWriteRemarks(this.cqApprovalData[this.currentApprovalIndex])) {
-        // Disable inputs if remarks cannot be written for this approval
-        this.selectedQuotations[this.currentApprovalIndex] = '';
-        this.remarks[this.currentApprovalIndex] = '';
-      }
-    },
     async getCMcqApproval(id) {
       try {
         const response = await QuotationController.getCMcqApproval(id);
-
-        this.cmCQapproval = response.filter(approval => approval.approval_type === 'CM Approval');
-
+     
+        this.cmCQapproval = response.filter(approval => approval.approval_status === 'Approval');
+        console.log('cm approval',this.cmCQapproval);
       } catch (error) {
-        his.FailMessage = 'Error:', error;
+        his.FailMessage = 'Error CM approval:', error;
       }
     },
     async getProject(id) {
       try {
         this.projectData = await CallofQuotationController.getDetailCQ(id);
       } catch (error) {
-        this.FailMessage = 'Error fetching CQ Approval data:', error;
+        this.FailMessage = 'Error get project details:', error;
       }
     },
     downloadExcelTemplate() {
@@ -745,7 +749,7 @@ export default {
           window.location.reload();
       }, 2000);
       } catch (error) {
-        this.FailMessage = "Error: " + error.errorMessage;
+        this.FailMessage = "Error rejected quotation: " + error.errorMessage;
         window.scrollTo(0, 0);
           setTimeout(() => {
           this.UpdateMessage = '';

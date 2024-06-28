@@ -149,22 +149,32 @@ const QuotationController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        const dataToSubmitFiltered = approvalDataToSubmit.filter(data => data.SubconListId !== undefined);
         const messages = [];
+        let foundId = null;
+        console.log('dataToSubmit',approvalDataToSubmit);
+        for (const data of approvalDataToSubmit) {
+            console.log('dataToSubmit',data);
+            const Cqresponse = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${data.cqId}`, { headers });
+          
+            const CheckCQ = Cqresponse.data.data;
+            
+            CheckCQ.forEach(cq => {
+            if (cq.system_user_id === data.userId) {
+                foundId = cq.id;
+            }
+            });
+                      
+            if (foundId){
 
-        console.log('dataToSubmit',dataToSubmitFiltered);
-
-       
-        for (const data of dataToSubmitFiltered) {
-            const response = await axios.post(`${apiHost}/cq_approval/add`, {
-                approval_remarks: data.remark,
-                call_for_quotation_subcon_list_id: data.SubconListId,
-                system_user_id: data.userId
-            }, { headers });
-
-            console.log('response',response);
-
-            messages.push(response.data.message);
+                const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
+                    approval_remarks: data.remark,
+                    approval_type: 'QS',
+                    call_for_quotation_subcon_list_id: data.callForQuotationListId
+                }, { headers });
+                
+                messages.push(response.data.message);
+                
+            }
         }
         
          return messages;
@@ -254,15 +264,12 @@ const QuotationController = {
         const Userid = localStorage.getItem('userid');
  
         const getComparisonSummary = await axios.put(`${apiHost}/call_for_quotation/edit/${CQid}`, {
-            status: 'CM Approval',
+            status: 'Waiting Admin Approval',
         }, { headers });
 
- 
         const response = await axios.post(`${apiHost}/cq_approval/add`, {
             approval_remarks: remarksData,
-            approval_status: 'Pending',
             approval_type: 'CM Approval',
-            call_for_quotation_id: CQid,
             call_for_quotation_subcon_list_id: selectedQuotation,
             system_user_id: Userid
         }, { headers });

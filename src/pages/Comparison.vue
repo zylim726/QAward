@@ -68,7 +68,7 @@
                   <md-icon style="color: orange;">edit_square</md-icon></div></button>
               <br>
               <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
-                <div class="tooltip">
+                <div class="tooltip" v-if="getDescription && getDescription.lengt === 0"  >
                   <span class="tooltiptext">Delete Comparison Summary</span>
                   <md-icon style="color: orange;">delete</md-icon></div></button>
           </div>
@@ -92,6 +92,7 @@ import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { Error } from "@/services";
 import { EditCQ,DeleteCQ }  from "@/components";
+import DescriptionController from "../services/controllers/DescriptionController";
 
 export default {
   components: {
@@ -108,6 +109,7 @@ export default {
       isModalVisible: false,
       CQunitType:[],
       UnitTypes: [],
+      getDescription:[],
       UpdateMessage: null,
       FailMessage: null,
       editModal: false,
@@ -170,6 +172,7 @@ export default {
     async getDetailCQ(Id) {
       try {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
+        this.getDescription = await DescriptionController.getNewDescription(Id);
         this.callQuotation = processedData[0];
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
@@ -182,9 +185,9 @@ export default {
         } 
       } catch (error) {
         if (error.errorMessage === undefined) {
-          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+          this.FailMessage = "Error cq description: " + Error.getMessage(504);
         } else {
-          this.FailMessage = "Error fetching data: " + error.errorMessage;
+          this.FailMessage = "Error cq description: " + error.errorMessage;
         }
       }
     },
@@ -197,9 +200,9 @@ export default {
         }
       } catch (error) {
         if (error.errorMessage === undefined) {
-          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+          this.FailMessage = "Error unit tyoe: " + Error.getMessage(504);
         } else {
-          this.FailMessage = "Error fetching data: " + error.errorMessage;
+          this.FailMessage = "Error unit tyoe: " + error.errorMessage;
         }
       }
     },
@@ -215,7 +218,7 @@ export default {
           this.FailMessage = "No unit types available. Please set up unit types in the Project Setup.";
         }
       } catch (error) {
-        this.handleFetchError(error); 
+        this.FailMessage = "Fail to find unit types.";
       }
     },
     async confirmSubconSelection() {
@@ -230,19 +233,12 @@ export default {
         }, 1000);
       } catch (error) {
         if (error.errorMessage === undefined) {
-          this.FailMessage = "Error fetching data: " + Error.getMessage(504);
+          this.FailMessage = "Error confirm selection: " + Error.getMessage(504);
         } else {
-          this.FailMessage = "Error fetching data: " + error.errorMessage;
+          this.FailMessage = "Error confirm selection: " + error.errorMessage;
         }
       }
       
-    },
-    handleFetchError(error) {
-      if (error.errorMessage === undefined) {
-        this.FailMessage = "Error fetching data: " + Error.getMessage(504);
-      } else {
-        this.FailMessage = "Error fetching data: " + error.errorMessage;
-      }
     },
   },
 };
