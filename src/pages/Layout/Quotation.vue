@@ -277,7 +277,7 @@ export default {
             <td><b>${formData.element || ''}</b></td>
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
-            <td><b>${formData.description_item}</b></td>
+            <td style="white-space: pre-wrap;"><b>${formData.description_item}</b></td>
             <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
@@ -301,7 +301,7 @@ export default {
             <td>${formData.element || ''}</td>
             <td>${formData.sub_element || ''}</td>
             <td>${formData.description_sub_sub_element || ''}</td>
-            <td style="padding-left:60px !important;">${formData.description_item}</td>
+            <td style="padding-left:60px !important;white-space: pre-wrap;">${formData.description_item}</td>
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>

@@ -27,7 +27,7 @@
             <th>Company Name</th>
             <th>Area</th>
             <th>Reg No</th>
-            <th style="text-align: center;">Action</th>
+            <th style="text-align: center;">Unit Type</th>
           </tr>
         </thead>
         <tbody>
@@ -42,14 +42,14 @@
               <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;">
                 <div class="tooltip">
                   <span class="tooltiptext">Set Up Unit Type</span>
-                  <md-icon style="color: orange !important;">edit</md-icon>
+                  <md-icon   :style="{ color: getUnitTypeColor(project.id) }" >edit</md-icon>
                 </div>
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-else>No projects available</div>
+      <div v-else style="text-align: center;">No projects available</div>
       <br />
     </div>
     <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
@@ -75,6 +75,8 @@ export default {
   data() {
     return {
       projects: [],
+      unitTypes: [],
+      unitTypeColors: {},
       searchText: "",
       errorMessage: null,
       UpdateMessage: null,
@@ -82,12 +84,12 @@ export default {
       showModal: false,
       showEditModal: false,
       editId: null,
+      loading: false,
     };
   },
   mounted() {
     this.accessProject();
   },
-  
   computed: {
     filterProject() {
       return this.projects.filter((project) => {
@@ -106,10 +108,30 @@ export default {
       try {
         const processedData = await ProjectController.accessProject();
         this.projects = processedData;
+        await this.updateUnitTypeColors();
       } catch (error) {
         console.error('Error fetching project data:', error);
         this.errorMessage = "Error fetching project data: " + error.message;
       }
+    },
+    async updateUnitTypeColors() {
+    this.loading = true;
+    try {
+        for (const project of this.projects) {
+          const unitType = await ProjectController.getUnitTypes(project.id);
+          console.log('Unit type fetched for project ID', project.id, ':', unitType);
+          this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'orange' : 'grey');
+        }
+      } catch (error) {
+        console.error('Error fetching unit types:', error);
+        const failMessage = "Error fetching unit types: " + error.message;
+        this.$emit('fail-message', failMessage);
+      } finally {
+        this.loading = false;
+      }
+    },
+    getUnitTypeColor(projectId) {
+      return this.unitTypeColors[projectId] || 'grey';
     },
     editProj(projectId) {
       this.editId = projectId;

@@ -34,6 +34,10 @@
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
         <md-card style="height: 70%">
+          <div class="status">
+            <i class="material-icons">notifications_active</i>
+            <h7>For the Subcon Comparison Status is: <b class="titleHeader">{{ callQuotation.status }}</b></h7>
+          </div>
           <div class="comparison-title">
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Project :</h6>
@@ -75,7 +79,7 @@
         </md-card>
       </div>
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
-        <md-card style="height: 97%">
+        <md-card style="min-height: 97%">
           <md-card-content style="line-height: 16px !important;">
             <comparison-table :cqId="cqId" ></comparison-table>
           </md-card-content>
@@ -290,5 +294,20 @@ export default {
   text-align: center;
   width: 500px;
 }
+
+.status {
+  display: flex;
+  background-color: antiquewhite;
+  padding: 17px;
+  justify-content: center
+}
+
+.status .material-icons {
+  font-size: 20px;
+  margin-right: 10px;
+  color: orange;
+}
+
+
 
 </style>

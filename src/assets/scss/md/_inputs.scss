@@ -653,12 +653,11 @@ background-color: #f8d7da;
 
 .tooltip .tooltiptext {
   visibility: hidden;
-
-  background-color: black;
-  color: white;
+  background-color: #FFE5B4;
+  color: black;
   text-align: center;
-  border-radius: 6px;
-  padding: 7px;
+  border-radius: 15px;
+  padding: 10px;
   position: absolute;
   z-index: 1;
   bottom: 125%; /* Position the tooltip above the element */
@@ -666,6 +665,7 @@ background-color: #f8d7da;
   margin-left: -60px; /* Center the tooltip */
 
 }
+
 
 .tooltip:hover .tooltiptext {
   visibility: visible;

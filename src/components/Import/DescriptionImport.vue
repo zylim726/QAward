@@ -50,7 +50,7 @@
               </label>
             </td>
             <td v-else></td>
-            <td v-for="column in filteredColumns" :key="column">
+            <td v-for="column in filteredColumns" :key="column" style="white-space: pre-wrap;">
               {{ displayValue(row[column], column) }}
             </td>
           </tr>
@@ -189,11 +189,13 @@ export default {
 
         if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative.");
+          return null;
         }
 
         for (const key in matchedValues) {
           if (matchedValues[key] < 0) {
               this.$emit('fail-message', "Unit type quantity cannot have negative amounts.");
+              return null;
           }
         }
 
@@ -201,12 +203,9 @@ export default {
         if (object["Unit"] !== "") {
           if (object["Budget Rate"] === "") {
             this.$emit('fail-message', "Budget Rate cannot be empty data.");
+            return null;
           }
-          for (const key in matchedValues) {
-            if (matchedValues[key] === "") {
-                this.$emit('fail-message', "Unit type quantity cannot be empty data.");
-            }
-          }
+         
         }
 
         const hasMatches = Object.keys(matchedValues).length > 0;
@@ -230,7 +229,7 @@ export default {
         this.$router.push({ path: '/comparison', query: { cqID: cqId } });
 
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage = "Error updating: " + error.errorMessage;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
       }

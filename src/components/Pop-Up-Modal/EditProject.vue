@@ -8,7 +8,11 @@
         <hr style="margin-top: -10px" />
         <br />
 
-        <div v-if="unitTypes.length > 0">
+        <div v-if="loading">
+          <p>Loading...</p><br>
+        </div>
+
+        <div v-if="!loading && unitTypes.length > 0">
           <div class="form-group" v-for="(unitType, index) in unitTypes" :key="index" style="margin-bottom: 50px;">
             <div class="input-pair">
               <div class="input-group">
@@ -58,17 +62,17 @@
             
           </div>
         </div>
-        <div v-else>
-          <p>No unit types found.</p><br><br><br>
+        <div v-if="!loading && unitTypes.length === 0">
+          <p>No unit types found.</p>
         </div>
         
         <!-- Buttons -->
-        <div class="form-group" style="margin-top: -45px;">
+        <div class="form-group">
           <button class="btn-save" aria-label="close" @click.stop="closeeditProj">Close</button>
           <button class="btn-save" aria-label="save" @click.stop="saveAndCloseModal()">Save</button>
           <button class="btn-save" aria-label="add" @click.stop="addUnitType()">Add Unit Type</button>
         </div>
-        <br>
+        <br><br>
       </div>
     </div>
   </div>
@@ -87,6 +91,7 @@ export default {
     return {
       processedData: null,
       unitTypes: [],
+      loading: false, // Add loading state
     };
   },
   watch: {
@@ -101,19 +106,27 @@ export default {
       this.$emit("close");
     },
     async saveAndCloseModal() {
+      this.loading = true; // Set loading state
       const updatedData = { unitTypes: this.unitTypes };
-      await this.editProjs(this.id, updatedData); 
+      try {
+        await this.editProjs(this.id, updatedData);
+      } finally {
+        this.loading = false; // Reset loading state
+      }
     },
-
     async getUnitTypes(id) {
+      this.loading = true; // Set loading state
       try {
         this.unitTypes = await ProjectController.getUnitTypes(id);
       } catch (error) {
         const FailMessage = "Error fetching unit types: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
+      } finally {
+        this.loading = false; // Reset loading state
       }
     },
     async editProjs(id, updatedData) {
+      this.loading = true; // Set loading state
       try {
         const SuccessMessage = await ProjectController.editProjs(id, updatedData);
         this.$emit("close");
@@ -126,6 +139,8 @@ export default {
       } catch (error) {
         const FailMessage = "Error updating project: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
+      } finally {
+        this.loading = false; // Reset loading state
       }
     },
     addUnitType() {
