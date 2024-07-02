@@ -22,10 +22,10 @@
         <p class="nav-item">Subcon List</p>
       </sidebar-link>
       <h4 class="menutitle">Admin</h4>
-      <sidebar-link  class="navbar-link" to="/user">
+      <!-- <sidebar-link  class="navbar-link" to="/user">
         <md-icon>person</md-icon>
         <p class="nav-item">Admin</p>
-      </sidebar-link>
+      </sidebar-link> -->
       <sidebar-link   v-if="hasAccess('User Access')" class="navbar-link" to="/userconfig">
         <md-icon>manage_accounts</md-icon>
         <p class="nav-item">User Access</p>

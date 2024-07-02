@@ -3,7 +3,7 @@
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
-      <div class="modal-content" style="max-height: 350px;">
+      <div class="modal-content" style="max-height: 600px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
         <table class="project-table">
               <thead>

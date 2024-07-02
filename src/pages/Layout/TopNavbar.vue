@@ -22,7 +22,7 @@
               <p class="hidden-lg hidden-md">Project List</p>
             </md-list-item>
 
-            <li class="md-list-item">
+            <!-- <li class="md-list-item">
               <div class="md-list-item-content">
                 <drop-down>
                   <md-button
@@ -39,12 +39,12 @@
                   </ul>
                 </drop-down>
               </div>
-            </li>
-
+            </li> -->
+<!-- 
             <md-list-item href="user">
               <i class="material-icons">person</i>
               <p class="hidden-lg hidden-md">Profile</p>
-            </md-list-item>
+            </md-list-item> -->
 
             <md-list-item @click="logout">
               <i class="material-icons">logout</i>

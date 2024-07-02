@@ -64,27 +64,40 @@ export default {
       }
     },
     async downloadDocument(url) {
-      try {
-        const headers = config.getHeadersWithToken(); 
-        const response = await  fetch(url, {
-          headers,
-        });
+  try {
+    console.log('Attempting to download document from:', url);
 
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+    const headers = config.getHeadersWithToken(); 
+    const response = await fetch(url, {
+      headers,
+    });
 
-        const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "revision.pdf"); // You can set a dynamic name here
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (error) {
-        console.error("Error downloading document:", error);
-      }
-    },
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    // Set the filename and extension for the downloaded file
+    link.setAttribute("download", "revision.xlsx");
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Error downloading document:", error);
+    // Optionally handle different types of errors here
+    if (error instanceof TypeError) {
+      console.error('Network error or fetch API issue');
+    } else {
+      console.error('Other error:', error.message);
+    }
+  }
+},
+
+
   },
 };
 </script>

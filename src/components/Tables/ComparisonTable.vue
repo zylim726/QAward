@@ -151,7 +151,7 @@
             <div class="row"  v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
               <div class="cqbox">
                 <div class="left-container">
-                  <div class="md-card-avatar" style="margin-bottom: 160px;">
+                  <div class="md-card-avatar" style="margin-bottom: 315px;">
                     <img class="img" src="@/assets/img/admin.png" />
                   </div>
                 </div>
@@ -165,7 +165,7 @@
                   <p style="margin: 8px 0 10px;">Date:</p>
                   <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.updatedAt }}</p>
                   <p style="margin: 8px 0 10px;">Remarks:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.approval_remarks }}</p>
+                  <p  class="quotation-select" style="background-color: #EFEFEF4D;height: 180px;" disabled>{{ cmapproval.approval_remarks }}</p>
                 </div>
               </div>
             </div>
