@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading...</div>
+    </div>
     <div class="md-layout">
       <!-- Unit Types Table -->
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25" style="padding: 0px 17px">
@@ -92,7 +95,8 @@ export default {
       selectAllUnitTypes: true,
       selectAllCallQuotation: true,
       UnitTypes: [],
-      callQuotation: []
+      callQuotation: [],
+      loading:false,
     };
   },
   created() {
@@ -153,6 +157,7 @@ export default {
     },
     async saveData() {
       try {
+        this.loading = true;
         const selectedUnitTypes = this.UnitTypes.filter(formData => formData.selected);
         const selectedCallQuotation = this.callQuotation.filter(formData => formData.selected);
         const callIds = selectedCallQuotation.map(formData => formData.id);
@@ -168,8 +173,11 @@ export default {
         });
 
       } catch (error) {
+        this.loading = false;
         const failMessage = "Error updating data: " + error.errorMessage;
         this.$emit('fail-message', failMessage);
+      } finally {
+        this.loading = false;
       }
     },
     handleFetchError(error) {

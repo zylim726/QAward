@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading...</div>
+    </div>
     <label
       for="desciptionInput"
       style="margin-right: 10px; float: right"
@@ -79,6 +82,7 @@ export default {
       Unittype: [],
       columnTitles: [],
       selectAll: true,
+      loading: false,
     };
   },
   computed: {
@@ -174,6 +178,7 @@ export default {
       }
     },
     async saveData() {
+      this.loading = true;
       const cqId = this.cqId;
       const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
       const unittype = this.Unittype;
@@ -229,9 +234,12 @@ export default {
         this.$router.push({ path: '/comparison', query: { cqID: cqId } });
 
       } catch (error) {
+        this.loading = false;
         const FailMessage = "Error updating: " + error.errorMessage;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
+      } finally {
+        this.loading = false;
       }
     }
   },

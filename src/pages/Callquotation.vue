@@ -46,7 +46,7 @@
               <div class="table-container" style="min-height: 100px;max-height: 600px;">
                 <table>
                   <thead>
-                    <tr>
+                    <tr >
                       <th>Action</th>
                       <th>ID</th>
                       <th>Category</th>
@@ -57,10 +57,12 @@
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
                       <th>Check By</th>
-                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
+                      <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 0" 
+                          :colspan="callQuotation[0].projectApproval.length">
                         Approval By
                       </th>
-                      <th v-else>Approval By
+                      <th v-else>
+                        Approval By
                       </th>
                       <th>Awarding Target Date</th>
                       <th>Remarks</th>
@@ -78,16 +80,17 @@
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'CM Approval'">
-                        {{ callQuotation.cqApproval[0].user[0].name  }}
+                      <th >
                       </th>
-                      <th v-else>
+                      <template v-if="projectApproval && projectApproval.length > 0">
+                        <th v-for="(approval, index) in projectApproval" 
+                          :key="index">
+                        {{ approval.user[0]?.name }}
                       </th>
-                      <th v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
-                        {{ callQuotation.cqApproval[0].user[0].name  }}
-                      </th>
-                      <th v-else>3
-                      </th>
+                      </template>
+                      <template v-else>
+                        <th></th>
+                      </template>
                       <th colspan="20"></th>
                     </tr>
                   </thead>
@@ -107,23 +110,24 @@
                       <td>{{ callQuotation.numberOfQuotations }}</td>
                       <td>{{ callQuotation.CallingQuotationDate !== '0000-00-00' ? callQuotation.CallingQuotationDate : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
-                      <td>{{ callQuotation.actuallDoneDate !== '0000-00-00' ? callQuotation.actuallDoneDate : '' }}
-                      </td>
-                      <td v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'CM Approval' ">
-                        {{ callQuotation.cqApproval[0].approval_remarks }}
-                      </td>
-                      <td v-else> {{ '' }}
-                      </td>
-                      <td v-if="callQuotation.cqApproval && callQuotation.cqApproval.length > 0 && callQuotation.cqApproval[0].approval_type === 'Admin Approval' ">
-                        {{ callQuotation.cqApproval[0].approval_remarks }}
-                      </td>
-                      <td v-else> {{ '' }}
-                      </td>
+                      <td>{{ callQuotation.actuallDoneDate !== '0000-00-00' ? callQuotation.actuallDoneDate : '' }}</td>
+                      <template v-if="callQuotation.cqApprovals && callQuotation.cqApprovals.length > 0" >
+                        <td v-for="(approval, index) in callQuotation.cqApprovals" :key="index">{{ formatDate(approval.updatedAt) }}</td>
+                      </template>
+                      <template v-else>
+                        <td></td>
+                        <template v-if="projectApproval && projectApproval.length > 0">
+                          <td v-for="(approval, index) in callQuotation.projectApproval" :key="index"></td>
+                        </template>
+                        <template v-else>
+                          <td></td>
+                        </template>
+                      </template>
                       <td>{{ callQuotation.awadingtargetdate !== '0000-00-00' ? callQuotation.awadingtargetdate : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
+                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
+                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
                       <td>{{ callQuotation.budget_amount }}</td>
                       <td>{{ callQuotation.adj_budget_amount }}</td>
                       <td>{{ callQuotation.subcontract_amount }}</td>
@@ -164,6 +168,7 @@ export default {
       projectName: "",
       errorMessage: "",
       callQuotation: [],
+      projectApproval:[],
       UpdateMessage: null,
       FailMessage: null,
       item: null,
@@ -225,9 +230,12 @@ export default {
     async accessCQ() {
       try {
         const processedData = await CallofQuotationController.accessCQ();
+        console.log('processeData',processedData);
         if (processedData.length > 0) {
-          console.log('Call for quotation',processedData);
           this.callQuotation = processedData;
+          this.projectApproval = processedData[0].projectApproval;
+          console.log('this quotation',this.callQuotation);
+          console.log('this projectApproval',this.projectApproval);
         } else {
           this.errorMessage = "An error occurred while fetching projects.";
         }
@@ -249,7 +257,21 @@ export default {
       } catch (error) {
         console.error('Error checking permission:', error);
       }
-    } 
+    },
+    formatDate(dateTimeString) {
+      if (!dateTimeString) return ''; 
+      const date = new Date(dateTimeString);
+      if (isNaN(date.getTime())) {
+        return ''; 
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); 
+      const day = String(date.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    },
+
   },
 };
 </script>

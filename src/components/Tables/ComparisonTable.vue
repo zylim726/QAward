@@ -12,7 +12,7 @@
         </form>
       </div>
       <div class="filter-container">
-        <!-- <a href="revision"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a> -->
+        <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px">
@@ -49,7 +49,9 @@
               <div class="tooltip" >
                 <span class="tooltiptext" style="margin-bottom: -107px !important;margin-left: -167px;width: 178px !important;">
                 Formula Quotation rate = ADJ Quantity x Quotation Rate</span>
-                <md-icon style="color: red;margin-top: 10px;margin-right: -10px;"  v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1"> priority_high</md-icon>
+                <md-icon style="color: red;margin-top: 10px;margin-right: -10px;"  
+                  v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1" 
+                > priority_high</md-icon>
               </div>
               <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
                 <button type="button" class="transparentButton"  >
@@ -68,6 +70,13 @@
                   <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
                 </div>
               </button>
+              <!-- <div class="tooltip" >
+                <span class="tooltiptext" style="margin-bottom: -95px !important;margin-right: -6px;" >
+                Download Quotation Documents</span>
+              
+                <md-icon style="color:orange;margin-left: 26px;margin-top: 10px;">folder_open</md-icon>
+              </div> -->
+              <!-- <button @click="downloadDocument">Download Document</button> -->
             </th>
           </tr>
           <tr>
@@ -107,7 +116,7 @@
     <div v-for="(project, index) in projectData" :key="index">
       <template v-if="project.status === 'Pending' && QuotationName.length > 1">
         <div class="confirmation-message">
-          <p>Are you sure want to submit Cost Comparison?</p>
+          <p>Ready to submit cost comparison?</p>
           <button class="btn-save" @click="approvalQuotation">Submit</button>
         </div>
       </template>
@@ -121,11 +130,11 @@
             </a>
           </template>
           <template v-else>
-            <p>Is this quotation acceptable for approval?</p>
-            <!--CM approval need to submit the approvalForm ,and upload one time revision-->
-            <button class="btn-save" @click="CMsubmitQuotation">Approval</button>
+            <p>Approval / reject cost comparison</p>
+            <!--CM approval need to submit the approvalForm-->
+            <button class="btn-save" @click="CMsubmitQuotation">Approve</button>
             <!--If CM rejected, need to go back pending -->
-            <button class="btn-save" @click="CMrejectedQuotation">Rejected</button>
+            <button class="btn-save" @click="CMrejectedQuotation">Reject</button>
           </template>
         </div>
       </template>
@@ -135,7 +144,7 @@
         </div>
       </template>
     </div>
-    <template v-if="project.status === 'Waiting Approval' && QuotationName.length > 0 ">
+    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved') && QuotationName.length > 0 ">
       <div class="cqapprovalBox-container">
         <template ><br>
           <div class="container" style="width: 100%;">
@@ -180,7 +189,8 @@
                       </option>
                     </select>
                     <p style="margin: 8px 0 10px;">Remarks:</p>
-                    <textarea v-model="remarks[index]" class="remarks-textarea" ></textarea>
+                    <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" ></textarea>
+                    <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Submit</button><br>
                   </div>
                   <div v-else>
                     <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
@@ -197,7 +207,6 @@
           </div>
         </template>
       </div>
-      <button class="btn-save" @click="submitAdminApproval">Submit</button><br>
     </template>
   </div> 
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
@@ -216,7 +225,7 @@ import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
-
+import { axios } from "@/services";
 
 export default {
   components: {
@@ -255,6 +264,7 @@ export default {
       cmAccessApproval: false,
       cmCQapproval:[],
       SubconListId:[],
+      totalQuotationData:[],
       excelFile: null,
       isLoading: false,
     };
@@ -333,8 +343,8 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Admin Approval'];
-        const cmapproval = ['CM Approval'];
+        const accessIds = ['Approved By'];
+        const cmapproval = ['Checked By'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
 
         this.cmAccessApproval = cmapproval.some(id => permission.includes(id));
@@ -347,31 +357,25 @@ export default {
       const end = start + 4;
       return this.cqApprovalData.slice(start, end);
     },
-    async submitAdminApproval() {
+    async submitAdminApproval(systemUserId,index) {
+      this.isLoading = true;
       const approvalDataToSubmit = [];
-        const uniqueEntries = new Set();
-        this.cqApprovalData.forEach((approvalData, index) => {
-          const selectedSubconListName = this.selectedQuotations[index];
-          const remark = this.remarks[index];
-          this.SubconListId .forEach((getSubconList, index) => {
-            const subconName = getSubconList.Subcon
-            if (subconName.name === selectedSubconListName ){
-              if (selectedSubconListName && remark) {
-                const entryKey = `${approvalData.system_user_id}_${selectedSubconListName}`;
-                if (!uniqueEntries.has(entryKey)) {
-                  approvalDataToSubmit.push({
-                    cqId: this.cqId,
-                    userId: approvalData.system_user_id,
-                    callForQuotationListId: getSubconList.id,
-                    remark: remark
-                  });
-                  uniqueEntries.add(entryKey);
-              
-                }
-              }
-            }
-        });
-       });
+      const selectedSubconListName = this.selectedQuotations[index];
+      const remark = this.remarks[index];
+      this.SubconListId.forEach((getSubconList) => {
+        const subconName = getSubconList.Subcon;
+        if (subconName.name === selectedSubconListName) {
+          if (selectedSubconListName && remark) {
+            approvalDataToSubmit.push({
+              cqId: this.cqId,
+              userId: systemUserId,
+              callForQuotationListId: getSubconList.id,
+              remark: remark
+            });
+          }
+        }
+      });
+
       try {
          const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
@@ -379,15 +383,18 @@ export default {
           this.UpdateMessage = Message;
           window.scrollTo({
             top: 0,
-            behavior: 'smooth' // Optional: smooth scroll animation
+            behavior: 'smooth' 
           });
 
           setTimeout(() => {
             this.UpdateMessage = '';
             window.location.reload();
-          }, 1000);
+         }, 1000);
       } catch (error) {
+        this.isLoading = false;
         this.FailMessage = 'Error while submitting approval data:', error;
+      } finally {
+        this.isLoading = false;
       }
     },
     editDescription(id) {
@@ -439,6 +446,7 @@ export default {
     }, 200), 
     async getDescription(id, isHide) {
       try {
+        this.isLoading = true;
         let processedData = await DescriptionController.getNewDescription(id);
         const searchQuery = this.searchQuery.toLowerCase().trim();
 
@@ -498,6 +506,8 @@ export default {
               for (const quotationRate of getQuotation) {
                 const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
                 const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
+
+                console.log('totalQuotation',totalQuotation);
 
                 this.totalQuotationData = totalQuotation;
 
@@ -617,7 +627,10 @@ export default {
         
         }
       } catch (error) {
+        this.isLoading = false;
         this.errorMessage = 'An error for get description data.';
+      } finally {
+        this.isLoading = false;
       }
     },
     async getCQApproval(id) {
@@ -644,16 +657,17 @@ export default {
           });
         });
       } catch (error) {
-        // Handle error
-        console.error('Error fetching CQ approvals:', error);
+        console.log('Error fetching CQ approvals:', error);
       }
     },
     async getCMcqApproval(id) {
       try {
         const response = await QuotationController.getCMcqApproval(id);
+     
         this.cmCQapproval = response.filter(approval => approval.approval_status === 'Approved');
+  
       } catch (error) {
-        his.FailMessage = 'Error CM approval:', error;
+        this.FailMessage = 'Error CM approval:', error;
       }
     },
     async getProject(id) {
@@ -710,25 +724,34 @@ export default {
     },
     EditMessage(message) {
       this.UpdateMessage = message;
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth' 
+      });
       setTimeout(() => {
         this.UpdateMessage = '';
-          window.scrollTo(0, 0);
           window.location.reload();
       }, 2000);
     },
     EditSubconMessage(message) {
       this.UpdateMessage = message;
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth' 
+      });
       setTimeout(() => {
         this.UpdateMessage = '';
-          window.scrollTo(0, 0);
           window.location.reload();
       }, 2000);
     },
     EditErrorMessage(message) {
       this.FailMessage = message;
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth' 
+      });
       setTimeout(() => {
         this.FailMessage = '';
-          window.scrollTo(0, 0);
           window.location.reload();
       }, 2000);
     },
@@ -736,14 +759,20 @@ export default {
       try {
         this.UpdateMessage = await QuotationController.CMrejectedQuotation(this.cqId); 
         
-        window.scrollTo(0, 0);
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth' 
+        });
         setTimeout(() => {
         this.UpdateMessage = '';
           window.location.reload();
       }, 2000);
       } catch (error) {
         this.FailMessage = "Error rejected quotation: " + error.errorMessage;
-        window.scrollTo(0, 0);
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth' 
+        });
           setTimeout(() => {
           this.UpdateMessage = '';
             window.location.reload();
@@ -782,18 +811,24 @@ export default {
         const getDataFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
         this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId, getDataFile);
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth' 
+        });
         setTimeout(() => {
           this.UpdateMessage = '';
-          window.scrollTo(0, 0);
           window.location.reload();
         }, 2000);
 
       } catch (error) {
         this.isLoading = false;
         this.FailMessage = 'Error: ' + error.message;
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth' 
+        });
         setTimeout(() => {
           this.UpdateMessage = '';
-          window.scrollTo(0, 0);
           window.location.reload();
         }, 2000);
       } finally {
@@ -813,7 +848,9 @@ export default {
   text-align: right;
   border-right: 1px solid #ddd;
 }
-
+.nested-table th, .nested-table td {
+    padding: 13px !important;
+}
 .img {
   width: 100px  !important;
   height: 50px;

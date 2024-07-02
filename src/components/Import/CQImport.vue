@@ -1,6 +1,8 @@
 <template>
   <div>
-    <!-- Your existing template code -->
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading...</div>
+    </div>
     <label
       for="fileInput"
       style="margin-right: 10px; float: right"
@@ -83,6 +85,7 @@ export default {
       importedData: [],
       columnTitles: [],
       selectAll: true,
+      loading: false,
     };
   },
   computed: {
@@ -148,6 +151,7 @@ export default {
       hiddenElement.click();
     },
     async saveData() {
+      this.loading = true;
       const selectedFormData = this.formDataList.filter(formData => formData.selected);
       const selectedImportedData = this.importedData.filter(importedRow => importedRow.selected);
 
@@ -174,6 +178,7 @@ export default {
           }
         });
 
+        
         selectedImportedData.forEach(importedRow => {
           const index = this.importedData.indexOf(importedRow);
           if (index !== -1) {
@@ -185,9 +190,12 @@ export default {
          window.location.reload();
 
       } catch (error) {
+        this.loading = false;
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
+      } finally {
+        this.loading = false; 
       }
     }
   },

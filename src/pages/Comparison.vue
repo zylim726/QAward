@@ -36,7 +36,7 @@
         <md-card style="height: 70%">
           <div class="status">
             <i class="material-icons">notifications_active</i>
-            <h7>For the Subcon Comparison Status is: <b class="titleHeader">{{ callQuotation.status }}</b></h7>
+            <h7>Status : <b class="titleHeader">{{ callQuotation.status }}</b></h7>
           </div>
           <div class="comparison-title">
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">

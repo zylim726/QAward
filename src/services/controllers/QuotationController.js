@@ -152,12 +152,9 @@ const QuotationController = {
         const messages = [];
         let foundId = null;
         for (const data of approvalDataToSubmit) {
-
             const Cqresponse = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${data.cqId}`, { headers });
 
             const CheckCQ = Cqresponse.data.data;
-            
-
             CheckCQ.forEach(cq => {
             if (cq.system_user_id === Number(data.userId)) {
                 
@@ -165,7 +162,6 @@ const QuotationController = {
             }
             });
 
-                      
             if (foundId){
 
                 const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
@@ -224,6 +220,7 @@ const QuotationController = {
     
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: cqId,
+            version: 'version',
         }, { headers });
 
         const revisionId = revisionResponse.data.data.id;

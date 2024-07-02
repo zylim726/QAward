@@ -120,7 +120,7 @@ export default {
         for (const project of this.projects) {
           const unitType = await ProjectController.getUnitTypes(project.id);
           console.log('Unit type fetched for project ID', project.id, ':', unitType);
-          this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'orange' : 'grey');
+          this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'orange');
         }
       } catch (error) {
         console.error('Error fetching unit types:', error);
@@ -131,7 +131,7 @@ export default {
       }
     },
     getUnitTypeColor(projectId) {
-      return this.unitTypeColors[projectId] || 'grey';
+      return this.unitTypeColors[projectId] || 'orange';
     },
     editProj(projectId) {
       this.editId = projectId;

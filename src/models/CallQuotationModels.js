@@ -13,9 +13,6 @@ const CallQuotationModels = {
         return false;
       }
     });
-
-      console.log('filteredData',filteredData);
-
     if (filteredData.length > 0) {
       const processedData = filteredData.map(config => ({
         id: config.id,
@@ -42,8 +39,9 @@ const CallQuotationModels = {
         projectId: config.project_id,
         message: response.message,
         cqSubconList: config.Call_For_Quotation_Subcon_Lists,
-        cqApproval: config.Cq_Approvals,
+        projectApproval: config.projectApproval,
         La: config.Las,
+        cqApprovals: config.cqApprovals,
 
       }));
       
