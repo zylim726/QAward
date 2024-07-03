@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading...</div>
+    </div>
     <div class="md-layout">
       <!-- Unit Types Table -->
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25" style="padding: 0px 17px">
@@ -49,8 +52,8 @@
                   <th scope="col">Category</th>
                   <th scope="col">Trade</th>
                   <th scope="col">Location 1</th>
-                  <th scope="col">Actual Calling Quotation Date (yyyy-mm-dd)</th>
-                  <th scope="col">Awarding Target Date (yyyy-mm-dd)</th>
+                  <th scope="col">Actual Calling Quotation Date (dd/mm/yyyy)</th>
+                  <th scope="col">Awarding Target Date (dd/mm/yyyy)</th>
                   <th scope="col">Remarks</th>
                 </tr>
               </thead>
@@ -60,8 +63,8 @@
                   <td>{{ formData.tradeCategory }}</td>
                   <td>{{ formData.trade }}</td>
                   <td>{{ formData.location }}</td>
-                  <td>{{ formData.CallingQuotationDate }}</td>
-                  <td>{{ formData.awadingtargetdate }}</td>
+                  <td>{{ displayDate(formData.CallingQuotationDate) }}</td>
+                  <td>{{ displayDate(formData.awadingtargetdate) }}</td>
                   <td>{{ formData.remarks }}</td>
                 </tr>
               </tbody>
@@ -89,10 +92,11 @@ export default {
   },
   data() {
     return {
-      selectAllUnitTypes: false,
-      selectAllCallQuotation: false,
+      selectAllUnitTypes: true,
+      selectAllCallQuotation: true,
       UnitTypes: [],
-      callQuotation: []
+      callQuotation: [],
+      loading:false,
     };
   },
   created() {
@@ -125,7 +129,10 @@ export default {
       try {
         const processedData = await CallofQuotationController.getUTypes();
         if (processedData.length > 0) {
-          this.UnitTypes = processedData;
+          this.UnitTypes = processedData.map(unitType => ({
+            ...unitType,
+            selected: true 
+          }));
         } else {
           this.errorMessage = "An error occurred while fetching unit types.";
         }
@@ -137,8 +144,10 @@ export default {
       try {
         const processedData = await CallofQuotationController.getCQ();
         if (processedData.length > 0) {
-          this.callQuotation = processedData;
-          console.log('this callquotation',this.callQuotation);
+          this.callQuotation = processedData.map(cq => ({
+            ...cq,
+            selected: true 
+          }));
         } else {
           this.errorMessage = "An error occurred while fetching call quotations.";
         }
@@ -148,6 +157,7 @@ export default {
     },
     async saveData() {
       try {
+        this.loading = true;
         const selectedUnitTypes = this.UnitTypes.filter(formData => formData.selected);
         const selectedCallQuotation = this.callQuotation.filter(formData => formData.selected);
         const callIds = selectedCallQuotation.map(formData => formData.id);
@@ -163,8 +173,11 @@ export default {
         });
 
       } catch (error) {
+        this.loading = false;
         const failMessage = "Error updating data: " + error.errorMessage;
         this.$emit('fail-message', failMessage);
+      } finally {
+        this.loading = false;
       }
     },
     handleFetchError(error) {
@@ -173,6 +186,19 @@ export default {
       } else {
         this.errorMessage = "Error fetching data: " + error.errorMessage;
       }
+    },
+    displayDate(dateStr) {
+      if (dateStr === "0000-00-00") {
+        return "";
+      }
+      
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const date = new Date(dateStr);
+        const options = { day: "2-digit", month: "short", year: "numeric" };
+        return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
+      }
+      
+      return dateStr;
     },
     getSelectedUnitTypes() {
       return this.UnitTypes.filter(formData => formData.selected);

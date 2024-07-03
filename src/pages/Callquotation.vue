@@ -26,22 +26,28 @@
                   </form>
                 </div>
 
+              
                 <div class="filter-container" style="margin-right: -15px">
-                  <a href="createcq" v-if="hasAccess"
-                    ><md-icon class="mdIcon" style="margin-right: 15px"
-                      >add</md-icon
-                    ></a
+                  <a href="createcq" v-if="hasAccess">
+                    <div class="tooltip">
+                      <span class="tooltiptext">Created Comparison Summary</span>
+                    <md-icon class="mdIcon" style="margin-right: 15px"
+                      >add</md-icon></div>
+                    </a
                   >
                 </div>
                 <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
-                  <md-icon class="mdIcon">system_update_alt</md-icon>
+                    <div class="tooltip">
+                    <span class="tooltiptext">Export Comparison Summary</span>
+                    <md-icon class="mdIcon">system_update_alt</md-icon>
+                    </div>
                 </button>
               </div>
               <div class="table-container" style="min-height: 100px;max-height: 600px;">
                 <table>
                   <thead>
-                    <tr>
-                      <th>Actions</th>
+                    <tr >
+                      <th>Action</th>
                       <th>ID</th>
                       <th>Category</th>
                       <th>Trade</th>
@@ -50,7 +56,14 @@
                       <th>Actual Calling Quotation Date</th>
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
-                      <th colspan="3" style="text-align: center">Check By</th>
+                      <th>Check By</th>
+                      <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 0" 
+                          :colspan="callQuotation[0].projectApproval.length">
+                        Approval By
+                      </th>
+                      <th v-else>
+                        Approval By
+                      </th>
                       <th>Awarding Target Date</th>
                       <th>Remarks</th>
                       <th>Awarded to</th>
@@ -61,67 +74,70 @@
                       <th>Subcontract Amount (RM)</th>
                       <th>Subcontract (ADJ) Amount (RM)</th>
                       <th>Cost Saving / (Overrun) (RM)</th>
+                      <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <th>CALL DB</th>
-                      <th>CallL</th>
-                      <th>CALL</th>
-                      <th colspan="19"></th>
+                      <th >
+                      </th>
+                      <template v-if="projectApproval && projectApproval.length > 0">
+                        <th v-for="(approval, index) in projectApproval" 
+                          :key="index">
+                        {{ approval.user[0]?.name }}
+                      </th>
+                      </template>
+                      <template v-else>
+                        <th></th>
+                      </template>
+                      <th colspan="20"></th>
                     </tr>
                   </thead>
                   
                   <tbody>
                     <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
-                      <td>
-                        <li class="md-list-item">
-                          <drop-down
-                            @dropdown-clicked="closeOtherDropDowns(item)"
-                          >
-                            <md-button
-                              slot="title"
-                              class="md-button md-just-icon md-simple"
-                              data-toggle="dropdown"
-                            >
-                              <md-icon>more_vert</md-icon>
-                            </md-button>
-                            <ul
-                              class="dropdown-menu dropdown-menu-left"
-                              style="margin-left: 48px !important"
-                            >
-                              <li>
-                                <a :href="'/comparison?cqID=' + callQuotation.id">Subcon Comparison</a>
-                              </li>
-                              <li><button class="transparentButton"  v-if="hasAccess && callQuotation.status === 'Pending'" @click="editCallQuotation(callQuotation.id)" style="margin-left: -6px;">Edit Call for Quotation</button></li>
-                              <li><button class="transparentButton"  v-if="hasAccess && callQuotation.status === 'Pending'" @click="deleteCallQuotation(callQuotation.id)" style="margin-left: -6px;">Delete</button></li>
-                            </ul>
-                          </drop-down>
-                        </li>
-                      </td>
+                      <td><a :href="'/comparison?cqID=' + callQuotation.id"><button class="transparentButton" >
+                        <div class="tooltip" >
+                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
+                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
+                      </a></td>
                       <td>{{ index + 1 }}</td>
                       <td>{{ callQuotation.tradeCategory }}</td>
                       <td>{{ callQuotation.trade }}</td>
                       <td>{{ callQuotation.location }}</td>
-                      <td></td>
-                      <td>{{ callQuotation.CallingQuotationDate }}</td>
+                      <td>{{ callQuotation.numberOfQuotations }}</td>
+                      <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
-                      <td>{{ callQuotation.actuallDoneDate }}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td>{{ callQuotation.awadingtargetdate }}</td>
+                      <td>{{ formatDate(callQuotation.actuallDoneDate) !== '0000-00-00' ? formatDate(callQuotation.actuallDoneDate) : '' }}</td>
+                      <template v-if="callQuotation.cqApprovals && callQuotation.cqApprovals.length > 0"  >
+                        <td v-for="(approval, index) in callQuotation.cqApprovals" :key="index">
+                          <span v-if="approval.approval_type === 'CM Approval'">{{ formatDate(approval.updatedAt) }} 
+                            <br><h9 style="font-size: 12px;">({{ approval.user[0].name }})</h9></span>
+                          <span v-else>{{ formatDate(approval.updatedAt) }}</span>
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td></td>
+                        <template v-if="projectApproval && projectApproval.length > 0">
+                          <td v-for="(approval, index) in callQuotation.projectApproval" :key="index"></td>
+                        </template>
+                        <template v-else>
+                          <td></td>
+                        </template>
+                      </template>
+                      <td>{{ callQuotation.awadingtargetdate !== '0000-00-00' ? callQuotation.awadingtargetdate : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td>{{ callQuotation.budget_amount }}</td>
-                      <td>{{ callQuotation.adj_budget_amount }}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
+                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
+                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
+                      <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.adj_budget_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.subcontract_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.adj_subcontract_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.total_saving) }}</td>
+                      <td>{{ formatAccounting(callQuotation.provisional_sum) }}</td>
                       <td>
                         <span class="notify-status">{{ callQuotation.status }}</span>
                       </td>
@@ -134,22 +150,19 @@
         </md-card>
       </div>
     </div>
-    <EditCQ :edit-modal="editModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage" @close="closeEditModal" :id="editId"  title="Edit Call of Quotation"></EditCQ>
-    <DeleteCQ :show-modal="showModal" @message="ModalMessage" @fail-message="ModalErrorMessage" @close="closeModal" :id="deleteId" title="Delete Call of Quotation"></DeleteCQ>
-  </div>
+    </div>
 </template>
 
 <script>
 const XLSX = require('xlsx');
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import { EditCQ,DeleteCQ }  from "@/components";
+
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
-    EditCQ,
-    DeleteCQ,
+  
   },
   data() {
     return {
@@ -159,11 +172,7 @@ export default {
       projectName: "",
       errorMessage: "",
       callQuotation: [],
-      editModal: false,
-      showModal: false,
-      deleteId: null,
-      editId: null,
-      editUTId: null,
+      projectApproval:[],
       UpdateMessage: null,
       FailMessage: null,
       item: null,
@@ -191,7 +200,7 @@ export default {
     if (projectName) {
       this.projectName = projectName;
     } else {
-      console.error('Project ID not found in localStorage');
+      this.errorMessage = "Project ID not found in localStorage";
     };
     this.accessCQ();
   },
@@ -199,20 +208,31 @@ export default {
     await this.checkPermission();
   },
   methods: {
+    formatAccounting(value) {
+      if (!value) {
+        return '0.00';
+      }
+      return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
-      
       const table = document.querySelector('table');
       const clonedTable = table.cloneNode(true);
 
+      // Remove first column from each row (Actions column)
       clonedTable.querySelectorAll('tr').forEach(row => {
         row.deleteCell(0);
       });
 
-      const ths = clonedTable.querySelectorAll('thead th');
-      ths[8].setAttribute('colspan', '3'); 
-      const ws = XLSX.utils.table_to_sheet(clonedTable);
+      // Update table cells based on conditions
+      clonedTable.querySelectorAll('td').forEach(cell => {
+        // Replace cell content with empty string if it matches '0000-00-00'
+        if (cell.textContent.trim() === '0000-00-00') {
+          cell.textContent = '';
+        }
+      });
 
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
 
       XLSX.writeFile(wb, 'summary.xlsx');
@@ -220,9 +240,12 @@ export default {
     async accessCQ() {
       try {
         const processedData = await CallofQuotationController.accessCQ();
+        console.log('processeData',processedData);
         if (processedData.length > 0) {
-          console.log('Call for quotation',processedData);
           this.callQuotation = processedData;
+          this.projectApproval = processedData[0].projectApproval;
+          console.log('this quotation',this.callQuotation);
+          console.log('this projectApproval',this.projectApproval);
         } else {
           this.errorMessage = "An error occurred while fetching projects.";
         }
@@ -236,44 +259,6 @@ export default {
       }
       this.openedDropdown = clickedItem;
     },
-    editCallQuotation(id) {
-      this.editId = id;
-      this.editModal = true;
-    },
-    closeEditModal() {
-      this.editModal = false;
-    },
-    deleteCallQuotation(id) {
-      this.deleteId = id;
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-    },
-    ModalMessage(message) {
-      this.UpdateMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 1000);
-    },
-    ModalErrorMessage(message) {
-      this.FailMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 1000);
-    },
-    EditMessage(message) {
-      this.UpdateMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 2000);
-    },
-    EditErrorMessage(message) {
-      this.FailMessage = message; 
-      setTimeout(() => {
-        this.UpdateMessage = '';
-      }, 2000);
-    },
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
@@ -282,7 +267,24 @@ export default {
       } catch (error) {
         console.error('Error checking permission:', error);
       }
-    } 
+    },
+    formatDate(dateTimeString) {
+      if (!dateTimeString) return '';
+
+      const date = new Date(dateTimeString);
+      if (isNaN(date.getTime())) {
+        return ''; // Return empty string for invalid dates
+      }
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getMonth()];
+      const year = date.getFullYear();
+
+      return `${day}-${month}-${year}`;
+    }
+
+
   },
 };
 </script>

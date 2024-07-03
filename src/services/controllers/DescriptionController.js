@@ -7,6 +7,38 @@ const DescriptionController = {
         const headers = config.getHeadersWithToken();
         const messageArray = [];
 
+        const checkingSubconList = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, {
+            headers,
+        });
+        
+        const GetSubconId = checkingSubconList.data.data;
+        const SubconId = "1";
+        let SubconListId = "";
+        let subconIdToRetrieve = null;
+        
+        for (const subcon of GetSubconId) {
+            if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(cqId)) {
+                subconIdToRetrieve = subcon.id;
+                break; 
+            }
+        }
+        
+        if (subconIdToRetrieve === null) {
+            try {
+                const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
+                    discount: 0.00,
+                    call_for_quotation_id: cqId,
+                    subcon_id: SubconId 
+                }, { headers });
+        
+                SubconListId = cqSubconResponse.data.data.id;
+            } catch (error) {
+              throw error
+            }
+        } else {
+          
+            SubconListId = subconIdToRetrieve;
+        }
 
         for (const data of matchedData) {
 
@@ -18,15 +50,10 @@ const DescriptionController = {
               description_item: data.description
           }, { headers });
 
-          const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
-            discount: 0.00,
-            call_for_quotation_id: cqId,
-            subcon_id: 1
-        }, { headers });
-
+       
           const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
               quote_rate: data.budget,
-              call_for_quotation_subcon_list_id: cqSubconResponse.data.data.id,
+              call_for_quotation_subcon_list_id: SubconListId,
               description_id: descriptionResponse.data.data.id
           }, { headers });
 

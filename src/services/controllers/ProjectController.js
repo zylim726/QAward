@@ -10,7 +10,6 @@ const ProjectController = {
       const response = await axios.get(`${apiHost}/sitelist`, { headers });
 
       const processedData = ProjectModels.processResponseData(response.data);
-
       return {
         data: processedData,
         message: null, 
@@ -97,7 +96,7 @@ const ProjectController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
 
-      const response = await axios.get(`${apiHost}/project`, {
+      const response = await axios.get(`${apiHost}/sitelist`, {
         headers,
       });
 
@@ -169,6 +168,7 @@ const ProjectController = {
       const response = await axios.get(`${apiHost}/project_unit_type/showByProject/${id}`, {
         headers,
       });
+
       return response.data.data;
       
     } catch (error) {
@@ -184,24 +184,32 @@ const ProjectController = {
         const headers = config.getHeadersWithToken();
         const messages = [];
 
-        const response = await axios.put(`${apiHost}/project/edit/${id}`, {
-          name: updatedData.name,
-          regno: updatedData.regno,
-          code: updatedData.code,
-          area: updatedData.area,
-        }, { headers });
-
         for (let unitType of updatedData.unitTypes) {
-          const unitReponse = await axios.put(
-            `${apiHost}/project_unit_type/edit/${unitType.id}`,
-            {
-              unit_type: unitType.unit_type,
-              quantity: unitType.quantity,
-              adj_factor: unitType.adj_factor,
-            },
-            { headers }
-          );
-          messages.push(unitReponse.data.message);
+          if (unitType.id) {
+            const unitResponse = await axios.put(
+              `${apiHost}/project_unit_type/edit/${unitType.id}`,
+              {
+                unit_type: unitType.unit_type,
+                quantity: unitType.quantity,
+                adj_factor: unitType.adj_factor,
+              },
+              { headers }
+            );
+            messages.push(unitResponse.data.message);
+          } else {
+          
+            const unitResponse = await axios.post(
+              `${apiHost}/project_unit_type/add`,
+              {
+                unit_type: unitType.unit_type,
+                quantity: unitType.quantity,
+                adj_factor: unitType.adj_factor,
+                project_id: id
+              },
+              { headers }
+            );
+            messages.push(unitResponse.data.message);
+          }
         }
 
         return messages;
@@ -214,13 +222,11 @@ const ProjectController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
-      const UnitResponse = await axios.delete(`${apiHost}/project_unit_type/removeByProject/${id}`, {
+      const UnitResponse = await axios.delete(`${apiHost}/project_unit_type/remove/${id}`, {
         headers,
       });
-      const response = await axios.delete(`${apiHost}/project/remove/${id}`, {
-        headers,
-      });
-      return response.data.message;
+
+      return UnitResponse.data.message;
     } catch (error) {
       const errorMessage = error.response.data.message;
       throw { errorMessage };

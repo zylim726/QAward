@@ -58,23 +58,22 @@
       </div>
       </div>
     </form>
-    <button type="submit" class="btn-save" @click="addModule">Updated</button><br /><br />
+    <button type="submit" class="btn-save" @click="addModule">Add</button><br /><br />
     
   </md-card-content>
 </template>
-
 
 <script>
 
 export default {
   data() {
     return {
-      modules: [{ tradeCategory: '', trade: '', location: '', budgetAmount: '', callingquotationDate: '', awadingtaget: '', remarks: '' }]
+      modules: [{ tradeCategory: '', trade: '', location: '', callingquotationDate: '', awadingtaget: '', remarks: '' }]
     };
   },
   methods: {
     addModule() {
-      const formData = { ...this.modules[0] }; 
+      const formData = { ...this.modules[0], selected: true }; 
       this.$emit('form-submitted', formData); 
     }
    

@@ -4,12 +4,24 @@
     <div v-if="isModalVisible" class="modal-overlay">
       <div class="modal-content">
         <h1 class="titleHeader">Select Subcon</h1><br>
-        <select class="dropdownSubcon" v-model="selectedOption">
-          <option v-for="(subconData, index) in columnKTitle" :key="index" :value="subconData.name">{{ subconData.name }}</option>
-        </select>
-        <button class="btn-confirm"  @click="confirmSubconSelection">Confirm</button>
+        <input type="text" v-model="searchTerm" placeholder="Search subcon name then select the subcon" class="dropdownSubcon"
+        style="width: 64%;"><br><br>
+        <div v-if="filteredSubconData.length > 0" style="height: 60%;">
+          <div class="tooltip" >
+            <span style="position: absolute;margin-top: 5px;margin-left: 10px;"  v-if="!selectedOption">Select Subcon</span>
+            <select class="dropdownSubcon" v-model="selectedOption" style="height: 29px;width: 188px;" >
+            <option v-for="(subconData, index) in filteredSubconData" :key="index" :value="subconData.name">{{ subconData.name }}</option>
+            </select>
+          </div>
+        <button class="btn-confirm" @click="confirmSubconSelection">Confirm</button>
+        </div>
+        <div v-else>
+          <p style="color: red;">No results found.</p>
+        </div>
       </div>
     </div>
+
+
 
     <div v-if="UpdateMessage" class="notification success">
       {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
@@ -20,11 +32,15 @@
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
         <label style="margin-right: 10px; float: right" class="file-label">
-          <md-icon class="mdIcon">upload_file</md-icon>
+          <div class="tooltip" >
+            <span class="tooltiptext" style="bottom: -238% !important;">Upload quotation excel.</span>
+          <md-icon class="mdIcon">upload_file</md-icon></div>
           <input type="file" multiple @change="importDataFromFiles" />
         </label>
         <button @click="downloadExcelTemplate" class="transparentButton" style="margin-right: 10px; float: right">
-          <md-icon class="mdIcon">download_for_offline</md-icon>
+          <div class="tooltip" >
+            <span class="tooltiptext" style="bottom: -297% !important;">Download quotation template and field in rate data.</span>
+          <md-icon class="mdIcon">download_for_offline</md-icon></div>
         </button>
         <md-card>
           <md-card-content>
@@ -34,9 +50,15 @@
                   <tr>
                     <th colspan="6"></th>
                     <th v-for="(unitdata, index) in getCqUnitTypes" :key="index" style="text-align: center;">
-                    <md-icon style="color: red;">priority_high</md-icon>
+                      <div class="tooltip" >
+                        <span class="tooltiptext" style="bottom: -127px;">Using adj factor to calculate quantity.</span>
+                        <md-icon style="color: red;">priority_high</md-icon></div>
                     </th>
-                    <th scope="col"><md-icon style="color: red;">priority_high</md-icon></th>
+                    <th scope="col">
+                      <div class="tooltip">
+                      <span class="tooltiptext" style="bottom: -127px;">Using adj factor to calculate quantity.</span>
+                      <md-icon style="color: red;">priority_high</md-icon></div>
+                    </th>
                     <th></th>
                   </tr>
                   <tr>
@@ -65,6 +87,24 @@
                 <tbody>
                 </tbody>
               </table>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <div style="display: flex; align-items: center;">
+                <label for="discount" style="margin-right: 5px;">Discount:</label>
+                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" min="0" />
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <div style="display: flex; align-items: center;">
+                <label for="remarks" style="margin-right: 5px;">Remarks:</label>
+                <input type="text" id="remarks" v-model.number="remarks" style="width: 94%;" />
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: -13px;">
+              <div>
+                <label for="documents" style="margin-right: 5px;">Documents:</label>
+                <input type="file" @change="handleFileChange">
+              </div>
             </div>
             <br>
             <button type="submit" class="btn-save" @click="saveAllData">Submit</button>
@@ -96,8 +136,12 @@ export default {
       columnKData: [],
       selectedOption: null,
       selectedSubconName: '',
+      searchTerm: '',
       QuotationDataArray: [],
       isModalVisible: false,
+      remarks: "",
+      discount: 0,
+      documents: {},
     };
   },
   mounted() {
@@ -118,9 +162,19 @@ export default {
   computed: {
     getCqUnitTypes() {
       return this.cqUnit.length > 0 ? this.cqUnit : [];
+    },
+    filteredSubconData() {
+      // Filter subconData based on searchTerm
+      return this.columnKTitle.filter(subconData => {
+        return subconData.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      });
     }
   },
   methods: {
+    handleFileChange(event) {
+      this.documents.file = event.target.files[0];
+      
+    },
     confirmSubconSelection() {
       if (this.selectedOption) {
         this.selectedSubconName = this.selectedOption;
@@ -139,7 +193,6 @@ export default {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
-        console.log('processedData',processedData);
         this.cqUnit = processedData[0].cqUnitType || [];
       } catch (error) {
         console.error('Error fetching Description:', error);
@@ -224,7 +277,7 @@ export default {
             <td><b>${formData.element || ''}</b></td>
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
-            <td><b>${formData.description_item}</b></td>
+            <td style="white-space: pre-wrap;"><b>${formData.description_item}</b></td>
             <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
@@ -248,7 +301,7 @@ export default {
             <td>${formData.element || ''}</td>
             <td>${formData.sub_element || ''}</td>
             <td>${formData.description_sub_sub_element || ''}</td>
-            <td style="padding-left:60px !important;">${formData.description_item}</td>
+            <td style="padding-left:60px !important;white-space: pre-wrap;">${formData.description_item}</td>
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
@@ -263,7 +316,6 @@ export default {
               rateData: rateCount,
               quotationName: this.selectedSubconName,
               rate: columnKData[columnKDataIndex],
-              cqId: id
             });
           }
 
@@ -273,37 +325,62 @@ export default {
     },
     async saveAllData() {
       try {
-        for (const QuotationData of this.QuotationDataArray) {
-          await this.saveData(QuotationData);
-        }
+        await this.saveData(this.QuotationDataArray,this.$route.query.cqId);
+        
       } catch (error) {
         this.$emit('fail-message', error.message);
       }
     },
-    async saveData(QuotationData) {
-      try {
-        const SubConName = this.selectedSubconName;
-        if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-           this.UpdateMessage = await QuotationController.addQuotation(QuotationData,SubConName);
-          setTimeout(() => {
-            this.UpdateMessage = '';
-            window.location.reload();
-          }, 2000);
-        } else {
-          this.FailMessage = "Error: Some data is empty";
-          setTimeout(() => {
-            this.UpdateMessage = '';
-            window.location.reload();
-          }, 2000);
-        }
+    async saveData(QuotationData,id) {
+        try {
+            const SubConName = this.selectedSubconName;
+            const Discount = this.discount;
+            const Remarks = this.remarks;
+            const Documents = this.documents;
 
-      } catch (error) {
-        this.FailMessage = error.message;
-        setTimeout(() => {
-          this.UpdateMessage = '';
-          window.location.reload();
-        }, 2000);
-      }
+            console.log('QuotationData',QuotationData);
+
+            const hasNegativeRate = QuotationData.some(data => data.rate < 0);
+            if (hasNegativeRate) {
+                this.FailMessage = "Error: Rate data cannot have negative values.";
+                setTimeout(() => {
+                    this.UpdateMessage = '';
+                    window.scrollTo(0, 0); 
+                    window.location.reload();
+                }, 2000);
+                return;
+            }
+
+            if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
+              
+              const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
+              const concatenatedMessage = SuccessMessage.join(', ');
+              this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
+              setTimeout(() => {
+                this.UpdateMessage = '';
+              }, 2500);
+              const routeData = this.$router.resolve({
+                  name: 'Subcon Comparison',
+                  query: { cqID: this.$route.query.cqId }
+              });
+
+               window.open(routeData.href, '_blank');
+            } else {
+              this.FailMessage = "Error: Rate data is empty";
+              setTimeout(() => {
+                this.UpdateMessage = '';
+                window.location.reload();
+              }, 2000);
+            }
+
+
+        } catch (error) {
+            this.FailMessage = error.message;
+            setTimeout(() => {
+              this.UpdateMessage = '';
+              window.location.reload();
+            }, 2000);
+        }
     },
     downloadExcelTemplate() {
       const dataTable = this.$refs.dataTable;
@@ -395,7 +472,8 @@ export default {
 .modal-content {
   text-align: center;
   width: 500px;
-  height: 160px;
+  overflow-y: clip;
+  height: 250px;
 }
 
 

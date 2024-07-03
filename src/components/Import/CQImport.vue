@@ -1,11 +1,17 @@
 <template>
   <div>
+    <div v-if="loading" class="loading-overlay">
+      <div class="loading-spinner">Loading...</div>
+    </div>
     <label
       for="fileInput"
       style="margin-right: 10px; float: right"
       class="file-label"
     >
-      <md-icon class="mdIcon">upload_file</md-icon>
+      <div class="tooltip">
+        <span class="tooltiptext">Upload your comparison summary</span>
+        <md-icon class="mdIcon">upload_file</md-icon>
+      </div>
       <input id="fileInput" type="file" @change="projectUpload" />
     </label>
     <button
@@ -13,10 +19,13 @@
       class="transparentButton"
       style="margin-right: 10px; float: right"
     >
-      <md-icon class="mdIcon">download_for_offline</md-icon>
+      <div class="tooltip">
+        <span class="tooltiptext"
+          >Download comparison summary then upload the new file.</span
+        >
+        <md-icon class="mdIcon">download_for_offline</md-icon>
+      </div>
     </button>
-   
-
 
     <div class="projectTable-container">
       <table class="project-table">
@@ -34,8 +43,8 @@
             <th scope="col">Category</th>
             <th scope="col">Trade</th>
             <th scope="col">Location 1</th>
-            <th scope="col">Actual Calling Quotation Date  (yyyy-mm-dd)</th>
-            <th scope="col">Awading Target Date  (yyyy-mm-dd)</th>
+            <th scope="col">Actual Calling Quotation Date (dd/mm/yyyy)</th>
+            <th scope="col">Awading Target Date (dd/mm/yyyy)</th>
             <th scope="col">Remarks</th>
           </tr>
         </thead>
@@ -45,34 +54,24 @@
             <td>{{ formData.tradeCategory }}</td>
             <td>{{ formData.trade }}</td>
             <td>{{ formData.location }}</td>
-            <td>{{ formData.callingquotationDate }}</td>
-            <td>{{ formData.awadingtaget }}</td>
+            <td>{{ displayDate(formData.callingquotationDate) }}</td>
+            <td>{{ displayDate(formData.awadingtaget) }}</td>
             <td>{{ formData.remarks }}</td>
           </tr>
-          <tr
-            v-for="(row, index) in importedData"
-            :key="index"
-            :class="{ 'selected-row': row.selected }"
-          >
-            <td>
-              <label class="control control--checkbox">
-                <input type="checkbox" v-model="row.selected" />
-              </label>
-            </td>
-            <td v-for="column in filteredColumns" :key="column">
-              {{ displayValue(row[column], column) }}
-            </td>
+          <tr v-for="(row, index) in importedData" :key="'importedData' + index" :class="{ 'selected-row': row.selected }">
+            <td><input type="checkbox" v-model="row.selected"></td>
+            <td v-for="column in filteredColumns" :key="column">{{ displayValue(row[column], column) }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <button type="submit" class="btn-save" @click="saveData" >Save</button><br /><br />
+    <button type="submit" class="btn-save" @click="saveData">Save</button><br /><br />
   </div>
 </template>
+
 <script>
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-
 
 export default {
   props: {
@@ -85,7 +84,8 @@ export default {
     return {
       importedData: [],
       columnTitles: [],
-      selectAll: false
+      selectAll: true,
+      loading: false,
     };
   },
   computed: {
@@ -104,7 +104,16 @@ export default {
       });
     },
     importData(data) {
-      this.importedData = this.importedData.concat(data);
+      // Filter out rows where all columns are empty
+      const filteredData = data.filter(row => {
+        // Check if any value in the row is not empty
+        return Object.values(row).some(value => value !== '');
+      });
+
+      this.importedData = filteredData.map(row => ({
+        ...row,
+        selected: true 
+      }));
       this.columnTitles = Object.keys(this.importedData[0]);
     },
     selectAllRows() {
@@ -121,34 +130,46 @@ export default {
       }
       return value; 
     },
+    displayDate(dateStr) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const [year, month, day] = dateStr.split('-');
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthName = monthNames[parseInt(month, 10) - 1];
+        return `${day}-${monthName}-${year}`;
+      }
+      return dateStr; 
+    },
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-        let csv = 'Category,Trade,Location 1,Actual Calling Quotation Date  (yyyy-mm-dd),Awaiting Target Date  (yyyy-mm-dd),Remarks\n';
+      let csv = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awading Target Date (dd/mm/yyyy),Remarks\n';
 
-        const hiddenElement = document.createElement('a');
-        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-        hiddenElement.target = '_blank';
+      const hiddenElement = document.createElement('a');
+      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+      hiddenElement.target = '_blank';
 
-        hiddenElement.download = 'La_template.csv';
-        hiddenElement.click();
+      hiddenElement.download = 'La_template.csv';
+      hiddenElement.click();
     },
     async saveData() {
+      this.loading = true;
       const selectedFormData = this.formDataList.filter(formData => formData.selected);
       const selectedImportedData = this.importedData.filter(importedRow => importedRow.selected);
 
       const transformedCQImport = selectedImportedData.map(unit => ({
-        tradeCategory: unit["category"],
-        trade: unit["trade"],
-        location: unit["location 1"],
-        CallingQuotationDate: unit["Actuall Calling Quotation Date"],
-        awadingtaget: unit["Awading Target Date"],
+        tradeCategory: unit["Category"],
+        trade: unit["Trade"],
+        location: unit["Location 1"],
+        callingquotationDate: unit["Actual Calling Quotation Date (dd/mm/yyyy)"],
+        awadingtaget: unit["Awading Target Date (dd/mm/yyyy)"],
         remarks: unit["Remarks"],
       }));
 
+    
+
       try {
-       const Message = await CallofQuotationController.addCQ(selectedFormData, transformedCQImport);
+        const Message = await CallofQuotationController.addCQ(selectedFormData, transformedCQImport);
         const UpdateMessage = Message[0]; 
         this.$emit('message', UpdateMessage);
 
@@ -159,6 +180,7 @@ export default {
           }
         });
 
+        
         selectedImportedData.forEach(importedRow => {
           const index = this.importedData.indexOf(importedRow);
           if (index !== -1) {
@@ -166,12 +188,16 @@ export default {
           }
         });
 
-        this.selectAll = false;
+         this.selectAll = false;
+         window.location.reload();
 
       } catch (error) {
+        this.loading = false;
         const FailMessage = "Error updating access permission: " + error.errorMessage;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
+      } finally {
+        this.loading = false; 
       }
     }
   },

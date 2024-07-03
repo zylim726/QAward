@@ -9,42 +9,52 @@
         <br />
         <div class="form-container">
           <div class="left-box">
-            <p>Trade Category : </p>
+            <p style="text-align: left;">Trade Category : </p>
             <input
               type="text"
               v-model="cquotationData.trade_category"
               placeholder="Category"
               class="typeInput"
+              readonly
+              style="background-color: #fef4e4;"
             />
-            <p>Trade : </p>
+            <p style="text-align: left;">Trade : </p>
             <input
               type="text"
               v-model="cquotationData.trade"
               placeholder="Trade"
               class="typeInput"
+              readonly
+              style="background-color: #fef4e4;"
             />
-            <p>Location 1 : </p>
+            <p style="text-align: left;">Location 1 : </p>
             <input
               type="text"
               v-model="cquotationData.trade_location1"
               placeholder="Location 1"
               class="typeInput"
+              readonly
+              style="background-color: #fef4e4;"
             />
-            <p>Budget Amount : </p>
+            <p style="text-align: left;">Actual Calling Quotation Date : </p>
             <input
               type="text"
-              v-model="cquotationData.budget_amount"
-              placeholder="AA Budget Amount"
-              class="typeInput"
-            />
-            <p>Actual Calling Quotation Date : </p>
-            <input
-              type="date"
-              v-model="cquotationData.actual_calling_quotation_date"
+              :value="formatDate(cquotationData.actual_calling_quotation_date)"
               placeholder="Actual Calling Quotation Date"
               class="typeInput"
+              readonly
+              style="background-color: #fef4e4;"
             />
-            <p>Remarks : </p>
+            <p style="text-align: left;">Awarding Target Date : </p>
+            <input
+              type="text"
+              :value="formatDate(cquotationData.awading_target_date)"
+              placeholder="Awarding Target Date"
+              class="typeInput"
+              readonly
+              style="background-color: #fef4e4;"
+            />
+            <p style="text-align: left;">Remarks : </p>
             <input
               type="text"
               v-model="cquotationData.remarks"
@@ -54,19 +64,23 @@
           </div>
           <div class="right-box">
             <div v-for="(unit, index) in unitResult" :key="index">
-              <p>Unit Type {{ index + 1 }} : </p>
+              <p style="text-align: left;">Unit Type {{ index + 1 }} : </p>
               <input
                 type="text"
                 v-model="unit.type"
                 placeholder="Unit Type"
                 class="typeInput"
+                readonly
+                style="background-color: #fef4e4;"
               />
-              <p>Unit Quantity : </p>
+              <p style="text-align: left;">Unit Quantity : </p>
               <input
                 type="text"
                 v-model="unit.quantity"
                 placeholder="Unit Quantity"
                 class="typeInput"
+                readonly
+                style="background-color: #fef4e4;"
               />
             </div>
           </div>
@@ -79,7 +93,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
@@ -158,8 +171,20 @@ export default {
         const FailMessage = "Error updating data: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       }
-    }
-  }
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      const options = { day: "2-digit", month: "short", year: "numeric" };
+      return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
+    },
+  },
 };
 </script>
 
+<style scoped>
+.message {
+  color: red;
+  text-align: center;
+}
+</style>
