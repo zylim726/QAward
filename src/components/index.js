@@ -2,8 +2,6 @@
 import ComparisonTable from "./Tables/ComparisonTable.vue";
 import ApprovalTable from "./Tables/ApprovalTable.vue";
 import CreatecqTable from "./Tables/CreatecqTable.vue";
-import VendorTable from "./Tables/VendorTable.vue";
-import TotalTable from "./Tables/TotalTable.vue";
 import ProjectcontrolTable from "./Tables/ProjectcontrolTable.vue";
 import AccessuserTable from "./Tables/AccessuserTable.vue";
 import PermissionTable from "./Tables/PermissionTable.vue";
@@ -36,8 +34,6 @@ export {
   Modal,
   CreatecqTable,
   DescriptionImport,
-  VendorTable,
-  TotalTable,
   QuotationImport,
   SubmitModal,
   ProjectcontrolTable,

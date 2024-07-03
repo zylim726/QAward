@@ -52,8 +52,8 @@
                   <th scope="col">Category</th>
                   <th scope="col">Trade</th>
                   <th scope="col">Location 1</th>
-                  <th scope="col">Actual Calling Quotation Date (mm/dd/yyyy)</th>
-                  <th scope="col">Awarding Target Date (mm/dd/yyyy)</th>
+                  <th scope="col">Actual Calling Quotation Date (dd/mm/yyyy)</th>
+                  <th scope="col">Awarding Target Date (dd/mm/yyyy)</th>
                   <th scope="col">Remarks</th>
                 </tr>
               </thead>
@@ -189,13 +189,16 @@ export default {
     },
     displayDate(dateStr) {
       if (dateStr === "0000-00-00") {
-        return ""; 
+        return "";
       }
+      
       if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        const [year, month, day] = dateStr.split('-');
-        return `${month}/${day}/${year}`;
+        const date = new Date(dateStr);
+        const options = { day: "2-digit", month: "short", year: "numeric" };
+        return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
       }
-      return dateStr; 
+      
+      return dateStr;
     },
     getSelectedUnitTypes() {
       return this.UnitTypes.filter(formData => formData.selected);
@@ -206,3 +209,4 @@ export default {
   },
 };
 </script>
+

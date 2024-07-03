@@ -64,7 +64,7 @@
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
               <h6>Awading Target Data :</h6>
-              <h3 class="titleHeader">{{ callQuotation.awading_target_date }}</h3>
+              <h3 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) }}</h3>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
                 <div class="tooltip">
@@ -173,6 +173,22 @@ export default {
         this.UpdateMessage = '';
       }, 2000);
     },
+    formatDate(dateTimeString) {
+      if (!dateTimeString) return '';
+
+      const date = new Date(dateTimeString);
+      if (isNaN(date.getTime())) {
+        return ''; // Return empty string for invalid dates
+      }
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getMonth()];
+      const year = date.getFullYear();
+
+      return `${day}-${month}-${year}`;
+    }
+    ,
     async getDetailCQ(Id) {
       try {
         const processedData = await CallofQuotationController.getDetailCQ(Id);

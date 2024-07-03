@@ -16,7 +16,7 @@
               placeholder="Category"
               class="typeInput"
               readonly
-                style="background-color: #fef4e4;"
+              style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Trade : </p>
             <input
@@ -25,7 +25,7 @@
               placeholder="Trade"
               class="typeInput"
               readonly
-                style="background-color: #fef4e4;"
+              style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Location 1 : </p>
             <input
@@ -34,25 +34,25 @@
               placeholder="Location 1"
               class="typeInput"
               readonly
-                style="background-color: #fef4e4;"
+              style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Actual Calling Quotation Date : </p>
             <input
-              type="date"
-              v-model="cquotationData.actual_calling_quotation_date"
+              type="text"
+              :value="formatDate(cquotationData.actual_calling_quotation_date)"
               placeholder="Actual Calling Quotation Date"
               class="typeInput"
               readonly
-                style="background-color: #fef4e4;"
+              style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Awarding Target Date : </p>
             <input
-              type="date"
-              v-model="cquotationData.awading_target_date"
+              type="text"
+              :value="formatDate(cquotationData.awading_target_date)"
               placeholder="Awarding Target Date"
               class="typeInput"
               readonly
-                style="background-color: #fef4e4;"
+              style="background-color: #fef4e4;"
             />
             <p style="text-align: left;">Remarks : </p>
             <input
@@ -93,7 +93,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
@@ -172,8 +171,20 @@ export default {
         const FailMessage = "Error updating data: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       }
-    }
-  }
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return "";
+      const date = new Date(dateStr);
+      const options = { day: "2-digit", month: "short", year: "numeric" };
+      return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
+    },
+  },
 };
 </script>
 
+<style scoped>
+.message {
+  color: red;
+  text-align: center;
+}
+</style>

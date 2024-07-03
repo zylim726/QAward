@@ -63,7 +63,6 @@
   </md-card-content>
 </template>
 
-
 <script>
 
 export default {

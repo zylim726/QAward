@@ -43,8 +43,8 @@
             <th scope="col">Category</th>
             <th scope="col">Trade</th>
             <th scope="col">Location 1</th>
-            <th scope="col">Actual Calling Quotation Date (mm/dd/yyyy)</th>
-            <th scope="col">Awading Target Date (mm/dd/yyyy)</th>
+            <th scope="col">Actual Calling Quotation Date (dd/mm/yyyy)</th>
+            <th scope="col">Awading Target Date (dd/mm/yyyy)</th>
             <th scope="col">Remarks</th>
           </tr>
         </thead>
@@ -133,7 +133,9 @@ export default {
     displayDate(dateStr) {
       if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
         const [year, month, day] = dateStr.split('-');
-        return `${month}/${day}/${year}`;
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthName = monthNames[parseInt(month, 10) - 1];
+        return `${day}-${monthName}-${year}`;
       }
       return dateStr; 
     },
@@ -141,7 +143,7 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-      let csv = 'Category,Trade,Location 1,Actual Calling Quotation Date (mm/dd/yyyy),Awading Target Date (mm/dd/yyyy),Remarks\n';
+      let csv = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awading Target Date (dd/mm/yyyy),Remarks\n';
 
       const hiddenElement = document.createElement('a');
       hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
@@ -159,8 +161,8 @@ export default {
         tradeCategory: unit["Category"],
         trade: unit["Trade"],
         location: unit["Location 1"],
-        callingquotationDate: unit["Actual Calling Quotation Date (mm/dd/yyyy)"],
-        awadingtaget: unit["Awading Target Date (mm/dd/yyyy)"],
+        callingquotationDate: unit["Actual Calling Quotation Date (dd/mm/yyyy)"],
+        awadingtaget: unit["Awading Target Date (dd/mm/yyyy)"],
         remarks: unit["Remarks"],
       }));
 

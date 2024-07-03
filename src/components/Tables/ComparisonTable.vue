@@ -158,12 +158,11 @@
                 <div class="right-container">
                   <div class="user-info">
                     <p class="user-name">Name: {{  cmapproval.user[0].name }}</p>
-                    <p class="user-access">Level: CM</p>
                   </div>
                   <p style="margin: 8px 0 10px;">Recommend Award To:</p>
                   <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}</p>
                   <p style="margin: 8px 0 10px;">Date:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.updatedAt }}</p>
+                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ formatDate(cmapproval.updatedAt) }}</p>
                   <p style="margin: 8px 0 10px;">Remarks:</p>
                   <p  class="quotation-select" style="background-color: #EFEFEF4D;height: 180px;" disabled>{{ cmapproval.approval_remarks }}</p>
                 </div>
@@ -304,6 +303,20 @@ export default {
     },
   },
   methods: {
+    formatDate(dateTimeString) {
+      if (!dateTimeString) return '';
+
+      const date = new Date(dateTimeString);
+      if (isNaN(date.getTime())) {
+        return ''; 
+      }
+      const day = String(date.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getMonth()];
+      const year = date.getFullYear();
+
+      return `${day}-${month}-${year}`;
+    },
     generateExcelFile() {
       
       const wb = XLSX.utils.book_new();
@@ -490,7 +503,7 @@ export default {
                 <td><b>${formData.element || ''}</b></td>
                 <td><b>${formData.sub_element || ''}</b></td>
                 <td><b>${formData.description_sub_sub_element || ''}</b></td>
-                <td style="padding-left:60px !important;white-space: pre-wrap;"><b>${formData.description_item}</b></td>
+                <td style="padding-left:10px !important;white-space: pre-wrap;"><b>${formData.description_item}</b></td>
               `;
               tableBody.appendChild(head1Row);
 
@@ -527,11 +540,13 @@ export default {
                 // }
 
                 quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
-                                <td style="text-align:right;border-right:1px solid #ddd !important">${quotationRate.total_quote_amount}</td>`;
+                                <td style="text-align:right;border-right:1px solid #ddd !important">${ this.formatAccounting(quotationRate.total_quote_amount) }</td>`;
               }
               let unitQuantityTDs = '';
               cqUnitType.forEach((cqUnit) => {
-                unitQuantityTDs += `<td style="text-align:center;">${cqUnit.quantity}</td>`;
+                console.log('cqUnit',cqUnit);
+                const quantity = cqUnit.quantity !== undefined ? cqUnit.quantity : 0;
+                unitQuantityTDs += `<td style="text-align:center;">${quantity}</td>`;
               });
 
               const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td>`;
@@ -543,7 +558,7 @@ export default {
                 <td>${formData.element || ''}</td>
                 <td>${formData.sub_element || ''}</td>
                 <td>${formData.description_sub_sub_element || ''}</td>
-                <td style="padding-left:60px !important;white-space: pre-wrap;">${formData.description_item}</td>
+                <td style="padding-left:10px !important;white-space: pre-wrap;">${formData.description_item}</td>
                 <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
@@ -568,11 +583,11 @@ export default {
           let remarks ='';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
             if (subconAmount[0].subcon_id !== 1) {
-              discountGivenTDs += `<td colspan="2">${subconAmount[0].discount_given}</td>`;
-              afterADJDiscountTDs += `<td colspan="2">${subconAmount[0].afterADJDiscount_give}</td>`;
-              overrumTDs += `<td colspan="2">${subconAmount[0].adj_totalSaving}</td>`;
-              winnerTDs += `<td colspan="2" ><b>${subconAmount[0].winner}</b></td>`;
-              rateTDs += `<td colspan="2" >${subconAmount[0].rate}</td>`;
+              discountGivenTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].discount_given)}</td>`;
+              afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].afterADJDiscount_give)}</td>`;
+              overrumTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].adj_totalSaving)}</td>`;
+              winnerTDs += `<td colspan="2" ><b>${this.formatAccounting(subconAmount[0].winner)}</b></td>`;
+              rateTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].rate)}</td>`;
             }else{
               discountGivenTDs += `<td colspan="2"></td>`;
               afterADJDiscountTDs += `<td colspan="2"></td>`;
@@ -580,10 +595,11 @@ export default {
               winnerTDs += `<td colspan="2" ><b></b></td>`;
               rateTDs += `<td colspan="2" ></td>`;
             }
-            bqTotalAmountTDs += `<td colspan="2" >${subconAmount[0].bq_totalAmount}</td>`;
-            adjTotalAmountTDs += `<td colspan="2" >${subconAmount[0].totalSubconAmount}</td>`;
-            remarks += `<td colspan="2">${subconAmount[0].remark ? subconAmount[0].remark : ''}</td>`;
+            bqTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].bq_totalAmount)}</td>`;
+            adjTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].totalSubconAmount)}</td>`;
+            remarks += `<td colspan="2" style="white-space: pre-wrap;line-height:25px">${subconAmount[0].remark ? subconAmount[0].remark : ''}</td>`;
           }
+
           
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
@@ -632,6 +648,12 @@ export default {
       } finally {
         this.isLoading = false;
       }
+    },
+    formatAccounting(value) {
+      if (!value) {
+        return '0.00';
+      }
+      return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     },
     async getCQApproval(id) {
       try {

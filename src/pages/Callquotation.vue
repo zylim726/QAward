@@ -108,11 +108,15 @@
                       <td>{{ callQuotation.trade }}</td>
                       <td>{{ callQuotation.location }}</td>
                       <td>{{ callQuotation.numberOfQuotations }}</td>
-                      <td>{{ callQuotation.CallingQuotationDate !== '0000-00-00' ? callQuotation.CallingQuotationDate : '' }}</td>
+                      <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
-                      <td>{{ callQuotation.actuallDoneDate !== '0000-00-00' ? callQuotation.actuallDoneDate : '' }}</td>
-                      <template v-if="callQuotation.cqApprovals && callQuotation.cqApprovals.length > 0" >
-                        <td v-for="(approval, index) in callQuotation.cqApprovals" :key="index">{{ formatDate(approval.updatedAt) }}</td>
+                      <td>{{ formatDate(callQuotation.actuallDoneDate) !== '0000-00-00' ? formatDate(callQuotation.actuallDoneDate) : '' }}</td>
+                      <template v-if="callQuotation.cqApprovals && callQuotation.cqApprovals.length > 0"  >
+                        <td v-for="(approval, index) in callQuotation.cqApprovals" :key="index">
+                          <span v-if="approval.approval_type === 'CM Approval'">{{ formatDate(approval.updatedAt) }} 
+                            <br><h9 style="font-size: 12px;">({{ approval.user[0].name }})</h9></span>
+                          <span v-else>{{ formatDate(approval.updatedAt) }}</span>
+                        </td>
                       </template>
                       <template v-else>
                         <td></td>
@@ -128,12 +132,12 @@
                       <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
                       <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
                       <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
-                      <td>{{ callQuotation.budget_amount }}</td>
-                      <td>{{ callQuotation.adj_budget_amount }}</td>
-                      <td>{{ callQuotation.subcontract_amount }}</td>
-                      <td>{{ callQuotation.adj_subcontract_amount}}</td>
-                      <td>{{ callQuotation.total_saving}}</td>
-                      <td>{{ callQuotation.provisional_sum}}</td>
+                      <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.adj_budget_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.subcontract_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.adj_subcontract_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation.total_saving) }}</td>
+                      <td>{{ formatAccounting(callQuotation.provisional_sum) }}</td>
                       <td>
                         <span class="notify-status">{{ callQuotation.status }}</span>
                       </td>
@@ -204,6 +208,12 @@ export default {
     await this.checkPermission();
   },
   methods: {
+    formatAccounting(value) {
+      if (!value) {
+        return '0.00';
+      }
+      return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
       const table = document.querySelector('table');
@@ -259,18 +269,21 @@ export default {
       }
     },
     formatDate(dateTimeString) {
-      if (!dateTimeString) return ''; 
+      if (!dateTimeString) return '';
+
       const date = new Date(dateTimeString);
       if (isNaN(date.getTime())) {
-        return ''; 
+        return ''; // Return empty string for invalid dates
       }
 
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); 
       const day = String(date.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[date.getMonth()];
+      const year = date.getFullYear();
 
-      return `${year}-${month}-${day}`;
-    },
+      return `${day}-${month}-${year}`;
+    }
+
 
   },
 };
