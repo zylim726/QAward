@@ -149,8 +149,3 @@ export default {
 </script>
 
 
-<style>
-.nested-table td {
-  padding: 15px !important;
-}
-</style>

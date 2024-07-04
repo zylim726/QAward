@@ -3,7 +3,7 @@
     flex-wrap: wrap;
     justify-content: center;
     text-align: left;
-    background-color: orange;
+    background-color: $orange;
 }
 
 .view-item {
@@ -24,8 +24,8 @@
 }
 
 .view-card {
-    background-color: #fff;
-    border: 1px solid orange;
+    background-color: $white;
+    border: 1px solid $orange;
     border-radius: 8px;
     padding: 20px;
 }
@@ -64,7 +64,7 @@
 }
 
 .modal-content {
-    background-color: #fff; 
+    background-color: $white; 
     padding: 16px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -103,9 +103,9 @@
 .modal-content td {
     padding: 12px; 
     text-align: left;
-    border: 1px solid #ddd; 
+    border: 1px solid $table-border-color; 
     border-radius: 8px; 
-    background-color: white; 
+    background-color: $white; 
 }
 
 
@@ -128,7 +128,7 @@
   }
   
   .Inforrmodal-content {
-    background-color: #fff;
+    background-color: $white;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 100%;
@@ -161,7 +161,7 @@
     border-radius: 4px;
     cursor: pointer;
     float: right;
-    background-color: white;
+    background-color: $white;
     margin-left: -54px;
     margin-top: 91px;
   }

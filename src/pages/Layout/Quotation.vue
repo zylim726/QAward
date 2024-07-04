@@ -382,74 +382,156 @@ export default {
             }, 2000);
         }
     },
+    // downloadExcelTemplate() {
+    //   const dataTable = this.$refs.dataTable;
+
+    //   if (!dataTable) {
+    //     console.error("Data table reference not found.");
+    //     return;
+    //   }
+
+    //   const clonedTable = dataTable.cloneNode(true);
+
+    //   if (!clonedTable) {
+    //     console.error("Cloned table not created.");
+    //     return;
+    //   }
+
+    //   // Remove IDs to avoid duplicate elements in the document
+    //   clonedTable.querySelectorAll('[id]').forEach(element => {
+    //     element.removeAttribute('id');
+    //   });
+
+    //   // Create a new workbook and add a worksheet
+    //   const workbook = new ExcelJS.Workbook();
+    //   const worksheet = workbook.addWorksheet('Sheet1');
+
+    //   // Add table rows to the worksheet, skipping the first row
+    //   const rows = clonedTable.querySelectorAll('tr');
+    //   rows.forEach((row, index) => {
+    //     if (index === 0) return; // Skip the first row
+    //     const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
+    //     worksheet.addRow(cells);
+    //   });
+
+    //   // Lock cells with text or numbers and leave blank cells unlocked
+    //   worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+    //     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+    //       if (cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+    //         cell.protection = { locked: true };  
+    //       } else {
+    //         cell.protection = { locked: false };  
+    //       }
+    //     });
+    //   });
+
+    //   // Protect the sheet
+    //   worksheet.protect('12345', {
+    //     selectLockedCells: false,
+    //     selectUnlockedCells: true,
+    //     formatCells: false,
+    //     formatColumns: false,
+    //     formatRows: false,
+    //     insertColumns: false,
+    //     insertRows: false,
+    //     insertHyperlinks: false,
+    //     deleteColumns: false,
+    //     deleteRows: false
+    //   });
+
+    //   // Write the workbook to a file
+    //   workbook.xlsx.writeBuffer().then(buffer => {
+    //     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    //     const link = document.createElement('a');
+    //     link.href = URL.createObjectURL(blob);
+    //     link.download = 'Quotation.xlsx';
+    //     link.click();
+    //   }).catch(err => {
+    //     console.error(err);
+    //   });
+    // }
     downloadExcelTemplate() {
-      const dataTable = this.$refs.dataTable;
+  const dataTable = this.$refs.dataTable;
 
-      if (!dataTable) {
-        console.error("Data table reference not found.");
-        return;
+  if (!dataTable) {
+    console.error("Data table reference not found.");
+    return;
+  }
+
+  const clonedTable = dataTable.cloneNode(true);
+
+  if (!clonedTable) {
+    console.error("Cloned table not created.");
+    return;
+  }
+
+  // Remove IDs to avoid duplicate elements in the document
+  clonedTable.querySelectorAll('[id]').forEach(element => {
+    element.removeAttribute('id');
+  });
+
+  // Create a new workbook and add a worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Sheet1');
+
+  // Retrieve column widths from the original table
+  const colWidths = Array.from(clonedTable.querySelectorAll('tr:first-child th')).map(th => {
+    const style = window.getComputedStyle(th);
+    const width = style.width.replace('px', '');
+    return parseFloat(width);
+  });
+
+  // Add table rows to the worksheet, skipping the first row
+  const rows = clonedTable.querySelectorAll('tr');
+  rows.forEach((row, index) => {
+    if (index === 0) return; // Skip the first row
+    const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
+    worksheet.addRow(cells);
+  });
+
+  // Set the column widths in the worksheet
+  worksheet.columns = worksheet.columns.map((col, index) => ({
+    ...col,
+    width: colWidths[index] / 7.5 // Convert px to Excel width (approximation)
+  }));
+
+  // Lock cells with text or numbers and leave blank cells unlocked
+  worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      if (cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
+        cell.protection = { locked: true };
+      } else {
+        cell.protection = { locked: false };
       }
+    });
+  });
 
-      const clonedTable = dataTable.cloneNode(true);
+  // Protect the sheet
+  worksheet.protect('12345', {
+    selectLockedCells: false,
+    selectUnlockedCells: true,
+    formatCells: false,
+    formatColumns: false,
+    formatRows: false,
+    insertColumns: false,
+    insertRows: false,
+    insertHyperlinks: false,
+    deleteColumns: false,
+    deleteRows: false
+  });
 
-      if (!clonedTable) {
-        console.error("Cloned table not created.");
-        return;
-      }
+  // Write the workbook to a file
+  workbook.xlsx.writeBuffer().then(buffer => {
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Quotation.xlsx';
+    link.click();
+  }).catch(err => {
+    console.error(err);
+  });
+}
 
-      // Remove IDs to avoid duplicate elements in the document
-      clonedTable.querySelectorAll('[id]').forEach(element => {
-        element.removeAttribute('id');
-      });
-
-      // Create a new workbook and add a worksheet
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Sheet1');
-
-      // Add table rows to the worksheet, skipping the first row
-      const rows = clonedTable.querySelectorAll('tr');
-      rows.forEach((row, index) => {
-        if (index === 0) return; // Skip the first row
-        const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
-        worksheet.addRow(cells);
-      });
-
-      // Lock cells with text or numbers and leave blank cells unlocked
-      worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-          if (cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
-            cell.protection = { locked: true };  
-          } else {
-            cell.protection = { locked: false };  
-          }
-        });
-      });
-
-      // Protect the sheet
-      worksheet.protect('yourPassword', {
-        selectLockedCells: false,
-        selectUnlockedCells: true,
-        formatCells: false,
-        formatColumns: false,
-        formatRows: false,
-        insertColumns: false,
-        insertRows: false,
-        insertHyperlinks: false,
-        deleteColumns: false,
-        deleteRows: false
-      });
-
-      // Write the workbook to a file
-      workbook.xlsx.writeBuffer().then(buffer => {
-        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'Quotation.xlsx';
-        link.click();
-      }).catch(err => {
-        console.error(err);
-      });
-    }
   },
 };
 </script>
