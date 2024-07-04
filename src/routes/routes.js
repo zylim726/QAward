@@ -27,7 +27,7 @@ const routes = [
     children: [
       {
         path: "projectlist",
-        name: "Project List123",
+        name: "Project List456",
         component: ProjectList,
         meta: { requiresAuth: true },
       },
