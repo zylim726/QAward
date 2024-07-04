@@ -59,10 +59,10 @@
                       <th>Check By</th>
                       <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 0" 
                           :colspan="callQuotation[0].projectApproval.length">
-                        Approval By
+                        Approved By
                       </th>
                       <th v-else>
-                        Approval By
+                        Approved By
                       </th>
                       <th>Awarding Target Date</th>
                       <th>Remarks</th>
@@ -127,7 +127,7 @@
                           <td></td>
                         </template>
                       </template>
-                      <td>{{ callQuotation.awadingtargetdate !== '0000-00-00' ? callQuotation.awadingtargetdate : '' }}</td>
+                      <td>{{ formatDate(callQuotation.awadingtargetdate) !== '0000-00-00' ? formatDate(callQuotation.awadingtargetdate) : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
                       <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
                       <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
@@ -138,7 +138,7 @@
                       <td>{{ formatAccounting(callQuotation.adj_subcontract_amount) }}</td>
                       <td>{{ formatAccounting(callQuotation.total_saving) }}</td>
                       <td>{{ formatAccounting(callQuotation.provisional_sum) }}</td>
-                      <td>
+                      <td> 
                         <span class="notify-status">{{ callQuotation.status }}</span>
                       </td>
                     </tr>

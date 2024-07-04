@@ -230,7 +230,7 @@
     font-size: 14px;
     text-align: left;
     list-style: none;
-    background-color: #fff;
+    background-color: $white;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid #ccc;
@@ -336,7 +336,6 @@
 }
 
 .md-ripple{
-  -webkit-mask-image: none;
   overflow: visible;
 
   > span{
@@ -629,7 +628,7 @@
   .navbar-toggle .icon-bar {
         display: block;
         position: relative;
-        background: #fff;
+        background: $white;
         width: 24px;
         height: 2px;
         border-radius: 1px;
@@ -726,7 +725,7 @@
       .open .dropdown-menu > li > a:hover,
       .open .dropdown-menu > li > a:focus,
       .navbar-nav .open .dropdown-menu > li > a:active {
-          color: white;
+          color: $white;
       }
 
       & > li > a,
@@ -749,8 +748,8 @@
               border-top-color: #777;
           }
           &:active .caret {
-              border-bottom-color: white;
-              border-top-color: white;
+              border-bottom-color: $white;
+              border-top-color: $white;
           }
       }
 
@@ -759,9 +758,7 @@
   .dropdown-menu {
       display: none;
   }
-  .navbar-fixed-top {
-      -webkit-backface-visibility: hidden;
-  }
+
   #bodyClick {
       height: 100%;
       width: 100%;

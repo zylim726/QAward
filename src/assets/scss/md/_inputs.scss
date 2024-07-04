@@ -454,9 +454,9 @@ select.form-control {
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
-  border: 1.5px solid orange;
+  border: 1.5px solid $orange;
   border-radius: 15px;
-  background-color: white;
+  background-color: $white;
   line-height: 4;
 
   /* Center the login box */
@@ -489,7 +489,7 @@ select.form-control {
 .input-data input:valid ~ label{
   transform: translateY(-27px);
   font-size: 13px;
-  color: orange;
+  color: $orange;
 }
 
 .input-data label{
@@ -516,7 +516,7 @@ select.form-control {
 
 .left-information{
   max-width: 400px;
-  background: #fff;
+  background: $white;
   width: 400px;
   padding: 18px 29px 29px 29px;
   box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
@@ -594,7 +594,7 @@ form .form-row .input-data{
 
 .warning {
   background-color: #fef4e4;
-  color: orange;
+  color: $orange;
   border: 1px solid #fef4e4;
 }
 
@@ -616,7 +616,7 @@ background-color: #f8d7da;
 
 .typeInput:focus {
   outline: none;
-  border-color: orange;
+  border-color: $orange;
 }
 
 .confirmation-message {
@@ -624,7 +624,7 @@ background-color: #f8d7da;
   justify-content: center;
   align-items: center;
   background-color: #fef4e4;
-  border: 1px solid #ddd;
+  border: 1px solid $table-border-color;
   border-radius: 5px;
   padding: 10px;
   margin-top: 20px;
@@ -640,7 +640,7 @@ background-color: #f8d7da;
 
 
 .dropdownSubcon {
-  border: 1px solid orange;
+  border: 1px solid $orange;
   width: 40%;
   height: 21%;
   border-radius: 6px;
@@ -693,6 +693,6 @@ background-color: #f8d7da;
 
 .cmApprovalH3{
   display: contents;
-  color: orange;
+  color: $orange;
   font-size: 18px;
 }

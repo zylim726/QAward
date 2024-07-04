@@ -15,7 +15,7 @@
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
-        <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px">
+        <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" v-if="!isLoading">
           <div class="tooltip" >
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
             <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
@@ -108,7 +108,7 @@
         <tbody>
         </tbody>
         <br>
-        <tfoot style="line-height: 2px !important;">
+        <tfoot style="line-height: 22px !important;">
         </tfoot>
       </table>
       <br />
@@ -870,9 +870,7 @@ export default {
   text-align: right;
   border-right: 1px solid #ddd;
 }
-.nested-table th, .nested-table td {
-    padding: 13px !important;
-}
+
 .img {
   width: 100px  !important;
   height: 50px;

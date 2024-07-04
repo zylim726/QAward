@@ -99,8 +99,8 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 .login button {
     width: 100%;
     padding: 10px;
-    background-color: orange;
-    color: #fff;
+    background-color: $orange;
+    color: $white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
@@ -119,9 +119,9 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 .save-button {
     position: absolute;
     padding: 8px 16px;
-    background-color: orange;
+    background-color: $orange;
     border: none;
-    color: white;
+    color: $white;
     font-size: 14px;
     cursor: pointer;
     border-radius: 4px;
@@ -136,13 +136,13 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
     border-radius: 4px;
     cursor: pointer;
     float: right;
-    background-color: white;
+    background-color: $white;
     margin-right: -25px;
 }
 
 .mdIcon {
     margin:6px;
-    color: orange !important; 
+    color: $orange !important; 
     font-size: 28px !important;
     cursor: pointer;
     float: right;
@@ -150,7 +150,7 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 }
 
 .PostmdIcon{
-  color: orange !important;
+  color: $orange !important;
   font-size: 30px;
   cursor: pointer;
 }
@@ -161,8 +161,8 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 }
 
 .btn-save {
-  background-color: orange;
-  color: white;
+  background-color: $orange;
+  color: $white;
   border: none;
   padding: 5px 15px;
   font-size: 16px;
@@ -175,7 +175,7 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 
   
 .doneAll{
-  color: orange !important;
+  color: $orange !important;
 }
   
   
@@ -189,9 +189,9 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
   justify-content: center;
 }
 .edit-button {
-  background: orange;
-  border: 1px solid orange;
-  color: white;
+  background: $orange;
+  border: 1px solid $orange;
+  color: $white;
 }
 
 .btnList button {
@@ -207,12 +207,12 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 
 .btn-rejected {
   background-color: #FF6347; /* Tomato */
-  color: white;
+  color: $white;
 }
 
 .btn-approval {
   background-color: #32CD32; /* Lime Green */
-  color: white;
+  color: $white;
 }
 
 .confirmation-message .btn-save {
@@ -231,19 +231,19 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
   margin-right: 10px;
   border: none;
   border-radius: 5px;
-  background-color: #f0f0f0;
+  background-color: $gray-lighter;
   color: #333;
   font-weight: bold;
   cursor: pointer;
 }
 
 .step-button.active {
-  background-color: orange;
-  color: #fff;
+  background-color: $orange;
+  color: $white;
 }
 .btn-confirm {
-  background-color: orange;
-    color: white;
+  background-color: $orange;
+    color: $white;
     border: none;
     padding: 5px 15px;
     font-size: 16px;

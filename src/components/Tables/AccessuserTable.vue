@@ -103,12 +103,4 @@ export default {
 };
 </script>
 
-<style>
-.nested-table th,
-.nested-table td {
-  padding: 19px !important;
-}
 
-
-
-</style>
