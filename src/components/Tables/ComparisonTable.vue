@@ -1,21 +1,25 @@
 <template>
   <div>
-    <div v-if="isLoading" class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+    <!--  -->
+    <div v-if="isLoading" class="spinner-border" role="status">
+      <span class="visually-hidden">   
+        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...</span>
     </div>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="container" style="margin-top: 20px">
-      <div class="search-container">
+      <div class="search-container" v-if="!isLoading">
         <form class="Searchbar">
           <input type="text" v-model="searchQuery" @input="handleInputChange" placeholder="Search Description....." />
         </form>
       </div>
-      <div class="filter-container">
+      <div class="filter-container" v-if="!isLoading">
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
-        <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" v-if="!isLoading">
+        <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" >
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
             <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
@@ -213,6 +217,7 @@
     <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
+
 
 <script>
 const XLSX = require('xlsx');
@@ -503,7 +508,7 @@ export default {
                 <td><b>${formData.element || ''}</b></td>
                 <td><b>${formData.sub_element || ''}</b></td>
                 <td><b>${formData.description_sub_sub_element || ''}</b></td>
-                <td style="padding-left:10px !important;white-space: pre-wrap;"><b>${formData.description_item}</b></td>
+                <td style="padding-left:10px !important;white-space: inherit;min-width:300px;"><b>${formData.description_item}</b></td>
               `;
               tableBody.appendChild(head1Row);
 
@@ -558,7 +563,7 @@ export default {
                 <td>${formData.element || ''}</td>
                 <td>${formData.sub_element || ''}</td>
                 <td>${formData.description_sub_sub_element || ''}</td>
-                <td style="padding-left:10px !important;white-space: pre-wrap;">${formData.description_item}</td>
+                <td style="padding-left:10px !important;white-space: inherit;min-width:300px">${formData.description_item}</td>
                 <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
@@ -604,35 +609,35 @@ export default {
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>BQ Total Amount (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>BQ Total Amount (RM) </b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>ADJ Total Amount (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>ADJ Total Amount (RM) </b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Discount Given (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Discount Given (RM) </b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>After Discount Given (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>After Discount Given (RM) </b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Total Saving / Overrun (RM)</b></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Total Saving / Overrun (RM) </b></td>
               ${overrumTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"> </td>
               ${rateTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"></td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}"> </td>
               ${winnerTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}">Remarks</td>
+              <td colspan="${isHide ? 7 : GetHidenumber + 7}">Remarks </td>
               ${remarks}  
             </tr>
           `;
@@ -689,7 +694,7 @@ export default {
         this.cmCQapproval = response.filter(approval => approval.approval_status === 'Approved');
   
       } catch (error) {
-        this.FailMessage = 'Error CM approval:', error;
+        // this.FailMessage = 'Error CM approval:', error;
       }
     },
     async getProject(id) {

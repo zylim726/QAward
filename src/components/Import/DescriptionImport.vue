@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-spinner">Loading...</div>
+    <div v-if="loading" class="spinner-border" role="status">
+      <span class="visually-hidden">   
+        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...</span>
     </div>
     <label
       for="desciptionInput"
