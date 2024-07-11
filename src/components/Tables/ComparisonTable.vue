@@ -587,6 +587,7 @@ export default {
           let rateTDs = '';
           let remarks ='';
           for (const subconAmount of Object.values(totalQuotationAmounts)) {
+           
             if (subconAmount[0].subcon_id !== 1) {
               discountGivenTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].discount_given)}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].afterADJDiscount_give)}</td>`;
@@ -874,6 +875,7 @@ export default {
 .nested-table tfoot td {
   text-align: right;
   border-right: 1px solid #ddd;
+  padding-right: 10px;
 }
 
 .img {

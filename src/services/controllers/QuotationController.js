@@ -11,7 +11,7 @@ const QuotationController = {
             headers,
         });
 
-        
+        console.log('quotation',QuotationData);
         const calculateSubcon = getSubcon.data.data;
         let SubconListId = "";
         let subconIdToRetrieve = null;
@@ -32,6 +32,8 @@ const QuotationController = {
                     break; 
                 }
             }
+
+            console.log('subconId',subconIdToRetrieve);
 
             if (subconIdToRetrieve === null) {
                 

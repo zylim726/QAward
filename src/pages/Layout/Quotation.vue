@@ -213,7 +213,9 @@ export default {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
+        console.log('this.Description',this.Description);
         this.cqUnit = processedData[0].cqUnitType || [];
+        console.log('this cqUnit',this.cqUnit);
       } catch (error) {
         console.error('Error fetching Description:', error);
         throw error;
@@ -312,7 +314,7 @@ export default {
 
           let unitQuantityTDs = '';
           cqUnitType.forEach(cqUnit => {
-            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adjQty}</td>`;
+            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adj_quantity}</td>`;
           });
 
           const head2Row = document.createElement('tr');
@@ -371,25 +373,25 @@ export default {
             }
 
             if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-              
+              console.log('get data',QuotationData);
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
-              const concatenatedMessage = SuccessMessage.join(', ');
-              this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
-              setTimeout(() => {
-                this.UpdateMessage = '';
-              }, 2500);
-              const routeData = this.$router.resolve({
-                  name: 'Subcon Comparison',
-                  query: { cqID: this.$route.query.cqId }
-              });
+              // const concatenatedMessage = SuccessMessage.join(', ');
+              // this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
+              // setTimeout(() => {
+              //   this.UpdateMessage = '';
+              // }, 2500);
+              // const routeData = this.$router.resolve({
+              //     name: 'Subcon Comparison',
+              //     query: { cqID: this.$route.query.cqId }
+              // });
 
-               window.open(routeData.href, '_blank');
+              //  window.open(routeData.href, '_blank');
             } else {
-              this.FailMessage = "Error: Rate data is empty";
-              setTimeout(() => {
-                this.UpdateMessage = '';
-                window.location.reload();
-              }, 2000);
+              // this.FailMessage = "Error: Rate data is empty";
+              // setTimeout(() => {
+              //   this.UpdateMessage = '';
+              //   window.location.reload();
+              // }, 2000);
             }
 
 
@@ -402,48 +404,48 @@ export default {
         }
     },
     downloadExcelTemplate() {
-  const dataTable = this.$refs.dataTable;
+      const dataTable = this.$refs.dataTable;
 
-  if (!dataTable) {
-    console.error("Data table reference not found.");
-    return;
-  }
+      if (!dataTable) {
+        console.error("Data table reference not found.");
+        return;
+      }
 
-  const clonedTable = dataTable.cloneNode(true);
+      const clonedTable = dataTable.cloneNode(true);
 
-  if (!clonedTable) {
-    console.error("Cloned table not created.");
-    return;
-  }
+      if (!clonedTable) {
+        console.error("Cloned table not created.");
+        return;
+      }
 
-  // Remove IDs to avoid duplicate elements in the document
-  clonedTable.querySelectorAll('[id]').forEach(element => {
-    element.removeAttribute('id');
-  });
+      // Remove IDs to avoid duplicate elements in the document
+      clonedTable.querySelectorAll('[id]').forEach(element => {
+        element.removeAttribute('id');
+      });
 
-  // Create a new workbook and add a worksheet
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Sheet1');
+      // Create a new workbook and add a worksheet
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sheet1');
 
-  // Add table rows to the worksheet, skipping the first row
-  const rows = clonedTable.querySelectorAll('tr');
-  rows.forEach((row, index) => {
-    if (index === 0) return; // Skip the first row
-    const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
-    worksheet.addRow(cells);
-  });
+      // Add table rows to the worksheet, skipping the first row
+      const rows = clonedTable.querySelectorAll('tr');
+      rows.forEach((row, index) => {
+        if (index === 0) return; // Skip the first row
+        const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
+        worksheet.addRow(cells);
+      });
 
-  // Write the workbook to a file
-  workbook.xlsx.writeBuffer().then(buffer => {
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Quotation.xlsx';
-    link.click();
-  }).catch(err => {
-    console.error(err);
-  });
-}
+      // Write the workbook to a file
+      workbook.xlsx.writeBuffer().then(buffer => {
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Quotation.xlsx';
+        link.click();
+      }).catch(err => {
+        console.error(err);
+      });
+    }
 
   },
 };
