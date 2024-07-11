@@ -163,7 +163,7 @@
 }
 
 .md-menu-content{
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+  box-shadow: 0 2px 5px 0 $gray-lighter;
   border-radius: $border-radius-base !important;
   overflow: hidden;
 
@@ -233,11 +233,11 @@
     background-color: $white;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    border: 1px solid #ccc;
-    border: 1px solid rgba(0,0,0,.15);
+    border: 1px solid $gray-light;
+    border: 1px solid $gray-lighter;
     border-radius: 4px;
-    -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    -webkit-box-shadow: 0 6px 12px $gray-light;
+    box-shadow: 0 6px 12px $gray-lighter;
 
     li {
       padding: 10px;
@@ -247,10 +247,10 @@
 }
 .dropdown-menu {
     border: 0;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    box-shadow: 0 2px 5px 0 $gray-light;
 
     .divider {
-        background-color: rgba(0, 0, 0, .12);
+        background-color: $gray-lighter;
     }
 
 
@@ -277,7 +277,7 @@
         a:focus,
         a:active {
             background-color: $brand-primary !important;
-            color: #FFFFFF !important;
+            color: $white !important;
         }
     }
 
@@ -291,7 +291,7 @@
             a:focus,
             a:active {
                 background-color: $brand-primary;
-                color: #FFFFFF;
+                color: $white;
                 @include shadow-big-color($brand-primary);
             }
         }
@@ -486,7 +486,7 @@
   }
   .navbar-transparent{
       padding-top: 15px;
-      background-color: rgba(0, 0, 0, 0.45);
+      background-color: $gray-light;
   }
   body,
   html{
@@ -522,7 +522,7 @@
       left: auto;
       z-index: 1032;
       visibility: visible;
-      background-color: #9A9A9A;
+      background-color: $gray-light;
       overflow-y: visible;
       border-top: none;
       text-align: left;
@@ -693,7 +693,7 @@
   }
 
   .dropdown-menu .divider{
-      background-color: rgba(229, 229, 229, 0.15);
+      background-color: $white;
   }
 
   .navbar-nav {
@@ -744,8 +744,8 @@
 
       & .dropdown > a{
           &:hover .caret {
-              border-bottom-color: #777;
-              border-top-color: #777;
+              border-bottom-color: $gray-light;
+              border-top-color: $gray-light;
           }
           &:active .caret {
               border-bottom-color: $white;

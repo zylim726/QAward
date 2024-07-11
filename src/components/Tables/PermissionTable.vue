@@ -223,11 +223,11 @@ export default {
   flex: 1;
   padding: 12px;
   text-align: center;
-  border-bottom: 1px solid #f2f2f2;
+  border-bottom: 1px solid #fef4e4;
 }
 
 .table-header {
-  background-color: #f2f2f2;
+  background-color: #fef4e4;
   font-weight: bold;
 }
 

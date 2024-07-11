@@ -166,7 +166,7 @@ output {
   background-size: 0 2px, 100% 1px;
   background-repeat: no-repeat;
   background-position: center bottom, center calc(100% - 1px);
-  background-color: rgba(0, 0, 0, 0);
+  background-color: $white;
   transition: background 0s ease-out;
   float: none;
   box-shadow: none;
@@ -182,7 +182,7 @@ output {
   &[readonly],
   &[disabled],
   fieldset[disabled] & {
-    background-color: rgba(0, 0, 0, 0);
+    background-color: $white;
   }
 
   &[disabled],
@@ -319,9 +319,9 @@ select.form-control {
 
 
 
-.input-group {  // may be in or outside of form-group
+.input-group {
   .input-group-btn {
-    padding: 0 12px; // match addon spacing
+    padding: 0 12px; 
   }
 
   .input-group-addon {
@@ -392,14 +392,14 @@ select.form-control {
     }
 
     &:after{
-      border-bottom: 1px dotted #d2d2d2;
+      border-bottom: 1px dotted $gray-lighter;
       background-color: transparent!important;
       background-image: none !important;
     }
   }
 
   &:not(.md-disabled):after{
-    background-color: #d2d2d2 !important;
+    background-color: $gray-lighter !important;
   }
 
   &:before{
@@ -417,7 +417,7 @@ select.form-control {
     border: 0;
     border-radius: 0;
     border-bottom: 1px solid transparent;
-    border-color: #d2d2d2 !important;
+    border-color: $gray-lighter !important;
   }
 
   &.md-has-textarea:not(.md-autogrow):before{
@@ -444,7 +444,7 @@ select.form-control {
 
 
 .title {
-  color: black;
+  color: $black;
   text-align: center;
   font-family: Inter,sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
   font-size: 25px;
@@ -470,7 +470,7 @@ select.form-control {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
+  border: 1px solid $gray-lighter;
   border-radius: 10px;
   box-sizing: border-box;
   font-size: 16px;
@@ -483,7 +483,7 @@ select.form-control {
   height: 100%;
   border: none;
   font-size: 17px;
-  border-bottom: 2px solid rgba(0,0,0, 0.12);
+  border-bottom: 2px solid $gray-lighter;
 }
 .input-data input:focus ~ label, 
 .input-data input:valid ~ label{
@@ -505,7 +505,7 @@ select.form-control {
   bottom: 0;
   height: 2px;
   width: 100%;
-  background: 	rgb(250, 213, 165);
+  background: $yellowLight;
 }
 
 .input-data input:focus ~ .underline:before,
@@ -519,7 +519,7 @@ select.form-control {
   background: $white;
   width: 400px;
   padding: 18px 29px 29px 29px;
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+  box-shadow: 0px 0px 10px $gray-lighter;
   text-align: left;
 }
 
@@ -570,7 +570,7 @@ form .form-row .input-data{
   left: 0;
   width: 100%;
   height: 60%;
-  background-color: rgba(0, 0, 0, 0.7); 
+  background-color: $gray-light; 
 }
 
 .message {
@@ -587,28 +587,29 @@ form .form-row .input-data{
 }
 
 .success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background-color: $greenLight;
+  color: $green-600;
+  border: 1px solid $greenLight;
 }
 
 .warning {
-  background-color: #fef4e4;
+  background-color: $orangeLight;
   color: $orange;
-  border: 1px solid #fef4e4;
+  border: 1px solid $orangeLight;
 }
 
 
 .fail {
-background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+background-color: $redLight;
+  color: $red-600;
+  border: 1px solid $redLight;
 }
+
 .typeInput {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid $gray-lighter;
   border-radius: 5px;
   box-sizing: border-box;
   transition: border-color 0.5s ease;
@@ -623,7 +624,7 @@ background-color: #f8d7da;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #fef4e4;
+  background-color: $orangeLight;
   border: 1px solid $table-border-color;
   border-radius: 5px;
   padding: 10px;
@@ -653,16 +654,16 @@ background-color: #f8d7da;
 
 .tooltip .tooltiptext {
   visibility: hidden;
-  background-color: #FFE5B4;
-  color: black;
+  background-color: $yellowLight;
+  color: $black;
   text-align: center;
   border-radius: 15px;
   padding: 10px;
   position: absolute;
   z-index: 1;
-  bottom: 125%; /* Position the tooltip above the element */
+  bottom: 125%; 
   left: 50%;
-  margin-left: -60px; /* Center the tooltip */
+  margin-left: -60px;
 
 }
 

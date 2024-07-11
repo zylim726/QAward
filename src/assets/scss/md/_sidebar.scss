@@ -59,12 +59,12 @@
       }
 
       & .md-list-item-container:hover{
-        background-color: rgba(200, 200, 200, 0.2) !important;
+        background-color: $orange-400 !important;
       }
     }
 
     .md-ripple span .md-ripple-wave{
-      background-color: rgba(200, 200, 200, 0.4) !important;
+      background-color: $gray-lighter !important;
     }
 
 
@@ -100,7 +100,7 @@
 
     .logo-tim{
         border-radius: 50%;
-        border: 1px solid #333;
+        border: 1px solid $black;
         display: block;
         height: 61px;
         width: 61px;
@@ -137,12 +137,12 @@
           }
             &:hover > a,
             .dropdown:hover > a{
-                background: rgba(200, 200, 200, 0.2);
+                background: $gray-lighter;
                 color: $black;
             }
 
             .active {
-                color: #FFFFFF !important;
+                color: $white !important;
 
                 .md-ripple i{
                     opacity: 1;
@@ -173,7 +173,7 @@
             line-height: 30px;
             width: 30px;
             text-align: center;
-            color: #a9afbb;
+            color: $gray-light;
         }
     }
 
@@ -240,7 +240,7 @@
 
     .logo-tim{
         border-radius: 50%;
-        border: 1px solid #333;
+        border: 1px solid $black;
         display: block;
         height: 61px;
         width: 61px;
@@ -259,7 +259,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background-color: rgba(27, 27, 27, 0.87);
+        background-color: $black;
         opacity: .85;
         top: 0;
         left: 0;
@@ -277,7 +277,7 @@
         }
 
         > li > a:focus{
-            background: rgba(200, 200, 200, 0.2);
+            background: $white;
         }
     }
 }
@@ -339,4 +339,12 @@
 .container, .container-sm, .container-md, .container-lg, .container-xl {
     max-width: 100%  !important;
 }
+}
+
+.spinner-border {
+  color: red;
+  text-align: center;
+  font-size: 21px;
+  padding: 10px;
+  margin-bottom: 10px;
 }

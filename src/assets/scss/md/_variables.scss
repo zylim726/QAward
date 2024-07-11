@@ -15,6 +15,7 @@
 $red: #f44336 !default;
 $red-400: #ef5350 !default;
 $red-600: #e53935 !default;
+$redLight: #f8d7da !default;
 
 $blue: #2196f3 !default;
 $cyan: #00bcd4 !default;
@@ -24,20 +25,18 @@ $cyan-600: #00acc1 !default;
 $green: #4caf50 !default;
 $green-400: #66bb6a !default;
 $green-600: #43a047 !default;
+$greenLight: #d4edda !default;
 
-$yellow: #FBC02D !default;
-$yellow-400: #ffee58 !default;
-$yellow-600: #fdd835 !default;
+$yellowLight: #FFE5B4 !default;
 
 $orange: #ff9800 !default;
 $orange-400: #ffa726 !default;
 $orange-600: #fb8c00 !default;
+$orangeLight: #fef4e4 !default;
 
 $black: #495057; 
 $rgb-black: "0,0,0" !default;
 $white: #FFF; 
-$rgb-white: "255,255,255" !default;
-$white-transparent: rgba($white, .8);
 
 $gray-base:              #000 !default;
 $gray-dark:              lighten($gray-base, 20%) !default;   // #333
@@ -150,18 +149,6 @@ $table-border-color:            #ddd !default;
 //== Buttons
 $mdb-btn-font-size-base: 12px !default;
 
-//== Dropdowns
-$mdb-dropdown-font-size: 13px !default;
-$dropdown-bg:                    $white !default;
-$dropdown-border:                rgba(0,0,0,.15) !default;
-$dropdown-fallback-border:       #ccc !default;
-$dropdown-divider-bg:            #e5e5e5 !default;
-$dropdown-link-color:            $gray-dark !default;
-$dropdown-link-hover-color:      darken($gray-dark, 5%) !default;
-$dropdown-link-hover-bg:         #f5f5f5 !default;
-$dropdown-link-disabled-color:   $gray-light !default;
-$dropdown-header-color:          $gray-light !default;
-$dropdown-caret-color:           #000 !default;
 
 //-- Z-index master list
 $zindex-navbar:            1000 !default;
@@ -172,8 +159,6 @@ $zindex-navbar-fixed:      1030 !default;
 $zindex-modal-background:  1040 !default;
 $zindex-modal:             1050 !default;
 
-
-//== Media queries breakpoints
 
 // Extra small screen / phone
 $screen-xs:                  480px !default;
@@ -238,24 +223,15 @@ $navbar-default-brand-color:               $navbar-default-link-color !default;
 $navbar-default-brand-hover-color:         darken($navbar-default-brand-color, 10%) !default;
 $navbar-default-brand-hover-bg:            transparent !default;
 
-// Navbar toggle
-$navbar-default-toggle-hover-bg:           #ddd !default;
-$navbar-default-toggle-icon-bar-bg:        #888 !default;
-$navbar-default-toggle-border-color:       #ddd !default;
 
 
 //=== Inverted navbar
-// Reset inverted navbar basics
-$navbar-inverse-color:                      lighten($gray-light, 15%) !default;
-$navbar-inverse-bg:                         #222 !default;
-$navbar-inverse-border:                     darken($navbar-inverse-bg, 10%) !default;
 
 // Inverted navbar links
 $navbar-inverse-link-color:                 lighten($gray-light, 15%) !default;
 $navbar-inverse-link-hover-color:           $white !default;
 $navbar-inverse-link-hover-bg:              transparent !default;
 $navbar-inverse-link-active-color:          $navbar-inverse-link-hover-color !default;
-$navbar-inverse-link-active-bg:             darken($navbar-inverse-bg, 10%) !default;
 $navbar-inverse-link-disabled-color:        #444 !default;
 $navbar-inverse-link-disabled-bg:           transparent !default;
 

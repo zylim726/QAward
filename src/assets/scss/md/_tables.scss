@@ -66,6 +66,11 @@
   }
 }
 
+
+.tbody td {
+  padding: 6px !important;
+}
+
 .Searchbar {
   display: flex;
   align-items: center;
@@ -111,11 +116,11 @@
 }
 
 .approval-table th {
-  background-color: #f2f2f2;
+  background-color: $gray-lighter;
 }
 
 .approval-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: $gray-lighter;
 }
 
 .approval-table tbody tr:hover {
@@ -127,7 +132,7 @@
   table-layout: fixed;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px $gray-lighter;
 }
 
 .comparison-table th,
@@ -140,7 +145,7 @@
 
 
 .comparison-table th {
-  background-color: #f2f2f2;
+  background-color: $gray-lighter;
   font-size: 16px;
   font-weight: bold;
 }
@@ -167,9 +172,9 @@
 }
 
 .finalTable th {
-  background-color: #f2f2f2;
+  background-color: $gray-lighter;
   font-size: 18px;
-  color: #333;
+  color: $black;
 }
 
 .finalTable .table-heading {
@@ -184,7 +189,7 @@
 
 .finalTable .value {
   font-size: 16px;
-  color: #007bff;
+  color: $blue;
 }
 
 .projectTable-container {
@@ -208,13 +213,13 @@ unittype-container {
 
 .project-table th,
 .project-table td {
-  border: 1px solid #fef4e4;
+  border: 1px solid $orangeLight;
   padding: 12px;
   text-align: left;
 }
 
 .project-table th {
-  background-color: #fef4e4;
+  background-color: $orangeLight;
   font-weight: bold;
 }
 
@@ -230,7 +235,7 @@ unittype-container {
   text-align: left;
 }
 .nested-table th {
-  background-color: #fef4e4;
+  background-color: $orangeLight;
   border:none
 }
 
@@ -253,7 +258,7 @@ label {
   border: 1px solid $orange;
   padding: 15px;
   border-radius: 8px;
-  background-color: #fef4e4;
+  background-color: $orangeLight;
   margin-bottom: 15px;
   width: 100%;
 }

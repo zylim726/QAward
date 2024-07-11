@@ -6,7 +6,7 @@
     overflow: unset;
     z-index: 0 !important;
 
-    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.14);
+    box-shadow: 0 1px 4px 0 $gray-lighter;
     border-radius: $border-radius-base;
     color: $mdb-card-body-text;
     background: $mdb-card-body-background;
@@ -47,7 +47,7 @@
             left: 15px;
             color: $mdb-card-image-headline;
             font-size: $font-size-h4;
-            text-shadow: 0 2px 5px rgba(33, 33, 33, 0.5);
+            text-shadow: 0 2px 5px $gray-light;
         }
     }
 
@@ -95,17 +95,17 @@
             color: rgba($white, .7);
         }
         .ct-grid{
-            stroke: rgba(255, 255, 255, 0.2);
+            stroke: $white;
         }
         .ct-series-a .ct-point,
         .ct-series-a .ct-line,
         .ct-series-a .ct-bar,
         .ct-series-a .ct-slice-donut{
-            stroke: rgba(255,255,255,.8);
+            stroke: $white;
         }
         .ct-series-a .ct-slice-pie,
         .ct-series-a .ct-area{
-            fill: rgba(255,255,255,.4);
+            fill: $white;
         }
 
     }
@@ -123,7 +123,7 @@
 
         h6{
             margin: 0;
-            color: rgba(255,255,255, .4);
+            color: $white;
         }
 
     }
@@ -131,7 +131,7 @@
     .md-card-actions{
         margin: 0 20px 10px;
         padding: 10px 0 0 0;
-        border-top: 1px solid #eeeeee;
+        border-top: 1px solid $gray-lighter;
 
         .content{
             display: block;
@@ -381,21 +381,21 @@
     margin: 1em;
     padding: 1.75em 2em;
     border: 1px solid $orange;
-    color: black;
+    color: $black;
     
     h3 {
       font-weight: 500;
     }
     &:hover {
-      background: #fef4e4;
+      background: $orangeLight;
       transform: scale(1.02);
-      color: black;
+      color: $black;
       text-decoration: none !important;
     
       p {
         opacity: 1;
         transform: none;
-        color: black;
+        color: $black;
       }
     }
   }
@@ -410,16 +410,16 @@ gap: 20px;
 
   
 .notify-status{
-background-color: #fef4e4;
-font-size: 13px;
-display: inline-block;
-padding: 5px 10px;
-border-radius: 10px;
-font-weight: bold;
-text-decoration: none;
+    background-color: $orangeLight;
+    font-size: 13px;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 
 .md-layout {
-flex: 1;
+    flex: 1;
 }

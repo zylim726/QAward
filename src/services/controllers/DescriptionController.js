@@ -118,10 +118,10 @@ const DescriptionController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
-
       const response = await axios.get(`${apiHost}/description/calculateByCallForQuotation/${id}`, {
         headers,
       });
+
       return response.data.data;
 
     } catch (error) {
@@ -149,20 +149,41 @@ const DescriptionController = {
       
     }
   },
-  async editQuotation(dataToSave,discount) {
+  async editQuotation(dataToSave,discount, remark,Documents) {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
       const messageArray = [];
-
-      console.log('getAPI',dataToSave);
-      
-      console.log('discount',discount);
+      const formData = new FormData();
 
       for (const data of dataToSave){
+
+
+        if (Documents && Documents.file) {
+          const formData = new FormData();
+          formData.append('file', Documents.file);
+          formData.append('data-table', 'call_for_quotation_subcon_list');
+          formData.append('data-table-id', data.subconListId);
+          formData.append('description', 'update quotation description');
+          formData.append('name', 'quotation.xlsx');
+  
+          // Perform the axios request to upload the file
+          await axios.post(
+            `${apiHost}/document/importExcel`, 
+            formData, 
+            { 
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}`,
+              }
+            }
+          );
+        }
+        
         const CQListresponse = await axios.put(`${apiHost}/call_for_quotation_subcon_list/edit/${data.subconListId}`, 
         {
           discount : discount,
+          remark : remark
 
         }, { headers, });
 

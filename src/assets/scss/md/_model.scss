@@ -67,7 +67,7 @@
     background-color: $white; 
     padding: 16px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px $gray-lighter;
     width: 850px; 
     max-height: 100vh; 
     overflow-y: auto;
@@ -110,11 +110,11 @@
 
 
 .modal-content tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: $white;
 }
 
 .modal-content tr:hover {
-    background-color: #f1f1f1;
+    background-color: $white;
 }
 
 
@@ -130,7 +130,7 @@
   .Inforrmodal-content {
     background-color: $white;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px $gray-light;
     width: 100%;
     max-width: 600px; 
     margin-top: 80px;
@@ -149,7 +149,7 @@
   
   .Inforrsubtitle {
     font-size: 18px;
-    color: #666;
+    color: $black;
     margin-bottom: 20px;
     text-align: center;
     margin-top: 20px;
@@ -172,7 +172,7 @@
     top: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0,0,0,0.4);
     z-index: 9999;
     padding: 20px;
   }
