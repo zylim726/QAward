@@ -6,7 +6,6 @@ const DescriptionController = {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const messageArray = [];
-
         const checkingSubconList = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, {
             headers,
         });
@@ -15,15 +14,17 @@ const DescriptionController = {
         const SubconId = "1";
         let SubconListId = "";
         let subconIdToRetrieve = null;
-        
         for (const subcon of GetSubconId) {
+
             if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(cqId)) {
                 subconIdToRetrieve = subcon.id;
                 break; 
             }
         }
         
+
         if (subconIdToRetrieve === null) {
+
             try {
                 const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
                     discount: 0.00,
@@ -40,7 +41,9 @@ const DescriptionController = {
             SubconListId = subconIdToRetrieve;
         }
 
+
         for (const data of matchedData) {
+
 
           const descriptionResponse = await axios.post(`${apiHost}/description/add`, {
               element: data.element,
@@ -49,7 +52,6 @@ const DescriptionController = {
               description_unit: data.description_unit,
               description_item: data.description
           }, { headers });
-
        
           const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
               quote_rate: data.budget,
@@ -154,42 +156,73 @@ const DescriptionController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
       const messageArray = [];
-      const formData = new FormData();
-
-      for (const data of dataToSave){
+      const token = localStorage.getItem('token');
 
 
-        if (Documents && Documents.file) {
-          const formData = new FormData();
-          formData.append('file', Documents.file);
-          formData.append('data-table', 'call_for_quotation_subcon_list');
-          formData.append('data-table-id', data.subconListId);
-          formData.append('description', 'update quotation description');
-          formData.append('name', 'quotation.xlsx');
-  
-          // Perform the axios request to upload the file
-          await axios.post(
+      
+
+      if (Documents && Documents.file) {
+        const formData = new FormData();
+        formData.append('file', Documents.file);
+        formData.append('data-table', 'call_for_quotation_subcon_list');
+        formData.append('data-table-id', dataToSave[0].subconListId);
+        formData.append('description', 'edit quotation quantity');
+        formData.append('name', 'quotation.xlsx');
+       
+        const response = await axios.post(
             `${apiHost}/document/importExcel`, 
             formData, 
             { 
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${token}`,
-              }
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
+                }
             }
-          );
-        }
-        
-        const CQListresponse = await axios.put(`${apiHost}/call_for_quotation_subcon_list/edit/${data.subconListId}`, 
-        {
-          discount : discount,
-          remark : remark
+        );
 
-        }, { headers, });
+      }
+     
+      const CQListresponse = await axios.put(`${apiHost}/call_for_quotation_subcon_list/edit/${dataToSave[0].subconListId}`, 
+      {
+        discount : discount,
+        remark : remark
+      }, { headers, });
+      
 
+      for (const data of dataToSave){
+
+      
         const Quoteresponse = await axios.put(`${apiHost}/quotation/edit/${data.quotationId}`, 
         {
           quote_rate: data.rate,
+
+        }, { headers, });
+
+        messageArray.push(Quoteresponse.data.message);
+        
+      }
+      
+      return messageArray;
+
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+    
+      throw { errorMessage };
+      
+    }
+  },
+  async editQuantity(dataToSave) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+      const messageArray = [];
+     
+      for (const data of dataToSave){
+
+        const Quoteresponse = await axios.put(`${apiHost}/description_cq_unit_type_list/editByDescription/${data.descriptionId}`, 
+        {
+          adj_quantity : data.adj_quantity,
+          remeasurement_quantity : data.remeasurement_quantity,
 
         }, { headers, });
 

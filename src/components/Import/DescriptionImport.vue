@@ -56,7 +56,7 @@
               </label>
             </td>
             <td v-else></td>
-            <td v-for="column in filteredColumns" :key="column" style="white-space: pre-wrap;">
+            <td v-for="column in filteredColumns" :key="column" class="td-max-width">
               {{ displayValue(row[column], column) }}
             </td>
           </tr>
@@ -185,16 +185,16 @@ export default {
       const cqId = this.cqId;
       const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
       const unittype = this.Unittype;
-      
+
       const matchedData = selectImportData.map(object => {
         const matchedValues = {};
         unittype.forEach(unit => {
           const combineObjects = `${unit.type} (${unit.quantity})`;
+         
           if (object.hasOwnProperty(combineObjects)) {
             matchedValues[unit.id] = `${object[combineObjects]}`;
           }
         });
-
         if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative.");
           return null;
@@ -213,11 +213,10 @@ export default {
             this.$emit('fail-message', "Budget Rate cannot be empty data.");
             return null;
           }
-         
         }
 
         const hasMatches = Object.keys(matchedValues).length > 0;
-
+      
         return hasMatches ? {
             matchedValues,
             element: object["Element"],
@@ -230,7 +229,10 @@ export default {
       }).filter(data => data !== null);
 
       try {
+        console.log('matcgedData',matchedData);
+        console.log('cqId',cqId);
         const SuccessMessage = await DescriptionController.addDescription(cqId,matchedData);
+        console.log('Successmessagge',SuccessMessage);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.$emit('message', Message);
@@ -239,8 +241,9 @@ export default {
       } catch (error) {
         this.loading = false;
         const FailMessage = "Error updating: " + error.errorMessage;
-        window.scrollTo(0, 0); 
-        this.$emit('fail-message', FailMessage);
+        console.log('FailMessage',FailMessage);
+       window.scrollTo(0, 0); 
+       this.$emit('fail-message', FailMessage);
       } finally {
         this.loading = false;
       }
@@ -248,3 +251,4 @@ export default {
   },
 };
 </script>
+

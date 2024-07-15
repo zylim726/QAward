@@ -7,13 +7,13 @@
         <h5 v-if="!projectData">Please select the project name on the right side.</h5>
         <h3 class="titleHeader" v-else>{{ projectData.name }}</h3>
       </div>
-      
+
       <div v-if="!hasExistingAdmins">
         <div class="admin-fields">
           <div v-for="(admin, index) in adminList" :key="index" class="form-group">
-            <label><b>Admin {{ index + 1 }}:</b></label>
+            <label><b>{{ getAdminLabel(index) }}:</b></label>
             <select
-              v-model="adminSelection[index]" 
+              v-model="adminSelection[index]"
               id="Admin"
               class="form-control Admin-dropdown"
               required
@@ -28,16 +28,19 @@
         </div>
         <button class="btn-save" @click="addAdminField">Add Admin Access</button><br />
       </div>
+
       <div v-else>
-        <div v-for="(item, index) in getUserHaveDT" :key="item.id">
-          <label><b>Admin {{ index + 1 }}</b></label>
+        <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;">
+          <label><b>{{ getAdminLabel(index) }}</b></label>
           <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="display: flex;">
             <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
-              <button class="transparentButton" @click="deleteAdminField(index, $event)"><md-icon style="color:orange;margin-top:5px;margin-left:-15px" >delete_forever</md-icon></button>
+              <button class="transparentButton" @click="deleteAdminField(index, $event)">
+                <md-icon style="color:orange;margin-top:5px;margin-left:-15px">delete_forever</md-icon>
+              </button>
             </div>
             <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-95">
               <select
-                v-model="getUserHaveDT[index].system_user_id" 
+                v-model="getUserHaveDT[index].system_user_id"
                 id="Admin"
                 class="form-control Admin-dropdown"
                 required
@@ -72,10 +75,10 @@ export default {
   data() {
     return {
       adminList: [],
-      adminSelection: [], 
+      adminSelection: [],
       users: [],
       getDTProject: null,
-      getUserHaveDT: [], 
+      getUserHaveDT: [],
     };
   },
   async mounted() {
@@ -100,6 +103,10 @@ export default {
     }
   },
   methods: {
+    getAdminLabel(index) {
+      if (index === 0) return 'Check By';
+      return `Admin ${index}`;
+    },
     async getProjectData(projectDt) {
       try {
         const response = await ProjectController.getProjectData(projectDt);
@@ -120,8 +127,8 @@ export default {
     },
     addAdminField() {
       const newAdmin = { id: 0, system_user_id: '' };
-      this.getUserHaveDT.push(newAdmin); 
-      this.adminSelection.push(''); 
+      this.getUserHaveDT.push(newAdmin);
+      this.adminSelection.push('');
     },
     async deleteAdminField(index, event) {
       event.preventDefault(); // Prevent the default action of the button click event

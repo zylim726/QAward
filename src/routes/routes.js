@@ -17,6 +17,7 @@ import Revision from "@/pages/Layout/Revision.vue";
 import Quotation from "@/pages/Layout/Quotation.vue";
 import EditQuotation from "@/pages/Layout/EditQuotation.vue";
 import Description from "@/pages/Layout/Description.vue";
+import Remeasurement from "@/pages/Layout/Remeasurement.vue";
 
 
 const routes = [
@@ -108,6 +109,13 @@ const routes = [
         path: "projectsetup",
         name: "Project Setup",
         component: ProjectSetup,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "remeasurement",
+        name: "Edit Quantity",
+        component: Remeasurement,
         meta: { requiresAuth: true },
       },
     ],

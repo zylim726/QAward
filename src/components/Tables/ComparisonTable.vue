@@ -18,7 +18,8 @@
       <div class="filter-container" v-if="!isLoading">
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
-        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 1">Add Description</button></a>
+        <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
+        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 2">Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" >
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
@@ -40,12 +41,19 @@
             <th colspan="6"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
-              <th colspan="1"></th>
             </template>
+            <th></th>
             <th>
               <div class="tooltip" >
                 <span class="tooltiptext" style="margin-bottom: -127px !important;margin-left: -167px;width: 178px !important;">
-                  ADJ Quantity formula = (Unit Type Quantity x Description Quantity) x ADJ Factor</span>
+                  ADJ Quantity formula = (Unit Type ADJ Quantity x Description Quantity) x ADJ Factor</span>
+                <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
+              </div>
+            </th>
+            <th v-if="Unittype.some(unitdata => unitdata.cqUnitType.remeasurement_quantity !== null)">
+              <div class="tooltip" >
+                <span class="tooltiptext" style="margin-bottom: -127px !important;margin-left: -167px;width: 178px !important;">
+                  Remeasurement Quantity formula = (Unit Type Remeasurement Quantity x Description Quantity) x ADJ Factor</span>
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
@@ -54,20 +62,20 @@
                 <span class="tooltiptext" style="margin-bottom: -107px !important;margin-left: -167px;width: 178px !important;">
                 Formula Quotation rate = ADJ Quantity x Quotation Rate</span>
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;"  
-                  v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1" 
+                  v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5" 
                 > priority_high</md-icon>
               </div>
               <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
                 <button type="button" class="transparentButton"  >
                   <div class="tooltip" >
-                    <span class="tooltiptext" style="margin-bottom: -95px !important;margin-right: -6px;" >
+                    <span class="tooltiptext" style="margin-bottom: -111px !important;margin-right: -6px;" >
                     Edit Quotation Rate</span>
                     <md-icon style="color:orange;margin-left: 26px;margin-top: 10px;">edit_note</md-icon>
                   </div>
                 </button>
               </a>
               <button style="margin-left: -9px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)"  
-              v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id !== 1">
+              v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5">
                 <div class="tooltip" >
                   <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
                   Delete Quotation</span>
@@ -92,20 +100,22 @@
             <th scope="col">Unit</th>
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
-              <th scope="col">BQ QTY</th>
             </template>
+            <th scope="col">BQ QTY</th>
             <th scope="col">(ADJ) QTY</th>
+            <th scope="col" v-if="Unittype.some(unitdata => unitdata.cqUnitType.remeasurement_quantity !== null)">(Reamesurement) QTY</th>
             <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
-              {{ quotationData.Call_For_Quotation_Subcon_List.Subcon.name }}<br>
+              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+              <br>
             </th>
           </tr>
           <tr>
             <th colspan="6"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
-              <th colspan="1"></th>
             </template>
-            <th></th>
+            <th colspan="2"></th>
+            <th v-if="Unittype.some(unitdata => unitdata.cqUnitType.remeasurement_quantity !== null)"></th>
             <th v-for="(header, index) in generatedHeaders" :key="index" style="text-align: center;border-left:1px solid #ddd !important;border-right:1px solid #ddd !important">{{ header }}</th>
           </tr>
         </thead>
@@ -214,6 +224,8 @@
   </div> 
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
     title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></SubmitModal>
+    <RejectedModal :reject-modal="rejectModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
+    title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></RejectedModal>
     <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
@@ -268,7 +280,6 @@ export default {
       cmAccessApproval: false,
       cmCQapproval:[],
       SubconListId:[],
-      totalQuotationData:[],
       excelFile: null,
       isLoading: false,
     };
@@ -308,6 +319,16 @@ export default {
     },
   },
   methods: {
+    getDisplayName(budgetId,name) {
+      budgetId = parseFloat(budgetId);
+      if (budgetId === 1) {
+        return 'Budget (ADJ)';
+      }
+      if (budgetId === 1.5) {
+        return 'Budget (Remeasurement)';
+      }
+      return name;
+    },
     formatDate(dateTimeString) {
       if (!dateTimeString) return '';
 
@@ -494,13 +515,14 @@ export default {
           let head2Counter = 0;
           
 
-          const totalQuotationAmounts = {};
+          const totalQuotationAmounts =  []; 
 
           for (const formData of processedData) {
             const cqUnitType = formData.cqUnitType;
             this.Unittype = cqUnitType;
             const getQuotation = formData.quotation;
-            if (getQuotation.length <= 0 || getQuotation[0].total_quote_amount === 0) {
+            console.log('formData',getQuotation);
+            if (getQuotation.length <= 0 || getQuotation[0].quote_rate === 0) {
               head1Counter++;
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
@@ -508,41 +530,36 @@ export default {
                 <td><b>${formData.element || ''}</b></td>
                 <td><b>${formData.sub_element || ''}</b></td>
                 <td><b>${formData.description_sub_sub_element || ''}</b></td>
-                <td style="padding-left:10px !important;white-space: inherit;min-width:300px;"><b>${formData.description_item}</b></td>
+                <td style="padding-left:10px !important" class="td-max-width"><b>${formData.description_item}</b></td>
               `;
               tableBody.appendChild(head1Row);
 
               head2Counter = 0;
             }
 
-            if (getQuotation.length > 0 && getQuotation[0].total_quote_amount !== 0) {
+            if (getQuotation.length > 0 && getQuotation[0].quote_rate !== 0  ) {
               head2Counter++;
     
               this.QuotationName = getQuotation;
+
+           
               
               let quotationTDs = '';
+              const seenSubconIds = new Set(); 
               for (const quotationRate of getQuotation) {
                 const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
                 const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
 
-                console.log('totalQuotation',totalQuotation);
-
-                this.totalQuotationData = totalQuotation;
-
-                if (!totalQuotationAmounts[SubconId]) {
-                  totalQuotationAmounts[SubconId] = totalQuotation;
-                } else {
-                  totalQuotationAmounts[SubconId] = {
-                    ...totalQuotationAmounts[SubconId],
-                    ...totalQuotation
-                  };
+                const exists = totalQuotationAmounts.some(entry => entry.subcon_id === SubconId);
+  
+                // If it doesn't exist, push the new entry
+                if (!exists) {
+                  totalQuotationAmounts.push({
+                    subcon_id: SubconId,
+                    data: totalQuotation,
+                  });
                 }
 
-                // if (!this.ApprovalDataArray.some(item => item.callSubconId === quotationRate.call_for_quotation_subcon_list_id)) {
-                // this.ApprovalDataArray.push({
-                //   cqId: id
-                // });
-                // }
 
                 quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
                                 <td style="text-align:right;border-right:1px solid #ddd !important">${ this.formatAccounting(quotationRate.total_quote_amount) }</td>`;
@@ -550,11 +567,16 @@ export default {
               let unitQuantityTDs = '';
               cqUnitType.forEach((cqUnit) => {
                 console.log('cqUnit',cqUnit);
-                const quantity = cqUnit.quantity !== undefined ? cqUnit.quantity : 0;
+                const quantity = cqUnit.adj_quantity !== undefined ? cqUnit.adj_quantity : 0;
                 unitQuantityTDs += `<td style="text-align:center;">${quantity}</td>`;
               });
 
-              const getHideHTML = isHide ? '' : `<td>${formData.bq_quantity}</td>`;
+              let remeasuremntQuantityTDs = '';
+              if(formData.remeasurement_quantity !== null){
+                remeasuremntQuantityTDs = `<td>${formData.remeasurement_quantity}</td>`;
+              }
+
+              const getHideHTML = `<td>${formData.bq_quantity}</td>`;
               const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
       
               const head2Row = document.createElement('tr');
@@ -563,11 +585,12 @@ export default {
                 <td>${formData.element || ''}</td>
                 <td>${formData.sub_element || ''}</td>
                 <td>${formData.description_sub_sub_element || ''}</td>
-                <td style="padding-left:10px !important;white-space: inherit;min-width:300px">${formData.description_item}</td>
+                <td style="padding-left:10px !important;" class="td-max-width">${formData.description_item}</td>
                 <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
                 <td>${formData.adj_quantity}</td>
+                ${remeasuremntQuantityTDs}
                 ${quotationTDs}
               `;
               tableBody.appendChild(head2Row);
@@ -576,19 +599,26 @@ export default {
 
           const UnitType = this.Unittype;
           const numberOfArrays = UnitType.length;
-          const GetHidenumber = numberOfArrays + 1;
+          const getRemeauserement = UnitType[0].is_remeasurement;
+
+          const colspan = isHide 
+          ? (getRemeauserement ? 9 : 8)
+          : (getRemeauserement ? numberOfArrays + 9 : numberOfArrays + 8);
+
 
           let bqTotalAmountTDs = '';
           let adjTotalAmountTDs = '';
           let discountGivenTDs = '';
           let afterADJDiscountTDs = '';
+          let remasurementTotalAmountTDs = '';
           let overrumTDs = '';
           let winnerTDs = '';
           let rateTDs = '';
           let remarks ='';
-          for (const subconAmount of Object.values(totalQuotationAmounts)) {
-           
-            if (subconAmount[0].subcon_id !== 1) {
+          console.log('totalQuotationAmount',totalQuotationAmounts);
+          for (const DatasubconAmount of Object.values(totalQuotationAmounts)) {
+            const subconAmount = DatasubconAmount.data;
+            if (subconAmount[0].subcon_id > 1.5 ) {
               discountGivenTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].discount_given)}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].afterADJDiscount_give)}</td>`;
               overrumTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].adj_totalSaving)}</td>`;
@@ -603,6 +633,7 @@ export default {
             }
             bqTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].bq_totalAmount)}</td>`;
             adjTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].totalSubconAmount)}</td>`;
+            remasurementTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].remeasurement_totalAmount)}</td>`;
             remarks += `<td colspan="2" style="white-space: pre-wrap;line-height:25px">${subconAmount[0].remark ? subconAmount[0].remark : ''}</td>`;
           }
 
@@ -610,35 +641,39 @@ export default {
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>BQ Total Amount (RM) </b></td>
+              <td colspan="${colspan}" ><b>BQ Total Amount (RM) </b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>ADJ Total Amount (RM) </b></td>
+              <td colspan="${colspan}" ><b>Remeasurement Total Amount (RM) </b></td>
+              ${remasurementTotalAmountTDs}
+            </tr>
+            <tr>
+              <td colspan="${colspan}"><b>ADJ Total Amount (RM) </b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Discount Given (RM) </b></td>
+              <td colspan="${colspan}"><b>Discount Given (RM) </b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>After Discount Given (RM) </b></td>
+              <td colspan="${colspan}"><b>After Discount Given (RM) </b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"><b>Total Saving / Overrun (RM) </b></td>
+              <td colspan="${colspan}"><b>Total Saving / Overrun (RM) </b></td>
               ${overrumTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"> </td>
+              <td colspan="${colspan}"> </td>
               ${rateTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}"> </td>
+              <td colspan="${colspan}"> </td>
               ${winnerTDs}
             </tr>
             <tr>
-              <td colspan="${isHide ? 7 : GetHidenumber + 7}">Remarks </td>
+              <td colspan="${colspan}">Remarks </td>
               ${remarks}  
             </tr>
           `;
@@ -646,7 +681,6 @@ export default {
         } else {
           const tableBody = document.querySelector('.nested-table tbody');
           tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
-        
         }
       } catch (error) {
         this.isLoading = false;
@@ -656,10 +690,25 @@ export default {
       }
     },
     formatAccounting(value) {
-      if (!value) {
+      if (value == null || isNaN(value) && !this.isNegativeFormatted(value)) {
         return '0.00';
       }
-      return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      // Handle negative formatted string
+      if (this.isNegativeFormatted(value)) {
+        const numericValue = parseFloat(value.replace(/[()]/g, '').trim()) * -1;
+        return `(${Math.abs(numericValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
+      }
+
+      const parsedValue = parseFloat(value);
+
+      // Format positive numbers
+      return parsedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    },
+
+    // Helper function to check if the value is formatted as a negative number
+    isNegativeFormatted(value) {
+      return typeof value === 'string' && value.startsWith('(') && value.endsWith(')');
     },
     async getCQApproval(id) {
       try {
@@ -784,6 +833,9 @@ export default {
       }, 2000);
     },
     async CMrejectedQuotation(){
+
+      // this.excelFile = this.generateExcelFile() || null;
+      // this.submitModal = true;
       try {
         this.UpdateMessage = await QuotationController.CMrejectedQuotation(this.cqId); 
         

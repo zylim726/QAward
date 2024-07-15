@@ -11,12 +11,12 @@ const QuotationController = {
             headers,
         });
 
-        console.log('quotation',QuotationData);
         const calculateSubcon = getSubcon.data.data;
         let SubconListId = "";
         let subconIdToRetrieve = null;
         const messages = [];
-         
+
+     
         if (calculateSubcon.length > 0) {
 
             const checkingSubconList = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, {
@@ -24,8 +24,7 @@ const QuotationController = {
             });
             
             const GetSubconId = checkingSubconList.data.data;
-            const SubconId = calculateSubcon[0].id;
-            
+            const SubconId = calculateSubcon[0].id; 
             for (const subcon of GetSubconId) {
                 if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(id)) {
                     subconIdToRetrieve = subcon.id;
@@ -33,8 +32,7 @@ const QuotationController = {
                 }
             }
 
-            console.log('subconId',subconIdToRetrieve);
-
+           
             if (subconIdToRetrieve === null) {
                 
                 try {
@@ -44,7 +42,9 @@ const QuotationController = {
                         call_for_quotation_id: id,
                         subcon_id: SubconId 
                     }, { headers });
-            
+
+                    
+       
                     SubconListId = cqSubconResponse.data.data.id;
 
                 } catch (error) {
@@ -53,7 +53,7 @@ const QuotationController = {
             } else {
                 SubconListId = subconIdToRetrieve;
             }
-
+           
             const formData = new FormData();
             formData.append('file', Documents.file);
             formData.append('data-table', 'call_for_quotation_subcon_list');
@@ -72,19 +72,16 @@ const QuotationController = {
                     }
                 }
             );
-        
+
+           
             for (const quotation of QuotationData) {
-     
+                console.log('quotation',quotation);
                 try {
                     const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
                         quote_rate: quotation.rate,
                         call_for_quotation_subcon_list_id: SubconListId,
                         description_id: quotation.description_id
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
+                    },  { headers });
     
                     messages.push(quotationResponse.data.message);
                 } catch (quotationError) {
@@ -92,6 +89,7 @@ const QuotationController = {
                 }
             }
 
+          
             return messages;
         } 
     } catch (error) {

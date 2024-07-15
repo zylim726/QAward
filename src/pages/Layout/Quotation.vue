@@ -182,7 +182,7 @@ export default {
     },
     confirmSubconSelection() {
       if (this.selectedOption) {
-        // Close the modal after confirming subcontractor and uploading file
+        this.selectedSubconName = this.selectedOption; 
         this.isModalVisible = false;
 
         // Ensure to pass event to importDataFromFiles
@@ -213,9 +213,7 @@ export default {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
-        console.log('this.Description',this.Description);
         this.cqUnit = processedData[0].cqUnitType || [];
-        console.log('this cqUnit',this.cqUnit);
       } catch (error) {
         console.error('Error fetching Description:', error);
         throw error;
@@ -299,7 +297,7 @@ export default {
             <td><b>${formData.element || ''}</b></td>
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
-            <td style="white-space: inherit;min-width:300px;"><b>${formData.description_item}</b></td>
+            <td  class="td-max-width"><b>${formData.description_item}</b></td>
             <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
@@ -323,7 +321,7 @@ export default {
             <td>${formData.element || ''}</td>
             <td>${formData.sub_element || ''}</td>
             <td>${formData.description_sub_sub_element || ''}</td>
-            <td style="padding-left:30px !important;white-space: inherit;min-width:300px">${formData.description_item}</td>
+            <td style="padding-left:30px !important;"  class="td-max-width">${formData.description_item}</td>
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
@@ -332,14 +330,17 @@ export default {
           tableBody.appendChild(head2Row);
 
           if (columnKData[columnKDataIndex] !== '') {
-            this.QuotationDataArray.push({
-              description_id: formData.id,
-              countData: count,
-              rateData: rateCount,
-              quotationName: this.selectedSubconName,
-              rate: columnKData[columnKDataIndex],
-            });
+            const existingEntry = this.QuotationDataArray.find(entry => entry.description_id === formData.id);
+            if (!existingEntry) {
+              this.QuotationDataArray.push({
+                description_id: formData.id,
+                countData: count,
+                rateData: rateCount,
+                rate: columnKData[columnKDataIndex],
+              });
+            }
           }
+
 
           columnKDataIndex++;
         }
@@ -359,8 +360,6 @@ export default {
             const Discount = this.discount;
             const Remarks = this.remarks;
             const Documents = this.documents;
-
-
             const hasNegativeRate = QuotationData.some(data => data.rate < 0);
             if (hasNegativeRate) {
                 this.FailMessage = "Error: Rate data cannot have negative values.";
@@ -371,27 +370,25 @@ export default {
                 }, 2000);
                 return;
             }
-
             if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-              console.log('get data',QuotationData);
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
-              // const concatenatedMessage = SuccessMessage.join(', ');
-              // this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
-              // setTimeout(() => {
-              //   this.UpdateMessage = '';
-              // }, 2500);
-              // const routeData = this.$router.resolve({
-              //     name: 'Subcon Comparison',
-              //     query: { cqID: this.$route.query.cqId }
-              // });
+              const concatenatedMessage = SuccessMessage.join(', ');
+              this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
+              setTimeout(() => {
+                this.UpdateMessage = '';
+              }, 2500);
+              const routeData = this.$router.resolve({
+                  name: 'Subcon Comparison',
+                  query: { cqID: this.$route.query.cqId }
+              });
 
-              //  window.open(routeData.href, '_blank');
+                window.open(routeData.href, '_blank');
             } else {
-              // this.FailMessage = "Error: Rate data is empty";
-              // setTimeout(() => {
-              //   this.UpdateMessage = '';
-              //   window.location.reload();
-              // }, 2000);
+              this.FailMessage = "Error: Rate data is empty";
+              setTimeout(() => {
+                this.UpdateMessage = '';
+                window.location.reload();
+              }, 2000);
             }
 
 

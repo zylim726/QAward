@@ -28,6 +28,7 @@
             <th>Area</th>
             <th>Reg No</th>
             <th style="text-align: center;">Unit Type</th>
+            <th>Admin Approved</th>
           </tr>
         </thead>
         <tbody>
@@ -41,10 +42,20 @@
             <td style="text-align: center">
               <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;">
                 <div class="tooltip">
-                  <span class="tooltiptext">Set Up Unit Type</span>
+                  <span class="tooltiptext">Set up unit type</span>
                   <md-icon   :style="{ color: getUnitTypeColor(project.id) }" >edit</md-icon>
                 </div>
               </button>
+            </td>
+            <td style="text-align: center">
+              <a href="/projectcontrol">
+              <button class="transparentButton" style="margin-left: -6px;">
+                <div class="tooltip">
+                  <span class="tooltiptext">Set up cm checkby and admin approved</span>
+                  <md-icon :style="{ color: getUnitTypeColor(project.id) }" >manage_accounts</md-icon>
+                </div>
+              </button>
+              </a>
             </td>
           </tr>
         </tbody>
