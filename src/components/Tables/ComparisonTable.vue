@@ -157,6 +157,13 @@
     </div>
   </template>
     <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
+      <div class="confirmation-message">
+        <p>It is the quotation is work order.</p> 
+        <label>
+          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange" >
+          Yes
+        </label>
+      </div>
       <div class="cqapprovalBox-container">
         <template ><br>
           <div class="container" style="width: 100%;">
@@ -288,9 +295,15 @@ export default {
       this.getProject(newValue);
       this.checkPermission();
       this.getCMcqApproval(newValue);
+      this.handleCheckboxChange();
     },
   },
   computed: {
+    isPermissionChecked() {
+      const isChecked = this.Unittype[0].Cq_Unit_Type.Call_For_Quotation.is_work_order === true;
+      console.log('isChecked',isChecked);
+      return isChecked;
+    },
     filteredCQApprovalData() {
       const cmSystemUserIds = this.cmCQapproval.map(approval => approval.system_user_id);
       return this.cqApprovalData.filter(approval => !cmSystemUserIds.includes(approval.system_user_id));
@@ -316,6 +329,16 @@ export default {
     },
   },
   methods: {
+    async handleCheckboxChange() {
+       if (event && event.target) {
+        const isChecked = event.target.checked; 
+        try {
+          const SuccessMessage = await QuotationController.updateWorkOrder(isChecked,this.cqId);
+        } catch (error) {
+          
+        }
+       }
+    },
     getDisplayName(budgetId,name) {
       budgetId = parseFloat(budgetId);
       if (budgetId === 1) {
@@ -434,30 +457,29 @@ export default {
       }
     },
     async rejectAdminApproval(systemUserId,index) {
-      console.log('checking');
       this.isLoading = true;
       this.excelFile = this.generateExcelFile() || null;
       const documents = this.excelFile;
       const approvalDataToSubmit = [];
       const selectedSubconListName = this.selectedQuotations[index];
       const remark = this.remarks[index];
+
       this.SubconListId.forEach((getSubconList) => {
         const subconName = getSubconList.Subcon;
         if (subconName.name === selectedSubconListName) {
-          if (selectedSubconListName && remark) {
+          if (selectedSubconListName) {  // Only check if selectedSubconListName is present
             approvalDataToSubmit.push({
               cqId: this.cqId,
               userId: systemUserId,
               callForQuotationListId: getSubconList.id,
-              remark: remark
+              remark: remark || ""  // Save an empty string if remark is empty or null
             });
           }
         }
       });
 
+
       try {
-        console.log('approved',approvalDataToSubmit);
-        console.log('documents',documents);
          const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit,documents);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
@@ -472,8 +494,7 @@ export default {
             window.location.reload();
          }, 1000);
       } catch (error) {
-          this.isLoading = false;
-          this.FailMessage = 'Error while submitting approval data:', error;
+         this.isLoading = false;
           window.scrollTo({
               top: 0,
             behavior: 'smooth' 
@@ -492,6 +513,9 @@ export default {
     },
     closerejectModal(){
       this.rejectModal = false;
+    },
+    closeEditModal(){
+      this.delModal = false;xs
     },
     deleteSubcon(id) {
       const matchedSubcons = [];
@@ -567,6 +591,7 @@ export default {
           for (const formData of processedData) {
             const cqUnitType = formData.cqUnitType;
             this.Unittype = cqUnitType;
+            console.log('this Unittype',this.Unittype);
             const getQuotation = formData.quotation;
             if (getQuotation.length <= 0 || getQuotation[0].quote_rate === 0) {
               head1Counter++;
@@ -588,7 +613,7 @@ export default {
     
               this.QuotationName = getQuotation;
 
-           
+           console.log('this.QuotationName',this.QuotationName);
               
               let quotationTDs = '';
               const seenSubconIds = new Set(); 
@@ -757,7 +782,6 @@ export default {
     async getCQApproval(id) {
       try {
         const response = await QuotationController.getCQApproval();
-        console.log('response',response);
         this.cqApprovalData = response;
         response.forEach((approval, index) => {
           const GetSubconList = approval.callForQuotation;
