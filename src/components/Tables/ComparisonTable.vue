@@ -135,30 +135,28 @@
         </div>
       </template>
       <div>
-      <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
-        <div class="confirmation-message">
-          <template v-if="cqApprovalData.length === 0" >
-            <p>Please CM go to project control set up admin approval.</p>
-            <a href="projectcontrol">
-              <button class="btn-save">Project Control</button>
-            </a>
-          </template>
-          <template v-else>
-            <p>Approval / reject cost comparison</p>
-            <!--CM approval need to submit the approvalForm-->
-            <button class="btn-save" @click="CMsubmitQuotation">Approve</button>
-            <!--If CM rejected, need to go back pending -->
-            <button class="btn-save" @click="CMrejectedQuotation">Reject</button>
-          </template>
-        </div>
-      </template>
       <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && !cmAccessApproval && !cmAccesslevel ">
         <div class="confirmation-message">
           <p>Waiting CM Approval or Rejected Quotation.</p>
         </div>
       </template>
     </div>
-    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved') && QuotationName.length > 0 ">
+    <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
+      <div class="confirmation-message">
+      <template v-if="cqApprovalData.length === 0" >
+        <p>Please CM go to project control set up admin approval.</p>
+        <a href="projectcontrol">
+          <button class="btn-save">Project Control</button>
+        </a>  
+      </template>
+      <template v-else>
+        <p>Approval / reject cost comparison</p>  
+        <button class="btn-save" @click="CMsubmitQuotation">Approve</button>
+        <button class="btn-save" @click="CMrejectedQuotation">Reject</button>
+      </template>
+    </div>
+  </template>
+    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
       <div class="cqapprovalBox-container">
         <template ><br>
           <div class="container" style="width: 100%;">
@@ -192,7 +190,6 @@
                 <div class="right-container">
                   <div v-for="(user, userIndex) in approvalData.systemuser" :key="userIndex" class="user-info">
                     <p class="user-name">Name: {{ user.name }}</p>
-                    <p class="user-access">Level: {{ user.accesslevel }}</p>
                   </div>
                   <p style="margin: 8px 0 10px;">Recommend Award To:</p>
                   <div v-if="(approvalData.system_user_id === Number(getUserIdLocal) || hasAccess) && index === 0 ">
@@ -202,8 +199,9 @@
                       </option>
                     </select>
                     <p style="margin: 8px 0 10px;">Remarks:</p>
-                    <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" ></textarea>
-                    <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Submit</button><br>
+                    <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" required ></textarea>
+                    <button class="btn-save"  @click="rejectAdminApproval(approvalData.system_user_id, index)">Rejected</button><br>
+                    <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approved</button><br>
                   </div>
                   <div v-else>
                     <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
@@ -224,8 +222,8 @@
   </div> 
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
     title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></SubmitModal>
-    <RejectedModal :reject-modal="rejectModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
-    title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></RejectedModal>
+    <RejectModal :reject-modal="rejectModal"   @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closerejectModal" 
+    title="Reject Approval" :ApprovalData="cmCQapproval"  :excelFile="excelFile"></RejectModal>
     <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
@@ -238,15 +236,16 @@ import DescriptionController from '@/services/controllers/DescriptionController.
 import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
 import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
+import RejectModal from '@/components/Pop-Up-Modal/RejectModal.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
-import { axios } from "@/services";
 
 export default {
   components: {
     SubmitModal,
-    DelSubcon 
+    DelSubcon,
+    RejectModal
   },
   props: {
     cqId: {
@@ -263,12 +262,10 @@ export default {
       searchQuery: '',
       isHide: true,
       errorMessage: '',
-      editModal: false,
       delModal: false,
       deleteId: [],
-      editId: null,
       submitModal: false,
-      submitId: null,
+      rejectModal: false,
       UpdateMessage: null,
       FailMessage: null,
       ApprovalDataArray: [],
@@ -436,15 +433,65 @@ export default {
         this.isLoading = false;
       }
     },
-    editDescription(id) {
-      this.editId = id;
-      this.editModal = true;
-    },
-    closeEditModal() {
-      this.delModal = false;
+    async rejectAdminApproval(systemUserId,index) {
+      console.log('checking');
+      this.isLoading = true;
+      this.excelFile = this.generateExcelFile() || null;
+      const documents = this.excelFile;
+      const approvalDataToSubmit = [];
+      const selectedSubconListName = this.selectedQuotations[index];
+      const remark = this.remarks[index];
+      this.SubconListId.forEach((getSubconList) => {
+        const subconName = getSubconList.Subcon;
+        if (subconName.name === selectedSubconListName) {
+          if (selectedSubconListName && remark) {
+            approvalDataToSubmit.push({
+              cqId: this.cqId,
+              userId: systemUserId,
+              callForQuotationListId: getSubconList.id,
+              remark: remark
+            });
+          }
+        }
+      });
+
+      try {
+        console.log('approved',approvalDataToSubmit);
+        console.log('documents',documents);
+         const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit,documents);
+          const concatenatedMessage = SuccessMessage.join(', ');
+          const Message = concatenatedMessage.split(',')[0].trim();
+          this.UpdateMessage = Message;
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth' 
+          });
+
+          setTimeout(() => {
+            this.UpdateMessage = '';
+            window.location.reload();
+         }, 1000);
+      } catch (error) {
+          this.isLoading = false;
+          this.FailMessage = 'Error while submitting approval data:', error;
+          window.scrollTo({
+              top: 0,
+            behavior: 'smooth' 
+          });
+
+          setTimeout(() => {
+            this.FailMessage = '';
+            window.location.reload();
+         }, 1000);
+      } finally {
+        this.isLoading = false;
+      }
     },
     closesubmitModal() {
       this.submitModal = false;
+    },
+    closerejectModal(){
+      this.rejectModal = false;
     },
     deleteSubcon(id) {
       const matchedSubcons = [];
@@ -521,7 +568,6 @@ export default {
             const cqUnitType = formData.cqUnitType;
             this.Unittype = cqUnitType;
             const getQuotation = formData.quotation;
-            console.log('formData',getQuotation);
             if (getQuotation.length <= 0 || getQuotation[0].quote_rate === 0) {
               head1Counter++;
               const head1Row = document.createElement('tr');
@@ -566,7 +612,6 @@ export default {
               }
               let unitQuantityTDs = '';
               cqUnitType.forEach((cqUnit) => {
-                console.log('cqUnit',cqUnit);
                 const quantity = cqUnit.adj_quantity !== undefined ? cqUnit.adj_quantity : 0;
                 unitQuantityTDs += `<td style="text-align:center;">${quantity}</td>`;
               });
@@ -615,7 +660,6 @@ export default {
           let winnerTDs = '';
           let rateTDs = '';
           let remarks ='';
-          console.log('totalQuotationAmount',totalQuotationAmounts);
           for (const DatasubconAmount of Object.values(totalQuotationAmounts)) {
             const subconAmount = DatasubconAmount.data;
             if (subconAmount[0].subcon_id > 1.5 ) {
@@ -713,6 +757,7 @@ export default {
     async getCQApproval(id) {
       try {
         const response = await QuotationController.getCQApproval();
+        console.log('response',response);
         this.cqApprovalData = response;
         response.forEach((approval, index) => {
           const GetSubconList = approval.callForQuotation;
@@ -833,31 +878,8 @@ export default {
       }, 2000);
     },
     async CMrejectedQuotation(){
-
-      // this.excelFile = this.generateExcelFile() || null;
-      // this.submitModal = true;
-      try {
-        this.UpdateMessage = await QuotationController.CMrejectedQuotation(this.cqId); 
-        
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth' 
-        });
-        setTimeout(() => {
-        this.UpdateMessage = '';
-          window.location.reload();
-      }, 2000);
-      } catch (error) {
-        this.FailMessage = "Error rejected quotation: " + error.errorMessage;
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth' 
-        });
-          setTimeout(() => {
-          this.UpdateMessage = '';
-            window.location.reload();
-        }, 2000);
-      }
+      this.excelFile = this.generateExcelFile() || null;
+      this.rejectModal = true;
     },
     async approvalQuotation(){
       try {
