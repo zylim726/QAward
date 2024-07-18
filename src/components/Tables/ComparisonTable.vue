@@ -414,8 +414,8 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Approved By'];
-        const cmapproval = ['Checked By'];
+        const accessIds = ['Admin Set Up Approved'];
+        const cmapproval = ['CM Set Up Checking'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
 
         this.cmAccessApproval = cmapproval.some(id => permission.includes(id));

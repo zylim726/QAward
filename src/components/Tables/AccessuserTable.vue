@@ -80,9 +80,8 @@ export default {
     async accessUsers() {
       try {
         this.users = await AccessUserController.accessUser();
-        console.log('this.users',this.users);
       } catch (error) {
-        this.errorMessage = "Error fetching user data: " + error.errorMessage;
+        this.errorMessage = "Error retreving user data: " + error.errorMessage;
       }
     },
     async updateLoginAccess(user) {

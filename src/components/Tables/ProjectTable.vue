@@ -27,8 +27,8 @@
             <th>Company Name</th>
             <th>Area</th>
             <th>Reg No</th>
-            <th style="text-align: center;">Unit Type</th>
-            <th>Admin Approved</th>
+            <th style="text-align: center;" v-if="hasAccess">Unit Type</th>
+            <th v-if="hasAdminAccess">Admin Approved</th>
           </tr>
         </thead>
         <tbody>
@@ -39,16 +39,16 @@
             <td>{{ project.billto }}</td>
             <td>{{ project.area }}</td>
             <td>{{ project.regno }}</td>
-            <td style="text-align: center">
-              <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;">
+            <td style="text-align: center" v-if="hasAccess">
+              <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;" >
                 <div class="tooltip">
                   <span class="tooltiptext">Set up unit type</span>
                   <md-icon   :style="{ color: getUnitTypeColor(project.id) }" >edit</md-icon>
                 </div>
               </button>
             </td>
-            <td style="text-align: center">
-              <a href="/projectcontrol">
+            <td style="text-align: center" v-if="hasAdminAccess" >
+              <a href="/projectcontrol" >
               <button class="transparentButton" style="margin-left: -6px;">
                 <div class="tooltip">
                   <span class="tooltiptext">Set up cm checkby and admin approved</span>
@@ -78,6 +78,7 @@
 <script>
 import ProjectController from "@/services/controllers/ProjectController.js";
 import EditProject from "@/components/Pop-Up-Modal/EditProject.vue";
+import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
@@ -88,6 +89,8 @@ export default {
       projects: [],
       unitTypes: [],
       unitTypeColors: {},
+      hasAccess: false,
+      hasAdminAccess: false,
       searchText: "",
       errorMessage: null,
       UpdateMessage: null,
@@ -100,6 +103,7 @@ export default {
   },
   mounted() {
     this.accessProject();
+    this.checkPermission();
   },
   computed: {
     filterProject() {
@@ -115,6 +119,19 @@ export default {
     },
   },
   methods: {
+    async checkPermission() {
+      try {
+        const permission = await checkAccess(); 
+        const accessIds = ['Set Up Unit Type'];
+        const accessAdmin = ['Set Up Admin Approved'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+        console.log('this.hasAccess',this.hasAccess);
+        this.hasAdminAccess = accessAdmin.some(id => permission.includes(id));
+        console.log('this.hasAdminAccess',this.hasAdminAccess);
+      } catch (error) {
+        console.error('Error checking permission:', error);
+      }
+    },
     async accessProject() {
       try {
         const processedData = await ProjectController.accessProject();
@@ -130,11 +147,9 @@ export default {
     try {
         for (const project of this.projects) {
           const unitType = await ProjectController.getUnitTypes(project.id);
-          console.log('Unit type fetched for project ID', project.id, ':', unitType);
           this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'orange');
         }
       } catch (error) {
-        console.error('Error fetching unit types:', error);
         const failMessage = "Error fetching unit types: " + error.message;
         this.$emit('fail-message', failMessage);
       } finally {

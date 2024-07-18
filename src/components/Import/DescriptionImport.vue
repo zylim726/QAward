@@ -176,7 +176,7 @@ export default {
         link.click();
         link.remove();
       } catch (error) {
-        const FailMessage = "Error exporting table headers:"+ error;
+        const FailMessage = "Error download template:"+ error;
         this.$emit('fail-message', FailMessage);
       }
     },

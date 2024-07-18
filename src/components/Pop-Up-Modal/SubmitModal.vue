@@ -88,7 +88,7 @@ export default {
         });
 
         if (this.matchingData.length === 0) {
-          const FailMessage = "No data found for call_for_quotation_id";
+          const FailMessage = "No data found for call for quotation";
           this.$emit('fail-message', FailMessage);
         } else {
           this.selectedQuotation = this.matchingData[0].id;

@@ -1,6 +1,5 @@
 // Tables
 import ComparisonTable from "./Tables/ComparisonTable.vue";
-import ApprovalTable from "./Tables/ApprovalTable.vue";
 import CreatecqTable from "./Tables/CreatecqTable.vue";
 import ProjectcontrolTable from "./Tables/ProjectcontrolTable.vue";
 import AccessuserTable from "./Tables/AccessuserTable.vue";
@@ -26,16 +25,13 @@ import DelSubcon from "./Pop-Up-Modal/DelSubcon.vue";
 // IMPORT
 import CQImport from "./Import/CQImport.vue";
 import DescriptionImport from "./Import/DescriptionImport.vue";
-import QuotationImport from "./Import/QuotationImport.vue";
 
 export {
   ComparisonTable,
-  ApprovalTable,
   CQImport,
   Modal,
   CreatecqTable,
   DescriptionImport,
-  QuotationImport,
   SubmitModal,
   RejectModal,
   ProjectcontrolTable,

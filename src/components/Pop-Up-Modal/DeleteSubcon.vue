@@ -57,7 +57,7 @@ export default {
             window.location.reload();
         }, 1000); 
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage = "Error updating subcon: " + error.errorMessage;
         this.$emit('deletefail-message', FailMessage);
       }
     }

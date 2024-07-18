@@ -249,7 +249,7 @@ export default {
           console.log('thiscallquotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
-          this.FailMessage = "No more projects.";
+          this.FailMessage = "No data.";
         }
       } catch (error) {
         this.FailMessage = ("Error Message :", error.errorMessage);
