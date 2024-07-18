@@ -7,7 +7,7 @@
         <br />
         <hr style="margin-top: -10px" />
         <br />
-        <md-icon style="text-align: center;font-size: 79px !important;margin-left: 47%;color: red;margin-top: 19px;">highlight_off</md-icon>
+        <md-icon style="text-align: center;font-size: 79px !important;color: red;margin-top: 19px;">highlight_off</md-icon>
         <p class="Inforrsubtitle" style="margin-top: 50px;">Please confirm deletion of the data !</p>
       <button
       class="btn-save"

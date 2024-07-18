@@ -18,6 +18,7 @@ import Createsubcon from "./Pop-Up-Modal/Createsubcon.vue";
 import DeleteCQ from "./Pop-Up-Modal/DeleteCQ.vue";
 import EditCQ from "./Pop-Up-Modal/EditCQ.vue";
 import DeleteSubcon from "./Pop-Up-Modal/DeleteSubcon.vue";
+import EditSubcon from "./Pop-Up-Modal/EditSubcon.vue";
 import Createproject from "./Pop-Up-Modal/Createproject.vue";
 import EditProject from "./Pop-Up-Modal/EditProject.vue";
 import DelSubcon from "./Pop-Up-Modal/DelSubcon.vue";
@@ -45,6 +46,7 @@ export {
   ProjectTable,
   Createsubcon,
   DeleteSubcon,
+  EditSubcon,
   Createproject,
   EditProject,
   DelSubcon

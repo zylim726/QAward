@@ -44,6 +44,7 @@
             <td>{{ subcon.short_code }}</td>
             <td>{{ subcon.contact_person }}({{ subcon.phone }})</td>
             <td style="text-align: center" v-if="hasAccess">
+              <button class="transparentButton"  @click="editSub(subcon.id)" style="margin-left: -6px;"><md-icon style="color: orange !important;">edit</md-icon></button>
               <button class="transparentButton"  @click="deleteSub(subcon.id)" style="margin-left: -6px;"><md-icon style="color: orange !important;">delete</md-icon></button>
             </td>
           </tr>
@@ -52,6 +53,7 @@
       <br />
     </div>
     <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
+    <EditSubcon :edit-subcon="showEditModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage"  @close="closeEditModal" :id="editId" title="Edit Subcon"></EditSubcon>
     <DeleteSubcon :delete-subcon="showDeleteModal" @deletemessage="DeleteMessage" @deletefail-message="DeleteErrorMessage" @close="closeDeleteModal" :id="deleteId" title="Delete Subcon"></DeleteSubcon>
   </div>
 </template>
@@ -59,12 +61,14 @@
 <script>
 import SubconController from "@/services/controllers/SubconController.js";
 import Createsubcon from "@/components/Pop-Up-Modal/Createsubcon.vue";
+import EditSubcon from "@/components/Pop-Up-Modal/EditSubcon.vue";
 import DeleteSubcon from "@/components/Pop-Up-Modal/DeleteSubcon.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
     Createsubcon,
+    EditSubcon,
     DeleteSubcon 
   },
   data() {
@@ -78,6 +82,7 @@ export default {
       showModal: false,
       showEditModal: false,
       showDeleteModal: false,
+      editId: null,
       deleteId: null
     };
   },
@@ -103,6 +108,13 @@ export default {
         this.errorMessage = "Error fetching subcon data: " + error.errorMessage;
       }
     },
+    editSub(subconId) {
+      this.editId = subconId;
+      this.showEditModal = true; 
+    },
+    closeEditModal() {
+      this.showEditModal = false; 
+    },
     deleteSub(subconId) {
       this.deleteId = subconId;
       this.showDeleteModal = true; 
@@ -123,6 +135,18 @@ export default {
     ModalErrorMessage(message) {
       this.FailMessage = message; 
     },
+    EditMessage(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    EditErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
     DeleteMessage(message) {
       this.UpdateMessage = message; 
       setTimeout(() => {
@@ -138,7 +162,7 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Add-Remove Subcon'];
+        const accessIds = ['Add-Edit-Remove Subcon'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
         console.error('Error checking permission:', error);
@@ -149,3 +173,8 @@ export default {
 </script>
 
 
+<style>
+.nested-table td {
+  padding: 15px !important;
+}
+</style>
