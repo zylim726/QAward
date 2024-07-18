@@ -193,8 +193,6 @@ export default {
         const fileInput = document.querySelector('input[type="file"]');
         if (fileInput && fileInput.files.length > 0) {
           const event = { target: { files: fileInput.files } };
-
-          console.log('event',event);
           this.importDataFromFiles(event);
         } else {
           console.error("No file selected.");

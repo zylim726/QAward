@@ -197,13 +197,15 @@ export default {
         });
         if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative.");
-          return null;
+          window.location.reload();
+          return;
         }
 
         for (const key in matchedValues) {
           if (matchedValues[key] < 0) {
               this.$emit('fail-message', "Unit type quantity cannot have negative amounts.");
-              return null;
+              window.location.reload();
+              return;
           }
         }
 
@@ -211,7 +213,8 @@ export default {
         if (object["Unit"] !== "") {
           if (object["Budget Rate"] === "") {
             this.$emit('fail-message', "Budget Rate cannot be empty data.");
-            return null;
+            window.location.reload();
+            return;
           }
         }
 
@@ -229,10 +232,7 @@ export default {
       }).filter(data => data !== null);
 
       try {
-        console.log('matcgedData',matchedData);
-        console.log('cqId',cqId);
         const SuccessMessage = await DescriptionController.addDescription(cqId,matchedData);
-        console.log('Successmessagge',SuccessMessage);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.$emit('message', Message);
@@ -241,9 +241,8 @@ export default {
       } catch (error) {
         this.loading = false;
         const FailMessage = "Error updating: " + error.errorMessage;
-        console.log('FailMessage',FailMessage);
-       window.scrollTo(0, 0); 
-       this.$emit('fail-message', FailMessage);
+        window.scrollTo(0, 0); 
+        this.$emit('fail-message', FailMessage);
       } finally {
         this.loading = false;
       }

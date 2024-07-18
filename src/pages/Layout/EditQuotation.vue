@@ -59,7 +59,7 @@
                       <td>{{ formData.bq_quantity }}</td>
                       <td>{{ formData.adj_quantity }}</td>
                       <td v-for="(quotationData, qIndex) in QuotationName" :key="'rate-'+formIndex+'-'+qIndex" style="text-align: center;">
-                        <input type="number" v-model="RateInput[formData.id]"   />
+                        <input type="number" v-model="RateInput[formData.id]" @keydown="blockNegativeInput"   />
                       </td>
                     </template>
                   </tr>
@@ -69,7 +69,7 @@
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
-                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" />
+                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" @keydown="blockNegativeInput" />
               </div>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
@@ -120,6 +120,11 @@ export default {
     this.getNewDescription(id, subconId);
   },
   methods: {
+    blockNegativeInput(event) {
+      if (event.key === '-' || event.key === 'Minus') {
+        event.preventDefault();
+      }
+    },
     handleFileChange(event) {
       this.documents.file = event.target.files[0];
       

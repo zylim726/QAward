@@ -1,7 +1,5 @@
 <template>
   <div class="content">
-    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
-    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
       <div class="modal-content" style="max-height: 600px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
@@ -33,6 +31,9 @@
 
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
+        <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+        <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+        <br>
         <md-card style="height: 70%">
           <div class="status">
             <i class="material-icons">notifications_active</i>
@@ -232,9 +233,7 @@ export default {
             ...unitType,
             selected: true 
           }));
-        } else {
-          this.FailMessage = "No unit types available. Please set up unit types in the Project Setup.";
-        }
+        } 
       } catch (error) {
         this.FailMessage = "Fail to find unit types.";
       }

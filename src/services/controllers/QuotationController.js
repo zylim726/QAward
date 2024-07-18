@@ -293,7 +293,7 @@ const QuotationController = {
         formData.append('file', getDataFile);
         formData.append('data-table', 'revision');
         formData.append('data-table-id', revisionId);
-        formData.append('description', 'submit cost comparison');
+        formData.append('description', 'Submit cost comparison');
         formData.append('name', 'revision.xlsx');
         // Log FormData keys and values
         for (let pair of formData.entries()) {
@@ -360,12 +360,14 @@ const QuotationController = {
 
         console.log('revisionResponse',revisionResponse);
         const revisionId = revisionResponse.data.data.id;
+        const getInformation = 'CM rejected :' + remarksData;
+
         
         const formData = new FormData();
         formData.append('file', getFile.file);
         formData.append('data-table', 'revision');
         formData.append('data-table-id', revisionId);
-        formData.append('description', 'CM rejected');
+        formData.append('description', getInformation);
         formData.append('name', 'revision.xlsx');
        
         const response = await axios.post(

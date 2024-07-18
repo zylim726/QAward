@@ -67,12 +67,10 @@ export default {
       
       if (success) {
         store.dispatch('setToken', { token, username, accesslevel });
-      
-        const projectId = localStorage.getItem('projectId');
-        const projectName = localStorage.getItem('projectName');
-        
+    
         this.$router.push({ name: 'Project List' });
-  
+
+
       } else {
        this.$refs.errorModal.openModal('Error Message',message);
       }
