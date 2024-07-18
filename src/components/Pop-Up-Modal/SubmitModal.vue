@@ -2,6 +2,12 @@
   <div class="modal" :class="{ 'is-active': submitModal }">
     <div class="modal-background" @click="closesubmitModal"></div>
     <div class="modal-content" style="width: 30%">
+      <div v-if="isLoading" class="spinner-border" role="status">
+        <span class="visually-hidden">   
+          <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+            <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+          </button> Loading...</span>
+      </div>
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
@@ -54,7 +60,8 @@ export default {
     return {
       remarksData: "",
       matchingData: [],
-      selectedQuotation: null
+      selectedQuotation: null,
+      isLoading: false,
     };
   },
   watch: {
@@ -93,6 +100,7 @@ export default {
     },
     async saveAndCloseModal(remarksData, selectedQuotation) {
       try {
+        this.isLoading = true;
         const CQid = this.ApprovalData;
         const getFile = this.excelFile;
         const SuccessMessage = await QuotationController.addApproval(remarksData, selectedQuotation, CQid);
@@ -101,8 +109,11 @@ export default {
       } catch (error) {
         const FailMessage = "Error: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
-        this.scrollToTop(); 
+        this.scrollToTop();
+        this.isLoading = false; 
 
+      } finally {
+        this.isLoading = false;
       }
     },
     scrollToTop() {

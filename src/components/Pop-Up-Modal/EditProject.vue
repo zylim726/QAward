@@ -8,8 +8,11 @@
         <hr style="margin-top: -10px" />
         <br />
 
-        <div v-if="loading">
-          <p>Loading...</p><br>
+        <div v-if="loading" class="spinner-border" role="status">
+          <span class="visually-hidden">   
+            <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+              <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+            </button> Loading...</span>
         </div>
 
         <div v-if="!loading && unitTypes.length > 0">

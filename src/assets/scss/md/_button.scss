@@ -157,7 +157,7 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 
 
 .selected-row {
-  background-color: #fef4e4;
+  background-color: $orangeLight;
 }
 
 .btn-save {
@@ -206,12 +206,12 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 }
 
 .btn-rejected {
-  background-color: #FF6347; /* Tomato */
+  background-color: $red-400;
   color: $white;
 }
 
 .btn-approval {
-  background-color: #32CD32; /* Lime Green */
+  background-color: $green-400; 
   color: $white;
 }
 
@@ -232,7 +232,7 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
   border: none;
   border-radius: 5px;
   background-color: $gray-lighter;
-  color: #333;
+  color: $black;
   font-weight: bold;
   cursor: pointer;
 }

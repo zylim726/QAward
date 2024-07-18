@@ -1,6 +1,6 @@
 const config = {
   hosts: {
-    production: "https://subconbackend.tribit.com.my",
+    production: "http://103.16.42.51:5000",
   },
 
   getTokenFromLocalStorage: () => {

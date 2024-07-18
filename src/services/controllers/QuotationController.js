@@ -11,12 +11,12 @@ const QuotationController = {
             headers,
         });
 
-        
         const calculateSubcon = getSubcon.data.data;
         let SubconListId = "";
         let subconIdToRetrieve = null;
         const messages = [];
-         
+
+     
         if (calculateSubcon.length > 0) {
 
             const checkingSubconList = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, {
@@ -24,8 +24,7 @@ const QuotationController = {
             });
             
             const GetSubconId = checkingSubconList.data.data;
-            const SubconId = calculateSubcon[0].id;
-            
+            const SubconId = calculateSubcon[0].id; 
             for (const subcon of GetSubconId) {
                 if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(id)) {
                     subconIdToRetrieve = subcon.id;
@@ -33,6 +32,7 @@ const QuotationController = {
                 }
             }
 
+           
             if (subconIdToRetrieve === null) {
                 
                 try {
@@ -42,7 +42,9 @@ const QuotationController = {
                         call_for_quotation_id: id,
                         subcon_id: SubconId 
                     }, { headers });
-            
+
+                    
+       
                     SubconListId = cqSubconResponse.data.data.id;
 
                 } catch (error) {
@@ -51,12 +53,12 @@ const QuotationController = {
             } else {
                 SubconListId = subconIdToRetrieve;
             }
-
+           
             const formData = new FormData();
             formData.append('file', Documents.file);
             formData.append('data-table', 'call_for_quotation_subcon_list');
             formData.append('data-table-id', SubconListId);
-            formData.append('description', 'update quotation description');
+            formData.append('description', 'update quotation');
             formData.append('name', 'quotation.xlsx');
 
             // Perform the axios request
@@ -70,19 +72,16 @@ const QuotationController = {
                     }
                 }
             );
-        
+
+           
             for (const quotation of QuotationData) {
-     
+                console.log('quotation',quotation);
                 try {
                     const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
                         quote_rate: quotation.rate,
                         call_for_quotation_subcon_list_id: SubconListId,
                         description_id: quotation.description_id
-                    }, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
+                    },  { headers });
     
                     messages.push(quotationResponse.data.message);
                 } catch (quotationError) {
@@ -90,6 +89,7 @@ const QuotationController = {
                 }
             }
 
+          
             return messages;
         } 
     } catch (error) {
@@ -168,6 +168,7 @@ const QuotationController = {
                     approval_remarks: data.remark,
                     approval_type: 'QS',
                     approval_status: 'Approved',
+                    call_for_quotation_id: data.cqId,
                     call_for_quotation_subcon_list_id: data.callForQuotationListId
                 }, { headers });
 
@@ -183,16 +184,78 @@ const QuotationController = {
         throw error;
     }
   },
-  async CMrejectedQuotation(cqId){
+  async rejectCQApproval(approvalDataToSubmit,documents){
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
+        const token = localStorage.getItem('token');
+        let foundId = null;
+        const messages = [];
+        
 
-        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-            status: 'Pending',
+        const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
+            call_for_quotation_id: approvalDataToSubmit[0].cqId,
         }, { headers });
 
-    
+
+        const revisionId = revisionResponse.data.data.id;
+
+        const formData = new FormData();
+        formData.append('file', documents.file);
+        formData.append('data-table', 'revision');
+        formData.append('data-table-id', revisionId);
+        formData.append('description', approvalDataToSubmit[0].remark);
+        formData.append('name', 'revision.xlsx');
+
+        const Importresponse = await axios.post(
+            `${apiHost}/document/importExcel`, 
+            formData, 
+            { 
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+        );
+
+  
+        for (const data of approvalDataToSubmit) {
+            try {
+
+                const Cqresponse = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${data.cqId}`, { headers });
+
+                const CheckCQ = Cqresponse.data.data;
+                CheckCQ.forEach(cq => {
+                    if (Number(cq.system_user_id) === Number(data.userId)) {
+                        foundId = cq.id;
+                    }
+                });
+
+
+                if (foundId){
+
+                    const cqApprovalResponse = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
+                        approval_remarks: data.remark,
+                        approval_type: 'QS',
+                        approval_status: 'Reject',
+                        call_for_quotation_id: data.cqId,
+                        call_for_quotation_subcon_list_id: data.callForQuotationListId
+                    }, { headers });
+                    console.log('cqApprovalResponse',cqApprovalResponse);
+
+                    
+                    const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
+                        status: 'Pending',
+                    }, { headers });
+
+                    messages.push(cqApprovalResponse.data.message);
+                }
+                    
+            } catch (error) {
+                throw error;
+            }
+        }
+
         return response.data.message;
 
     } catch (error) {
@@ -217,10 +280,11 @@ const QuotationController = {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
+
+        console.log('cqId',cqId);
     
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: cqId,
-            version: 'version',
         }, { headers });
 
         const revisionId = revisionResponse.data.data.id;
@@ -229,7 +293,7 @@ const QuotationController = {
         formData.append('file', getDataFile);
         formData.append('data-table', 'revision');
         formData.append('data-table-id', revisionId);
-        formData.append('description', 'update revision');
+        formData.append('description', 'Submit cost comparison');
         formData.append('name', 'revision.xlsx');
         // Log FormData keys and values
         for (let pair of formData.entries()) {
@@ -262,20 +326,67 @@ const QuotationController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        const Userid = localStorage.getItem('userid');
- 
+        
+
         const getComparisonSummary = await axios.put(`${apiHost}/call_for_quotation/edit/${CQid}`, {
-            status: 'Waiting Approval',
+            status: 'Waiting Approval'
         }, { headers });
 
         const response = await axios.post(`${apiHost}/cq_approval/add`, {
             approval_remarks: remarksData,
-            approval_type: 'CM Approval',
-            call_for_quotation_subcon_list_id: selectedQuotation,
-            system_user_id: Userid
+            approval_type: 'CM',
+            call_for_quotation_id: CQid,
+            call_for_quotation_subcon_list_id: selectedQuotation
         }, { headers });
 
         return response.data.message;
+
+    } catch (error) {
+        throw error;
+    }
+  },
+  async CMrejectedQuotation(remarksData,CQid,getFile){
+    try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const token = localStorage.getItem('token');
+
+        console.log('rev');
+
+
+        const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
+            call_for_quotation_id: CQid,
+        }, { headers });
+
+        console.log('revisionResponse',revisionResponse);
+        const revisionId = revisionResponse.data.data.id;
+        const getInformation = 'CM rejected :' + remarksData;
+
+        
+        const formData = new FormData();
+        formData.append('file', getFile.file);
+        formData.append('data-table', 'revision');
+        formData.append('data-table-id', revisionId);
+        formData.append('description', getInformation);
+        formData.append('name', 'revision.xlsx');
+       
+        const response = await axios.post(
+                    `${apiHost}/document/importExcel`, 
+                    formData, 
+                    { 
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${token}`,
+                        }
+                    }
+                );
+
+        const getComparisonSummary = await axios.put(`${apiHost}/call_for_quotation/edit/${CQid}`, {
+            status: 'Pending',
+            remarks: remarksData
+        }, { headers });
+
+        return getComparisonSummary.data.message;
 
     } catch (error) {
         throw error;
@@ -290,6 +401,28 @@ const QuotationController = {
         const CQresponse =  await axios.delete(`${apiHost}/call_for_quotation_subcon_list/remove/${deleteId}`, { headers });
        
         return CQresponse.data.message;
+    } catch (error) {
+        throw error;
+    }
+  },
+  async updateWorkOrder(checked,cqId) {
+    try {
+
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+      
+        if(checked === true) {
+            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+                is_work_order : 1
+            }, { headers });
+        }else {
+            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+                is_work_order : 0
+            }, { headers });
+        }
+    
+        
+        return response.data.message;
     } catch (error) {
         throw error;
     }

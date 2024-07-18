@@ -12,11 +12,17 @@
         <md-card>
           <md-card-content style="font-size: 13px !important;line-height: 17px !important">
             <div>
+              <div v-if="isLoading" class="spinner-border" role="status">
+                <span class="visually-hidden">   
+                  <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+                    <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+                  </button> Loading...</span>
+              </div>
               <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
               <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
               <br>
-              <div class="container">
-                <div class="search-container">
+              <div class="container" v-if="!isLoading">
+                <div class="search-container" >
                   <form class="Searchbar">
                     <input
                       type="text"
@@ -25,8 +31,6 @@
                     />
                   </form>
                 </div>
-
-              
                 <div class="filter-container" style="margin-right: -15px">
                   <a href="createcq" v-if="hasAccess">
                     <div class="tooltip">
@@ -57,8 +61,8 @@
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
                       <th>Check By</th>
-                      <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 0" 
-                          :colspan="callQuotation[0].projectApproval.length">
+                      <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 1" 
+                          :colspan="callQuotation[0].projectApproval.length - 1">
                         Approved By
                       </th>
                       <th v-else>
@@ -80,8 +84,6 @@
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <th >
-                      </th>
                       <template v-if="projectApproval && projectApproval.length > 0">
                         <th v-for="(approval, index) in projectApproval" 
                           :key="index">
@@ -90,8 +92,9 @@
                       </template>
                       <template v-else>
                         <th></th>
+                        <th></th>
                       </template>
-                      <th colspan="20"></th>
+                      <th colspan="12"></th>
                     </tr>
                   </thead>
                   
@@ -119,7 +122,6 @@
                         </td>
                       </template>
                       <template v-else>
-                        <td></td>
                         <template v-if="projectApproval && projectApproval.length > 0">
                           <td v-for="(approval, index) in callQuotation.projectApproval" :key="index"></td>
                         </template>
@@ -177,6 +179,7 @@ export default {
       FailMessage: null,
       item: null,
       hasAccess: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -200,7 +203,7 @@ export default {
     if (projectName) {
       this.projectName = projectName;
     } else {
-      this.errorMessage = "Project ID not found in localStorage";
+      this.FailMessage = "Project ID not found in localStorage";
     };
     this.accessCQ();
   },
@@ -239,18 +242,19 @@ export default {
     },
     async accessCQ() {
       try {
+        this.isLoading = true;
         const processedData = await CallofQuotationController.accessCQ();
-        console.log('processeData',processedData);
         if (processedData.length > 0) {
           this.callQuotation = processedData;
+          console.log('thiscallquotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
-          console.log('this quotation',this.callQuotation);
-          console.log('this projectApproval',this.projectApproval);
         } else {
-          this.errorMessage = "An error occurred while fetching projects.";
+          this.FailMessage = "No more projects.";
         }
       } catch (error) {
-        this.errorMessage = "No more projects.";
+        this.FailMessage = ("Error Message :", error.errorMessage);
+      } finally {
+        this.isLoading = false;
       }
     },
     closeOtherDropDowns(clickedItem) {
@@ -265,7 +269,7 @@ export default {
         const accessIds = ['Add-Edit-Remove CQ'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
-        console.error('Error checking permission:', error);
+        this.FailMessage = ("Error checking permission :", error.errorMessage);
       }
     },
     formatDate(dateTimeString) {
@@ -273,7 +277,7 @@ export default {
 
       const date = new Date(dateTimeString);
       if (isNaN(date.getTime())) {
-        return ''; // Return empty string for invalid dates
+        return ''; 
       }
 
       const day = String(date.getDate()).padStart(2, '0');

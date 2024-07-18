@@ -1,7 +1,5 @@
 <template>
   <div class="content">
-    <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
-    <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
       <div class="modal-content" style="max-height: 600px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
@@ -33,6 +31,9 @@
 
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
+        <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+        <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+        <br>
         <md-card style="height: 70%">
           <div class="status">
             <i class="material-icons">notifications_active</i>
@@ -46,17 +47,17 @@
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Category :</h6>
-              <h3 class="titleHeader">{{ callQuotation.trade_category }}</h3>
+              <h3 class="titleHeader">{{ callQuotation.trade_category ? callQuotation.trade_category : '-' }}</h3>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Trade :</h6>
-              <h3 class="titleHeader">{{ callQuotation.trade }}</h3>
+              <h3 class="titleHeader">{{ callQuotation.trade ? callQuotation.trade : '-' }}</h3>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Location 1 :</h6>
-              <h3 class="titleHeader">{{ callQuotation.trade_location1 }}</h3>
+              <h3 class="titleHeader">{{ callQuotation.trade_location1 ? callQuotation.trade_location1 : '-' }}</h3>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Prepare :</h6>
@@ -64,7 +65,7 @@
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
               <h6>Awading Target Data :</h6>
-              <h3 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) }}</h3>
+              <h3 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h3>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
                 <div class="tooltip">
@@ -72,7 +73,7 @@
                   <md-icon style="color: orange;">edit_square</md-icon></div></button>
               <br>
               <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
-                <div class="tooltip" v-if="getDescription && getDescription.lengt === 0"  >
+                <div class="tooltip" v-if="callQuotation && callQuotation.status !== 'Waiting Approval' &&  callQuotation.status !== 'Approved' "  >
                   <span class="tooltiptext">Delete Comparison Summary</span>
                   <md-icon style="color: orange;">delete</md-icon></div></button>
           </div>
@@ -96,7 +97,6 @@ import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { Error } from "@/services";
 import { EditCQ,DeleteCQ }  from "@/components";
-import DescriptionController from "../services/controllers/DescriptionController";
 
 export default {
   components: {
@@ -113,7 +113,6 @@ export default {
       isModalVisible: false,
       CQunitType:[],
       UnitTypes: [],
-      getDescription:[],
       UpdateMessage: null,
       FailMessage: null,
       editModal: false,
@@ -192,7 +191,7 @@ export default {
     async getDetailCQ(Id) {
       try {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
-        this.getDescription = await DescriptionController.getNewDescription(Id);
+
         this.callQuotation = processedData[0];
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
@@ -234,9 +233,7 @@ export default {
             ...unitType,
             selected: true 
           }));
-        } else {
-          this.FailMessage = "No unit types available. Please set up unit types in the Project Setup.";
-        }
+        } 
       } catch (error) {
         this.FailMessage = "Fail to find unit types.";
       }

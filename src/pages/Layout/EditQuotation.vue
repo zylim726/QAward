@@ -42,7 +42,7 @@
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
                       <td><b>{{ formData.description_sub_sub_element || '' }}</b></td>
-                      <td><b>{{ formData.description_item }}</b></td>
+                      <td class="td-max-width"><b>{{ formData.description_item }}</b></td>
                       <td><b>{{ formData.description_unit || '' }}</b></td>
                       <td colspan="8"></td>
                     </template>
@@ -51,7 +51,7 @@
                       <td>{{ formData.element || '' }}</td>
                       <td>{{ formData.sub_element || '' }}</td>
                       <td>{{ formData.description_sub_sub_element || '' }}</td>
-                      <td style="padding-left: 60px !important;">{{ formData.description_item }}</td>
+                      <td style="padding-left: 60px !important;" class="td-max-width">{{ formData.description_item }}</td>
                       <td>{{ formData.description_unit || '' }}</td>
                       <td v-for="(cqUnit, unitIndex) in formData.cqUnitType" :key="'cqUnit-'+formIndex+'-'+unitIndex" style="text-align: center;">
                         {{ cqUnit.quantity }}
@@ -59,7 +59,7 @@
                       <td>{{ formData.bq_quantity }}</td>
                       <td>{{ formData.adj_quantity }}</td>
                       <td v-for="(quotationData, qIndex) in QuotationName" :key="'rate-'+formIndex+'-'+qIndex" style="text-align: center;">
-                        <input type="number" v-model="RateInput[formData.id]"   />
+                        <input type="number" v-model="RateInput[formData.id]" @keydown="blockNegativeInput"   />
                       </td>
                     </template>
                   </tr>
@@ -69,7 +69,19 @@
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
-                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" />
+                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" @keydown="blockNegativeInput" />
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+              <div style="display: flex; align-items: center;">
+                <label for="remark" style="margin-right: 5px;">Remarks:</label>
+                <input type="text" id="remarks" v-model.number="remarks" style="width: 94%;" />
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: -13px;">
+              <div>
+                <label for="documents" style="margin-right: 5px;">Documents:</label>
+                <input type="file" @change="handleFileChange">
               </div>
             </div>
             <br>
@@ -98,6 +110,8 @@ export default {
       Description: [],
       discount: 0,
       RateInput: {}, 
+      remarks: '',
+      documents: {},
     };
   },
   mounted() {
@@ -106,6 +120,15 @@ export default {
     this.getNewDescription(id, subconId);
   },
   methods: {
+    blockNegativeInput(event) {
+      if (event.key === '-' || event.key === 'Minus') {
+        event.preventDefault();
+      }
+    },
+    handleFileChange(event) {
+      this.documents.file = event.target.files[0];
+      
+    },
     async getNewDescription(id, subconId) {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
@@ -127,8 +150,6 @@ export default {
               this.$set(this.RateInput, formData.id, quotation.quote_rate || '');
             });
           }
-
-          console.log('this RateInput',this.RateInput);
         });
 
       } catch (error) {
@@ -155,7 +176,9 @@ export default {
       }).filter(data => data !== null);
       
         const discount = this.discount;
-        const SuccessMessage = await DescriptionController.editQuotation(dataToSave,discount);
+        const remark = this.remarks;
+        const Documents = this.documents;
+        const SuccessMessage = await DescriptionController.editQuotation(dataToSave,discount, remark,Documents);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;

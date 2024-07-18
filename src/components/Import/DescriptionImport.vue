@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-spinner">Loading...</div>
+    <div v-if="loading" class="spinner-border" role="status">
+      <span class="visually-hidden">   
+        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...</span>
     </div>
     <label
       for="desciptionInput"
@@ -53,7 +56,7 @@
               </label>
             </td>
             <td v-else></td>
-            <td v-for="column in filteredColumns" :key="column" style="white-space: pre-wrap;">
+            <td v-for="column in filteredColumns" :key="column" class="td-max-width">
               {{ displayValue(row[column], column) }}
             </td>
           </tr>
@@ -182,25 +185,27 @@ export default {
       const cqId = this.cqId;
       const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
       const unittype = this.Unittype;
-      
+
       const matchedData = selectImportData.map(object => {
         const matchedValues = {};
         unittype.forEach(unit => {
           const combineObjects = `${unit.type} (${unit.quantity})`;
+         
           if (object.hasOwnProperty(combineObjects)) {
             matchedValues[unit.id] = `${object[combineObjects]}`;
           }
         });
-
         if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative.");
-          return null;
+          window.location.reload();
+          return;
         }
 
         for (const key in matchedValues) {
           if (matchedValues[key] < 0) {
               this.$emit('fail-message', "Unit type quantity cannot have negative amounts.");
-              return null;
+              window.location.reload();
+              return;
           }
         }
 
@@ -208,13 +213,13 @@ export default {
         if (object["Unit"] !== "") {
           if (object["Budget Rate"] === "") {
             this.$emit('fail-message', "Budget Rate cannot be empty data.");
-            return null;
+            window.location.reload();
+            return;
           }
-         
         }
 
         const hasMatches = Object.keys(matchedValues).length > 0;
-
+      
         return hasMatches ? {
             matchedValues,
             element: object["Element"],
@@ -245,3 +250,4 @@ export default {
   },
 };
 </script>
+

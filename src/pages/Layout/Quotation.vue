@@ -4,16 +4,21 @@
     <div v-if="isModalVisible" class="modal-overlay">
       <div class="modal-content">
         <h1 class="titleHeader">Select Subcon</h1><br>
-        <input type="text" v-model="searchTerm" placeholder="Search subcon name then select the subcon" class="dropdownSubcon"
-        style="width: 64%;"><br><br>
+        <input type="text" v-model="searchTerm" placeholder="Search subcon name then select the subcon" class="dropdownSubcon" style="width: 59%;height: 15%;"><br><br>
         <div v-if="filteredSubconData.length > 0" style="height: 60%;">
-          <div class="tooltip" >
-            <span style="position: absolute;margin-top: 5px;margin-left: 10px;"  v-if="!selectedOption">Select Subcon</span>
-            <select class="dropdownSubcon" v-model="selectedOption" style="height: 29px;width: 188px;" >
-            <option v-for="(subconData, index) in filteredSubconData" :key="index" :value="subconData.name">{{ subconData.name }}</option>
+          <div class="tooltip">
+            <span style="position: absolute;margin-top: 8px;margin-left: 10px;" v-if="!selectedOption">Select Subcon</span>
+            <select class="dropdownSubcon" v-model="selectedOption" style="height: 32px;width: 278px;">
+              <option v-for="(subconData, index) in filteredSubconData" :key="index" :value="subconData.name">{{ subconData.name }}</option>
             </select>
           </div>
-        <button class="btn-confirm" @click="confirmSubconSelection">Confirm</button>
+          
+          <!-- File input section -->
+          <div class="file-upload-container" v-if="selectedOption">
+            <label for="fileInput">Upload File: </label>
+            <input type="file" multiple @change="importDataFromFiles" />
+          </div>
+          <button class="btn-confirm" @click="confirmSubconSelection" v-if="selectedOption" style="margin-left: 41%;">Confirm</button>
         </div>
         <div v-else>
           <p style="color: red;">No results found.</p>
@@ -22,28 +27,27 @@
     </div>
 
 
-
-    <div v-if="UpdateMessage" class="notification success">
-      {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
-    </div>
-    <div v-if="FailMessage" class="notification fail">
-      {{ FailMessage }} <md-icon>cancel</md-icon>
-    </div>
     <div class="md-layout">
-      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
-        <label style="margin-right: 10px; float: right" class="file-label">
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px"> 
+          <button @click="openModal" class="transparentButton" style="margin-right: 10px; float: right">
           <div class="tooltip" >
-            <span class="tooltiptext" style="bottom: -238% !important;">Upload quotation excel.</span>
-          <md-icon class="mdIcon">upload_file</md-icon></div>
-          <input type="file" multiple @change="importDataFromFiles" />
-        </label>
+            <span class="tooltiptext" style="bottom: -310% !important;">Select subcon and upload quotation excel.</span>
+            <md-icon class="mdIcon" >upload_file</md-icon></div>
+          <!-- <input type="file" multiple @change="importDataFromFiles" /> -->
+        </button>
         <button @click="downloadExcelTemplate" class="transparentButton" style="margin-right: 10px; float: right">
           <div class="tooltip" >
-            <span class="tooltiptext" style="bottom: -297% !important;">Download quotation template and field in rate data.</span>
+            <span class="tooltiptext" style="bottom: -305% !important;">Download quotation template and field in rate data.</span>
           <md-icon class="mdIcon">download_for_offline</md-icon></div>
         </button>
         <md-card>
           <md-card-content>
+            <div v-if="UpdateMessage" class="notification success">
+              {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
+            </div><br>
+            <div v-if="FailMessage" class="notification fail">
+              {{ FailMessage }} <md-icon>cancel</md-icon>
+            </div><br>
             <div class="table-container" style="margin-top: 0px !important;">
               <table class="nested-table" id="data-table" ref="dataTable">
                 <thead>
@@ -84,14 +88,14 @@
                     <th scope="col">Rate</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody >
                 </tbody>
               </table>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
-                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" min="0" />
+                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" min="0" @keydown="blockNegativeInput" />
               </div>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
@@ -149,9 +153,6 @@ export default {
     this.getNewDescription(id)
       .then(() => {
         this.generateTable(this.Description, id);
-        if (!this.selectedSubconName) {
-          this.isModalVisible = true;
-        }
       })
       .catch(error => {
         console.error('Error fetching Description:', error);
@@ -171,14 +172,35 @@ export default {
     }
   },
   methods: {
+    blockNegativeInput(event) {
+      if (event.key === '-' || event.key === 'Minus') {
+        event.preventDefault();
+      }
+    },
+    openModal() {
+      this.isModalVisible = true;
+    },
     handleFileChange(event) {
       this.documents.file = event.target.files[0];
       
     },
     confirmSubconSelection() {
       if (this.selectedOption) {
-        this.selectedSubconName = this.selectedOption;
+        this.selectedSubconName = this.selectedOption; 
         this.isModalVisible = false;
+
+        // Ensure to pass event to importDataFromFiles
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput && fileInput.files.length > 0) {
+          const event = { target: { files: fileInput.files } };
+          this.importDataFromFiles(event);
+        } else {
+          console.error("No file selected.");
+          // Handle case where no file is selected
+        }
+      } else {
+        console.error("No subcontractor selected.");
+        // Handle case where no subcontractor is selected
       }
     },
     async accessSubcon() {
@@ -277,7 +299,7 @@ export default {
             <td><b>${formData.element || ''}</b></td>
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
-            <td style="white-space: pre-wrap;"><b>${formData.description_item}</b></td>
+            <td  class="td-max-width"><b>${formData.description_item}</b></td>
             <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
@@ -292,7 +314,7 @@ export default {
 
           let unitQuantityTDs = '';
           cqUnitType.forEach(cqUnit => {
-            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adjQty}</td>`;
+            unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adj_quantity}</td>`;
           });
 
           const head2Row = document.createElement('tr');
@@ -301,7 +323,7 @@ export default {
             <td>${formData.element || ''}</td>
             <td>${formData.sub_element || ''}</td>
             <td>${formData.description_sub_sub_element || ''}</td>
-            <td style="padding-left:60px !important;white-space: pre-wrap;">${formData.description_item}</td>
+            <td style="padding-left:30px !important;"  class="td-max-width">${formData.description_item}</td>
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
@@ -310,14 +332,17 @@ export default {
           tableBody.appendChild(head2Row);
 
           if (columnKData[columnKDataIndex] !== '') {
-            this.QuotationDataArray.push({
-              description_id: formData.id,
-              countData: count,
-              rateData: rateCount,
-              quotationName: this.selectedSubconName,
-              rate: columnKData[columnKDataIndex],
-            });
+            const existingEntry = this.QuotationDataArray.find(entry => entry.description_id === formData.id);
+            if (!existingEntry) {
+              this.QuotationDataArray.push({
+                description_id: formData.id,
+                countData: count,
+                rateData: rateCount,
+                rate: columnKData[columnKDataIndex],
+              });
+            }
           }
+
 
           columnKDataIndex++;
         }
@@ -337,9 +362,6 @@ export default {
             const Discount = this.discount;
             const Remarks = this.remarks;
             const Documents = this.documents;
-
-            console.log('QuotationData',QuotationData);
-
             const hasNegativeRate = QuotationData.some(data => data.rate < 0);
             if (hasNegativeRate) {
                 this.FailMessage = "Error: Rate data cannot have negative values.";
@@ -350,9 +372,7 @@ export default {
                 }, 2000);
                 return;
             }
-
             if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-              
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
               const concatenatedMessage = SuccessMessage.join(', ');
               this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
@@ -364,7 +384,7 @@ export default {
                   query: { cqID: this.$route.query.cqId }
               });
 
-               window.open(routeData.href, '_blank');
+                window.open(routeData.href, '_blank');
             } else {
               this.FailMessage = "Error: Rate data is empty";
               setTimeout(() => {
@@ -382,155 +402,49 @@ export default {
             }, 2000);
         }
     },
-    // downloadExcelTemplate() {
-    //   const dataTable = this.$refs.dataTable;
-
-    //   if (!dataTable) {
-    //     console.error("Data table reference not found.");
-    //     return;
-    //   }
-
-    //   const clonedTable = dataTable.cloneNode(true);
-
-    //   if (!clonedTable) {
-    //     console.error("Cloned table not created.");
-    //     return;
-    //   }
-
-    //   // Remove IDs to avoid duplicate elements in the document
-    //   clonedTable.querySelectorAll('[id]').forEach(element => {
-    //     element.removeAttribute('id');
-    //   });
-
-    //   // Create a new workbook and add a worksheet
-    //   const workbook = new ExcelJS.Workbook();
-    //   const worksheet = workbook.addWorksheet('Sheet1');
-
-    //   // Add table rows to the worksheet, skipping the first row
-    //   const rows = clonedTable.querySelectorAll('tr');
-    //   rows.forEach((row, index) => {
-    //     if (index === 0) return; // Skip the first row
-    //     const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
-    //     worksheet.addRow(cells);
-    //   });
-
-    //   // Lock cells with text or numbers and leave blank cells unlocked
-    //   worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-    //     row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-    //       if (cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
-    //         cell.protection = { locked: true };  
-    //       } else {
-    //         cell.protection = { locked: false };  
-    //       }
-    //     });
-    //   });
-
-    //   // Protect the sheet
-    //   worksheet.protect('12345', {
-    //     selectLockedCells: false,
-    //     selectUnlockedCells: true,
-    //     formatCells: false,
-    //     formatColumns: false,
-    //     formatRows: false,
-    //     insertColumns: false,
-    //     insertRows: false,
-    //     insertHyperlinks: false,
-    //     deleteColumns: false,
-    //     deleteRows: false
-    //   });
-
-    //   // Write the workbook to a file
-    //   workbook.xlsx.writeBuffer().then(buffer => {
-    //     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    //     const link = document.createElement('a');
-    //     link.href = URL.createObjectURL(blob);
-    //     link.download = 'Quotation.xlsx';
-    //     link.click();
-    //   }).catch(err => {
-    //     console.error(err);
-    //   });
-    // }
     downloadExcelTemplate() {
-  const dataTable = this.$refs.dataTable;
+      const dataTable = this.$refs.dataTable;
 
-  if (!dataTable) {
-    console.error("Data table reference not found.");
-    return;
-  }
-
-  const clonedTable = dataTable.cloneNode(true);
-
-  if (!clonedTable) {
-    console.error("Cloned table not created.");
-    return;
-  }
-
-  // Remove IDs to avoid duplicate elements in the document
-  clonedTable.querySelectorAll('[id]').forEach(element => {
-    element.removeAttribute('id');
-  });
-
-  // Create a new workbook and add a worksheet
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Sheet1');
-
-  // Retrieve column widths from the original table
-  const colWidths = Array.from(clonedTable.querySelectorAll('tr:first-child th')).map(th => {
-    const style = window.getComputedStyle(th);
-    const width = style.width.replace('px', '');
-    return parseFloat(width);
-  });
-
-  // Add table rows to the worksheet, skipping the first row
-  const rows = clonedTable.querySelectorAll('tr');
-  rows.forEach((row, index) => {
-    if (index === 0) return; // Skip the first row
-    const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
-    worksheet.addRow(cells);
-  });
-
-  // Set the column widths in the worksheet
-  worksheet.columns = worksheet.columns.map((col, index) => ({
-    ...col,
-    width: colWidths[index] / 7.5 // Convert px to Excel width (approximation)
-  }));
-
-  // Lock cells with text or numbers and leave blank cells unlocked
-  worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-      if (cell.value !== null && cell.value !== undefined && cell.value.toString().trim() !== '') {
-        cell.protection = { locked: true };
-      } else {
-        cell.protection = { locked: false };
+      if (!dataTable) {
+        console.error("Data table reference not found.");
+        return;
       }
-    });
-  });
 
-  // Protect the sheet
-  worksheet.protect('12345', {
-    selectLockedCells: false,
-    selectUnlockedCells: true,
-    formatCells: false,
-    formatColumns: false,
-    formatRows: false,
-    insertColumns: false,
-    insertRows: false,
-    insertHyperlinks: false,
-    deleteColumns: false,
-    deleteRows: false
-  });
+      const clonedTable = dataTable.cloneNode(true);
 
-  // Write the workbook to a file
-  workbook.xlsx.writeBuffer().then(buffer => {
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Quotation.xlsx';
-    link.click();
-  }).catch(err => {
-    console.error(err);
-  });
-}
+      if (!clonedTable) {
+        console.error("Cloned table not created.");
+        return;
+      }
+
+      // Remove IDs to avoid duplicate elements in the document
+      clonedTable.querySelectorAll('[id]').forEach(element => {
+        element.removeAttribute('id');
+      });
+
+      // Create a new workbook and add a worksheet
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sheet1');
+
+      // Add table rows to the worksheet, skipping the first row
+      const rows = clonedTable.querySelectorAll('tr');
+      rows.forEach((row, index) => {
+        if (index === 0) return; // Skip the first row
+        const cells = Array.from(row.querySelectorAll('th, td')).map(cell => cell.textContent.trim());
+        worksheet.addRow(cells);
+      });
+
+      // Write the workbook to a file
+      workbook.xlsx.writeBuffer().then(buffer => {
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Quotation.xlsx';
+        link.click();
+      }).catch(err => {
+        console.error(err);
+      });
+    }
 
   },
 };
@@ -555,7 +469,13 @@ export default {
   text-align: center;
   width: 500px;
   overflow-y: clip;
-  height: 250px;
+  height: 300px;
+}
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  margin: 20px 0px 18px 97px;
 }
 
 

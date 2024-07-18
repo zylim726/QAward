@@ -3,7 +3,7 @@
     <modal ref="errorModal"></modal>
     <a href="#" class="simple-text">
       <img
-        src="@/assets/img/background.png"
+        src="@/assets/img/background.jpg"
         alt=""
         style="width: 100%; height: 60%"
       />
@@ -67,16 +67,10 @@ export default {
       
       if (success) {
         store.dispatch('setToken', { token, username, accesslevel });
-      
-        const projectId = localStorage.getItem('projectId');
-        const projectName = localStorage.getItem('projectName');
-        
-        if (!projectId || !projectName) {
-          this.$router.push({ name: 'Project List' });
-        } else {
-          this.$router.push({ name: 'Call For Quotation' });
-         }
-        
+    
+        this.$router.push({ name: 'Project List' });
+
+
       } else {
        this.$refs.errorModal.openModal('Error Message',message);
       }
