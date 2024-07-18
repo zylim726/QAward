@@ -13,8 +13,10 @@
                   <tr>
                     <th scope="col">No</th>
                     <th scope="col">Revision</th>
-                    <th scope="col">Date</th>
                     <th>Remarks</th>
+                    <th scope="col">Date</th>
+                    <th>Create By</th>
+                    <th>Reason</th>
                     <th scope="col" style="text-align: right;"></th>
                   </tr>
                 </thead>
@@ -22,8 +24,10 @@
                   <tr v-for="(rv, index) in revision" :key="index">
                     <td>{{ index + 1 }}</td>
                     <td>Revision {{ rv.version }}</td>
+                    <td>{{ rv.remark?.approval_remarks || 'No remarks available' }}</td>
                     <td>{{ formatDate(rv.createdAt) }}</td>
-                    <td>{{ rv.remark }}</td>
+                    <td>{{ rv.created_by }}</td>
+                    <td>{{ rv.document_description }}</td>
                     <td>
                       <button class="btn-save" @click="downloadDocument(rv.document_api)">
                         Download Revision

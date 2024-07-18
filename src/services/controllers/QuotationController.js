@@ -58,7 +58,7 @@ const QuotationController = {
             formData.append('file', Documents.file);
             formData.append('data-table', 'call_for_quotation_subcon_list');
             formData.append('data-table-id', SubconListId);
-            formData.append('description', 'update quotation description');
+            formData.append('description', 'update quotation');
             formData.append('name', 'quotation.xlsx');
 
             // Perform the axios request
@@ -191,6 +191,7 @@ const QuotationController = {
         const token = localStorage.getItem('token');
         let foundId = null;
         const messages = [];
+        
 
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: approvalDataToSubmit[0].cqId,
@@ -279,10 +280,11 @@ const QuotationController = {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
+
+        console.log('cqId',cqId);
     
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: cqId,
-            version: 'version',
         }, { headers });
 
         const revisionId = revisionResponse.data.data.id;
@@ -291,7 +293,7 @@ const QuotationController = {
         formData.append('file', getDataFile);
         formData.append('data-table', 'revision');
         formData.append('data-table-id', revisionId);
-        formData.append('description', 'update revision');
+        formData.append('description', 'submit cost comparison');
         formData.append('name', 'revision.xlsx');
         // Log FormData keys and values
         for (let pair of formData.entries()) {
@@ -349,17 +351,21 @@ const QuotationController = {
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
 
+        console.log('rev');
+
+
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: CQid,
         }, { headers });
 
+        console.log('revisionResponse',revisionResponse);
         const revisionId = revisionResponse.data.data.id;
         
         const formData = new FormData();
         formData.append('file', getFile.file);
         formData.append('data-table', 'revision');
         formData.append('data-table-id', revisionId);
-        formData.append('description', 'update revision');
+        formData.append('description', 'CM rejected');
         formData.append('name', 'revision.xlsx');
        
         const response = await axios.post(

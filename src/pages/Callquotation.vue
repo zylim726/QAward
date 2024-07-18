@@ -203,7 +203,7 @@ export default {
     if (projectName) {
       this.projectName = projectName;
     } else {
-      this.errorMessage = "Project ID not found in localStorage";
+      this.FailMessage = "Project ID not found in localStorage";
     };
     this.accessCQ();
   },
@@ -249,10 +249,10 @@ export default {
           console.log('thiscallquotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
-          this.errorMessage = "An error occurred while fetching projects.";
+          this.FailMessage = "No more projects.";
         }
       } catch (error) {
-        this.errorMessage = "No more projects.";
+        this.FailMessage = ("Error Message :", error.errorMessage);
       } finally {
         this.isLoading = false;
       }
@@ -269,7 +269,7 @@ export default {
         const accessIds = ['Add-Edit-Remove CQ'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
-        console.error('Error checking permission:', error);
+        this.FailMessage = ("Error checking permission :", error.errorMessage);
       }
     },
     formatDate(dateTimeString) {
@@ -277,7 +277,7 @@ export default {
 
       const date = new Date(dateTimeString);
       if (isNaN(date.getTime())) {
-        return ''; // Return empty string for invalid dates
+        return ''; 
       }
 
       const day = String(date.getDate()).padStart(2, '0');

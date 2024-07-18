@@ -3,7 +3,7 @@
     <modal ref="errorModal"></modal>
     <a href="#" class="simple-text">
       <img
-        src="@/assets/img/background.png"
+        src="@/assets/img/background.jpg"
         alt=""
         style="width: 100%; height: 60%"
       />

@@ -50,7 +50,7 @@
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
-            <th v-if="Unittype.some(unitdata => unitdata.cqUnitType.remeasurement_quantity !== null)">
+            <th v-if="hasRemeasurement">
               <div class="tooltip" >
                 <span class="tooltiptext" style="margin-bottom: -127px !important;margin-left: -167px;width: 178px !important;">
                   Remeasurement Quantity formula = (Unit Type Remeasurement Quantity x Description Quantity) x ADJ Factor</span>
@@ -103,11 +103,17 @@
             </template>
             <th scope="col">BQ QTY</th>
             <th scope="col">(ADJ) QTY</th>
-            <th scope="col" v-if="Unittype.some(unitdata => unitdata.cqUnitType.remeasurement_quantity !== null)">(Reamesurement) QTY</th>
-            <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
-              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+            <th scope="col" v-if="hasRemeasurement">(Reamesurement) QTY</th>
+            <th 
+              scope="col" 
+              colspan="2" 
+              v-for="(quotationData, index) in QuotationName" 
+              :key="index" 
+              style="text-align: center; border: 1px solid #ddd !important">
+              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id,quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
               <br>
             </th>
+
           </tr>
           <tr>
             <th colspan="6"></th>
@@ -115,7 +121,7 @@
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
             </template>
             <th colspan="2"></th>
-            <th v-if="Unittype.some(unitdata => unitdata.cqUnitType.remeasurement_quantity !== null)"></th>
+            <th v-if="hasRemeasurement"></th>
             <th v-for="(header, index) in generatedHeaders" :key="index" style="text-align: center;border-left:1px solid #ddd !important;border-right:1px solid #ddd !important">{{ header }}</th>
           </tr>
         </thead>
@@ -230,7 +236,7 @@
     <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
     title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></SubmitModal>
     <RejectModal :reject-modal="rejectModal"   @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closerejectModal" 
-    title="Reject Approval" :ApprovalData="cmCQapproval"  :excelFile="excelFile"></RejectModal>
+    title="Reject Approval" :ApprovalData="ApprovalDataArray"  :excelFile="excelFile"></RejectModal>
     <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
   </div>
 </template>
@@ -268,7 +274,6 @@ export default {
       show: ref(false),
       searchQuery: '',
       isHide: true,
-      errorMessage: '',
       delModal: false,
       deleteId: [],
       submitModal: false,
@@ -299,9 +304,16 @@ export default {
     },
   },
   computed: {
+    hasRemeasurement(){   
+      if (Array.isArray(this.Unittype) && this.Unittype.length > 0) {
+        const firstUnit = this.Unittype[0];
+        const remeasurementQuantity = firstUnit?.is_remeasurement;
+        return remeasurementQuantity === true;
+      }
+      return false;
+    },
     isPermissionChecked() {
       const isChecked = this.Unittype[0].Cq_Unit_Type.Call_For_Quotation.is_work_order === true;
-      console.log('isChecked',isChecked);
       return isChecked;
     },
     filteredCQApprovalData() {
@@ -339,15 +351,15 @@ export default {
         }
        }
     },
-    getDisplayName(budgetId,name) {
+    getDisplayName(budgetId, name) {
       budgetId = parseFloat(budgetId);
+      if (isNaN(budgetId)) {
+        return name; // Return the name if budgetId is invalid
+      }
       if (budgetId === 1) {
-        return 'Budget (ADJ)';
+        return 'Budget ADJ';
       }
-      if (budgetId === 1.5) {
-        return 'Budget (Remeasurement)';
-      }
-      return name;
+      return name; // Default case
     },
     formatDate(dateTimeString) {
       if (!dateTimeString) return '';
@@ -461,25 +473,20 @@ export default {
       this.excelFile = this.generateExcelFile() || null;
       const documents = this.excelFile;
       const approvalDataToSubmit = [];
-      const selectedSubconListName = this.selectedQuotations[index];
       const remark = this.remarks[index];
 
       this.SubconListId.forEach((getSubconList) => {
-        const subconName = getSubconList.Subcon;
-        if (subconName.name === selectedSubconListName) {
-          if (selectedSubconListName) {  // Only check if selectedSubconListName is present
-            approvalDataToSubmit.push({
-              cqId: this.cqId,
-              userId: systemUserId,
-              callForQuotationListId: getSubconList.id,
-              remark: remark || ""  // Save an empty string if remark is empty or null
-            });
-          }
-        }
+        approvalDataToSubmit.push({
+          cqId: this.cqId,
+          userId: systemUserId,
+          callForQuotationListId: getSubconList.id,
+          remark: remark || "" 
+        });
       });
 
 
       try {
+
          const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit,documents);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
@@ -558,10 +565,13 @@ export default {
       try {
         this.isLoading = true;
         let processedData = await DescriptionController.getNewDescription(id);
+      
         const searchQuery = this.searchQuery.toLowerCase().trim();
 
+        console.log('id',id);
+        
         this.ApprovalDataArray.push(Number(id));
-  
+        
         if (searchQuery) {
           processedData = processedData.filter(formData =>
             formData.description_item.toLowerCase().includes(searchQuery) ||
@@ -569,30 +579,28 @@ export default {
             formData.sub_element.toLowerCase().includes(searchQuery) ||
             formData.description_sub_sub_element.toLowerCase().includes(searchQuery)
           );
+
         }
 
         const projectStatus = this.projectData;
         if (!Array.isArray(processedData)) {
           processedData = [];
         }
-
         this.processedData = processedData;
-        
+
         if (processedData.length > 0) {
           const tableBody = document.querySelector('.nested-table tbody');
           tableBody.innerHTML = '';
 
           let head1Counter = 0;
           let head2Counter = 0;
-          
 
-          const totalQuotationAmounts =  []; 
+          const totalQuotationAmounts = [];
 
           for (const formData of processedData) {
-            const cqUnitType = formData.cqUnitType;
-            this.Unittype = cqUnitType;
-            console.log('this Unittype',this.Unittype);
             const getQuotation = formData.quotation;
+            this.Unittype = formData.cqUnitType;
+
             if (getQuotation.length <= 0 || getQuotation[0].quote_rate === 0) {
               head1Counter++;
               const head1Row = document.createElement('tr');
@@ -608,22 +616,18 @@ export default {
               head2Counter = 0;
             }
 
-            if (getQuotation.length > 0 && getQuotation[0].quote_rate !== 0  ) {
+            if (getQuotation.length > 0 && getQuotation[0].quote_rate !== 0) {
               head2Counter++;
-    
-              this.QuotationName = getQuotation;
 
-           console.log('this.QuotationName',this.QuotationName);
-              
+            this.QuotationName = getQuotation;
+
               let quotationTDs = '';
-              const seenSubconIds = new Set(); 
+              const seenSubconIds = new Set();
               for (const quotationRate of getQuotation) {
                 const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
                 const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-
                 const exists = totalQuotationAmounts.some(entry => entry.subcon_id === SubconId);
-  
-                // If it doesn't exist, push the new entry
+
                 if (!exists) {
                   totalQuotationAmounts.push({
                     subcon_id: SubconId,
@@ -631,24 +635,23 @@ export default {
                   });
                 }
 
-
                 quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
-                                <td style="text-align:right;border-right:1px solid #ddd !important">${ this.formatAccounting(quotationRate.total_quote_amount) }</td>`;
+                                <td style="text-align:right;border-right:1px solid #ddd !important">${this.formatAccounting(quotationRate.total_quote_amount)}</td>`;
               }
               let unitQuantityTDs = '';
-              cqUnitType.forEach((cqUnit) => {
-                const quantity = cqUnit.adj_quantity !== undefined ? cqUnit.adj_quantity : 0;
-                unitQuantityTDs += `<td style="text-align:center;">${quantity}</td>`;
+              formData.cqUnitType.forEach((cqUnit) => {
+            
+                unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adj_quantity}</td>`;
               });
 
               let remeasuremntQuantityTDs = '';
-              if(formData.remeasurement_quantity !== null){
+              if (formData.remeasurement_quantity !== null) {
                 remeasuremntQuantityTDs = `<td>${formData.remeasurement_quantity}</td>`;
               }
 
               const getHideHTML = `<td>${formData.bq_quantity}</td>`;
               const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
-      
+
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
                 <td>${head1Counter}.${head2Counter}</td>
@@ -671,10 +674,9 @@ export default {
           const numberOfArrays = UnitType.length;
           const getRemeauserement = UnitType[0].is_remeasurement;
 
-          const colspan = isHide 
-          ? (getRemeauserement ? 9 : 8)
-          : (getRemeauserement ? numberOfArrays + 9 : numberOfArrays + 8);
-
+          const colspan = isHide
+            ? (getRemeauserement ? 9 : 8)
+            : (getRemeauserement ? numberOfArrays + 9 : numberOfArrays + 8);
 
           let bqTotalAmountTDs = '';
           let adjTotalAmountTDs = '';
@@ -684,16 +686,16 @@ export default {
           let overrumTDs = '';
           let winnerTDs = '';
           let rateTDs = '';
-          let remarks ='';
+          let remarks = '';
           for (const DatasubconAmount of Object.values(totalQuotationAmounts)) {
             const subconAmount = DatasubconAmount.data;
-            if (subconAmount[0].subcon_id > 1.5 ) {
+            if (subconAmount[0].subcon_id > 1.5) {
               discountGivenTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].discount_given)}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].afterADJDiscount_give)}</td>`;
               overrumTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].adj_totalSaving)}</td>`;
               winnerTDs += `<td colspan="2" ><b>${this.formatAccounting(subconAmount[0].winner)}</b></td>`;
               rateTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].rate)}</td>`;
-            }else{
+            } else {
               discountGivenTDs += `<td colspan="2"></td>`;
               afterADJDiscountTDs += `<td colspan="2"></td>`;
               overrumTDs += `<td colspan="2"></td>`;
@@ -706,54 +708,51 @@ export default {
             remarks += `<td colspan="2" style="white-space: pre-wrap;line-height:25px">${subconAmount[0].remark ? subconAmount[0].remark : ''}</td>`;
           }
 
-          
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
-              <td colspan="${colspan}" ><b>BQ Total Amount (RM) </b></td>
+              <td colspan="${colspan}"><b>BQ Total Amount (RM)</b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}" ><b>Remeasurement Total Amount (RM) </b></td>
-              ${remasurementTotalAmountTDs}
-            </tr>
-            <tr>
-              <td colspan="${colspan}"><b>ADJ Total Amount (RM) </b></td>
+              <td colspan="${colspan}"><b>ADJ Total Amount (RM)</b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Discount Given (RM) </b></td>
+              <td colspan="${colspan}"><b>Remeasurement Total Amount (RM)</b></td>
+              ${remasurementTotalAmountTDs}
+            </tr>
+            <tr>
+              <td colspan="${colspan}"><b>Discount Given (RM)</b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>After Discount Given (RM) </b></td>
+              <td colspan="${colspan}"><b>After Discount Given (RM)</b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Total Saving / Overrun (RM) </b></td>
+              <td colspan="${colspan}"><b>Total Saving / Overrun (RM)</b></td>
               ${overrumTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"> </td>
+              <td colspan="${colspan}"></td>
               ${rateTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"> </td>
+              <td colspan="${colspan}"></td>
               ${winnerTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}">Remarks </td>
-              ${remarks}  
+              <td colspan="${colspan}">Remarks</td>
+              ${remarks}
             </tr>
           `;
-          
         } else {
           const tableBody = document.querySelector('.nested-table tbody');
           tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
         }
       } catch (error) {
-        this.isLoading = false;
-        this.errorMessage = 'An error for get description data.';
+        this.FailMessage = 'An error occurred while getting description data.';
       } finally {
         this.isLoading = false;
       }
@@ -806,14 +805,14 @@ export default {
         console.log('Error fetching CQ approvals:', error);
       }
     },
-    async getCMcqApproval(id) {
+    async getCMcqApproval() {
       try {
+        const id = this.cqId;
         const response = await QuotationController.getCMcqApproval(id);
-     
         this.cmCQapproval = response.filter(approval => approval.approval_status === 'Approved');
   
       } catch (error) {
-        // this.FailMessage = 'Error CM approval:', error;
+         //this.FailMessage = 'Error CM approval:', error;
       }
     },
     async getProject(id) {

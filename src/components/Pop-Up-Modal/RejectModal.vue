@@ -16,7 +16,7 @@
         />
       </div>
       <button class="btn-save" aria-label="close" @click.stop="closerejectModal">Close</button>
-      <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal(remarksData, selectedQuotation)">Save</button>
+      <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal">Save</button>
     </div>
   </div>
 </template>
@@ -53,18 +53,23 @@ export default {
       this.$emit("close");
       this.scrollToTop();
     },
-    async saveAndCloseModal(remarksData) {
+    async saveAndCloseModal() {
       try {
-        const CQid = this.ApprovalData[0].call_for_quotation_id;
+        const CQid = this.ApprovalData[0];
         const getFile = this.excelFile;
-        const SuccessMessage = await QuotationController.CMrejectedQuotation(remarksData,CQid,getFile); 
+        
+        if (!CQid) {
+          throw new Error('CQid is missing');
+        }
+
+        const SuccessMessage = await QuotationController.CMrejectedQuotation(this.remarksData, CQid, getFile);
+        console.log('SuccessMessage:', SuccessMessage); 
         this.$emit('editMessage', SuccessMessage); 
         this.closerejectModal(); 
       } catch (error) {
-        const FailMessage = "Error: " + error.errorMessage;
+        const FailMessage = "Error: " + (error.errorMessage || error.message);
         this.$emit('fail-message', FailMessage);
         this.scrollToTop(); 
-
       }
     },
     scrollToTop() {

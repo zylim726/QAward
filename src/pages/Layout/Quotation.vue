@@ -27,15 +27,8 @@
     </div>
 
 
-
-    <div v-if="UpdateMessage" class="notification success">
-      {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
-    </div>
-    <div v-if="FailMessage" class="notification fail">
-      {{ FailMessage }} <md-icon>cancel</md-icon>
-    </div>
     <div class="md-layout">
-      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px"> 
           <button @click="openModal" class="transparentButton" style="margin-right: 10px; float: right">
           <div class="tooltip" >
             <span class="tooltiptext" style="bottom: -310% !important;">Select subcon and upload quotation excel.</span>
@@ -49,6 +42,12 @@
         </button>
         <md-card>
           <md-card-content>
+            <div v-if="UpdateMessage" class="notification success">
+              {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
+            </div><br>
+            <div v-if="FailMessage" class="notification fail">
+              {{ FailMessage }} <md-icon>cancel</md-icon>
+            </div><br>
             <div class="table-container" style="margin-top: 0px !important;">
               <table class="nested-table" id="data-table" ref="dataTable">
                 <thead>
@@ -96,7 +95,7 @@
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
-                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" min="0" />
+                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" min="0" @keydown="blockNegativeInput" />
               </div>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
@@ -173,6 +172,11 @@ export default {
     }
   },
   methods: {
+    blockNegativeInput(event) {
+      if (event.key === '-' || event.key === 'Minus') {
+        event.preventDefault();
+      }
+    },
     openModal() {
       this.isModalVisible = true;
     },
