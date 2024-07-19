@@ -153,8 +153,7 @@ export default {
         });
 
       } catch (error) {
-        console.error('Error fetching Description:', error);
-        throw error;
+        this.FailMessage = "Error Message :",error;
       }
     },
     async saveAllData() {

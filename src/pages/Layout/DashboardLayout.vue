@@ -74,7 +74,7 @@ export default {
         const permission = await checkAccess(); 
         this.userPermissions = permission;
       } catch (error) {
-        console.error('Error checking permission:', error);
+        
       }
     },
     hasAccess(permissionName) {

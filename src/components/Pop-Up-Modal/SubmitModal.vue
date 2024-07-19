@@ -94,7 +94,7 @@ export default {
           this.selectedQuotation = this.matchingData[0].id;
         }
       } catch (error) {
-        const FailMessage = "Error: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },
@@ -107,7 +107,7 @@ export default {
         this.$emit('editMessage', SuccessMessage); 
         this.closesubmitModal(); 
       } catch (error) {
-        const FailMessage = "Error: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
         this.scrollToTop();
         this.isLoading = false; 

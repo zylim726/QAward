@@ -81,7 +81,7 @@ export default {
       try {
         this.users = await AccessUserController.accessUser();
       } catch (error) {
-        this.errorMessage = "Error retreving user data: " + error.errorMessage;
+        this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
       }
     },
     async updateLoginAccess(user) {
@@ -92,7 +92,7 @@ export default {
           window.location.reload();
       }, 2000);
       } catch (error) {
-        this.FailMessage = "Error updating access: " + error.errorMessage;
+        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         setTimeout(() => {
           window.location.reload();
       }, 2000);

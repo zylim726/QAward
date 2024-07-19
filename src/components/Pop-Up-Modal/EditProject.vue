@@ -158,7 +158,7 @@ export default {
         try {
           await ProjectController.removeProject(id);
         } catch (error) {
-          const FailMessage = "Error deleting unit type: " + error.errorMessage;
+          const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
           this.$emit('fail-message', FailMessage);
         }
       }

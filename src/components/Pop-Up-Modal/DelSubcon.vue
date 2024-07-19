@@ -55,7 +55,7 @@ export default {
        const SuccessMessage = await QuotationController.removeSubcon(deleteId);
         this.$emit('editSubconMessage', SuccessMessage); 
       } catch (error) {
-        const FailMessage = "Error : " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('editfail-message', FailMessage);
       }
     }

@@ -203,11 +203,7 @@ export default {
           }
         } 
       } catch (error) {
-        if (error.errorMessage === undefined) {
-          this.FailMessage = "Error cq description: " + Error.getMessage(504);
-        } else {
-          this.FailMessage = "Error cq description: " + error.errorMessage;
-        }
+        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
       }
     },
     async getCQUnitType(Id) {
@@ -218,11 +214,7 @@ export default {
           this.isModalVisible = true;
         }
       } catch (error) {
-        if (error.errorMessage === undefined) {
-          this.FailMessage = "Error unit tyoe: " + Error.getMessage(504);
-        } else {
-          this.FailMessage = "Error unit tyoe: " + error.errorMessage;
-        }
+        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
       }
     },
     async getUTypes() {
@@ -235,7 +227,7 @@ export default {
           }));
         } 
       } catch (error) {
-        this.FailMessage = "Fail to find unit types.";
+        this.FailMessage = `Error Message: ${error.message || 'Fail to find unit types.'}`;
       }
     },
     async confirmSubconSelection() {
@@ -249,11 +241,7 @@ export default {
           window.location.reload(0);
         }, 1000);
       } catch (error) {
-        if (error.errorMessage === undefined) {
-          this.FailMessage = "Error confirm selection: " + Error.getMessage(504);
-        } else {
-          this.FailMessage = "Error confirm selection: " + error.errorMessage;
-        }
+        this.FailMessage = `Error Message: ${error.message || 'Fail to selection.'}`;
       }
       
     },

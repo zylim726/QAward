@@ -163,7 +163,7 @@ export default {
       try {
         this.processedData = await SubconController.getDetailSubcon(id);
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },
@@ -175,7 +175,7 @@ export default {
           window.location.reload();
         }, 1000); 
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     }

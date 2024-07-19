@@ -155,7 +155,7 @@ export default {
         this.generateTable(this.Description, id);
       })
       .catch(error => {
-        console.error('Error fetching Description:', error);
+        this.FailMessage = ('Error fetching Description:', error);
         this.FailMessage = error.message;
       });
     this.accessSubcon();
@@ -195,11 +195,11 @@ export default {
           const event = { target: { files: fileInput.files } };
           this.importDataFromFiles(event);
         } else {
-          console.error("No file selected.");
+          this.FailMessage = ("No file selected.");
           // Handle case where no file is selected
         }
       } else {
-        console.error("No subcontractor selected.");
+        this.FailMessage = ("No subcontractor selected.");
         // Handle case where no subcontractor is selected
       }
     },
@@ -217,7 +217,7 @@ export default {
         this.Description = processedData;
         this.cqUnit = processedData[0].cqUnitType || [];
       } catch (error) {
-        console.error('Error fetching Description:', error);
+        this.FailMessage = ('Error fetching Description:', error);
         throw error;
       }
     },
@@ -406,14 +406,14 @@ export default {
       const dataTable = this.$refs.dataTable;
 
       if (!dataTable) {
-        console.error("Data table reference not found.");
+        this.FailMessage = "Data table reference not found.";
         return;
       }
 
       const clonedTable = dataTable.cloneNode(true);
 
       if (!clonedTable) {
-        console.error("Cloned table not created.");
+        this.FailMessage = "Cloned table not created.";
         return;
       }
 
@@ -442,7 +442,7 @@ export default {
         link.download = 'Quotation.xlsx';
         link.click();
       }).catch(err => {
-        console.error(err);
+        this.FailMessage = err;
       });
     }
 

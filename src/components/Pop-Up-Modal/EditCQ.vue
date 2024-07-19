@@ -152,7 +152,7 @@ export default {
         console.log('unitResult',this.unitResult);
 
       } catch (error) {
-        const FailMessage = "Error retrieving details: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },
@@ -168,7 +168,7 @@ export default {
         const UpdateMessage = await CallofQuotationController.editCQ(id, updatedData, updatedUnit);
         this.$emit('editMessage', UpdateMessage);
       } catch (error) {
-        const FailMessage = "Error updating data: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },

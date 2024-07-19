@@ -1,5 +1,6 @@
 import { axios, config } from "@/services";
 import SubconModels from "@/models/SubconModels.js";
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
 const SubconController = {
   async accessSubcon() {
@@ -15,7 +16,7 @@ const SubconController = {
       return processedData;
 
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },
@@ -42,7 +43,7 @@ const SubconController = {
       );
       return response.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
 
     }
@@ -60,7 +61,7 @@ const SubconController = {
       return response.data.data;
       
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
       
@@ -86,7 +87,7 @@ const SubconController = {
         }, { headers });
         return response.data.message;
     } catch (error) {
-        const errorMessage = error.response.data.message;
+        const errorMessage = handleApiError(error);
         throw { errorMessage };
     }
   },
@@ -100,7 +101,7 @@ const SubconController = {
       });
       return response.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },

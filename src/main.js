@@ -12,15 +12,13 @@ import GlobalComponents from "./models/plugin/globalComponents";
 import Dashboard from "./models/plugin/dashboard";
 import Modal from "./models/plugin/modal";
 
-import Error from "./models/error";
-
 import Chartist from "chartist";
 
 // configure router
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes, // short for routes: routes
+  routes,
   linkExactActiveClass: "nav-item active",
 });
 
@@ -34,14 +32,12 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-
 Vue.prototype.$Chartist = Chartist;
 
 Vue.use(VueRouter);
 Vue.use(Dashboard);
 Vue.use(GlobalComponents);
 Vue.use(Modal);
-Vue.use(Error);
 
 new Vue({
   store,

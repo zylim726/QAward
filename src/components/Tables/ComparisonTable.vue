@@ -82,13 +82,6 @@
                   <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
                 </div>
               </button>
-              <!-- <div class="tooltip" >
-                <span class="tooltiptext" style="margin-bottom: -95px !important;margin-right: -6px;" >
-                Download Quotation Documents</span>
-              
-                <md-icon style="color:orange;margin-left: 26px;margin-top: 10px;">folder_open</md-icon>
-              </div> -->
-              <!-- <button @click="downloadDocument">Download Document</button> -->
             </th>
           </tr>
           <tr>
@@ -103,7 +96,7 @@
             </template>
             <th scope="col">BQ QTY</th>
             <th scope="col">(ADJ) QTY</th>
-            <th scope="col" v-if="hasRemeasurement">(Reamesurement) QTY</th>
+            <th scope="col" v-if="hasRemeasurement">(Remeasurement) QTY</th>
             <th 
               scope="col" 
               colspan="2" 
@@ -128,7 +121,7 @@
         <tbody>
         </tbody>
         <br>
-        <tfoot style="line-height: 22px !important;">
+        <tfoot style="line-height: 1px !important;">
         </tfoot>
       </table>
       <br />
@@ -163,10 +156,10 @@
     </div>
   </template>
     <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
-      <div class="confirmation-message">
+      <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
         <p>It is the quotation is work order.</p> 
-        <label>
-          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange" >
+        <label >
+          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
           Yes
         </label>
       </div>
@@ -416,7 +409,7 @@ export default {
         const accessIds = ['Submit Approved'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
-        this.FailMessage = 'Error checking permission:', error;
+        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
       }
     },
     getRowData(rowIndex) {
@@ -749,7 +742,7 @@ export default {
           tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
         }
       } catch (error) {
-        this.FailMessage = 'An error occurred while getting description data.';
+        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
       } finally {
         this.isLoading = false;
       }
@@ -816,7 +809,7 @@ export default {
       try {
         this.projectData = await CallofQuotationController.getDetailCQ(id);
       } catch (error) {
-        this.FailMessage = 'Error get project details:', error;
+        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
       }
     },
     downloadExcelTemplate() {

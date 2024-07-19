@@ -60,7 +60,7 @@
           </tr>
         </tbody>
       </table>
-      <div v-else style="text-align: center;"  v-if="!FailMessage">No projects available</div>
+      <div  v-else-if="!failMessage && projectData.length === 0"  style="text-align: center;" >No projects available</div>
       <br />
     </div>
     <EditProject
@@ -121,7 +121,7 @@ export default {
       try {
         const permission = await checkAccess(); 
         const accessIds = ['Set Up Unit Type'];
-        const accessAdmin = ['Set Up Admin Approved'];
+        const accessAdmin = ['Set Up Approved'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
         this.hasAdminAccess = accessAdmin.some(id => permission.includes(id));
       } catch (error) {
@@ -135,7 +135,7 @@ export default {
         await this.updateUnitTypeColors();
       } catch (error) {
         this.loading = false;
-        this.FailMessage = "Error fetching project data: " + error.message;
+        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
       } finally {
         this.loading = false;
       }
@@ -148,7 +148,7 @@ export default {
           this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'orange');
         }
       } catch (error) {
-        const failMessage = "Error fetching unit types: " + error.message;
+        const failMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', failMessage);
       } finally {
         this.loading = false;

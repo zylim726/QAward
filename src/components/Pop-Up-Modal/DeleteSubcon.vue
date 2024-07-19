@@ -57,7 +57,7 @@ export default {
             window.location.reload();
         }, 1000); 
       } catch (error) {
-        const FailMessage = "Error updating subcon: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('deletefail-message', FailMessage);
       }
     }

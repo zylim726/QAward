@@ -67,7 +67,7 @@ export default {
         this.$emit('editMessage', SuccessMessage); 
         this.closerejectModal(); 
       } catch (error) {
-        const FailMessage = "Error: " + (error.errorMessage || error.message);
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
         this.scrollToTop(); 
       }

@@ -1,4 +1,5 @@
 import { axios, config } from "@/services";
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
 const RevisionController = {
   async accessRevision(id) {
@@ -11,7 +12,7 @@ const RevisionController = {
       return response.data.data;
 
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   }

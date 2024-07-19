@@ -129,7 +129,7 @@ export default {
           window.location.reload();
         }, 500);
       } catch (error) {
-        const FailMessage = "Error updating project: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },

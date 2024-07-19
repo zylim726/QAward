@@ -1,5 +1,6 @@
 import { axios, Error, config } from "@/services";
 import ConfigModels from "@/models/ConfigModels.js";
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
 const AccessUserController = {
   async accessUser() {
@@ -16,7 +17,7 @@ const AccessUserController = {
       return processedData;
 
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },
@@ -36,7 +37,7 @@ const AccessUserController = {
 
       return response.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },

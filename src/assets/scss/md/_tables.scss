@@ -233,15 +233,18 @@ unittype-container {
   border-collapse: collapse;
   width: 100%;
   border: 1px solid $table-border-color;
+  vertical-align: baseline;
 
 }
 .nested-table th, .nested-table td {
   border: none;
   text-align: left;
+  vertical-align: baseline;
 }
 .nested-table th {
   background-color: $orangeLight;
-  border:none
+  border:none;
+  vertical-align: baseline;
 }
 
 .unityQuantityClass{

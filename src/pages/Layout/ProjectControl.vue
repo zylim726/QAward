@@ -16,10 +16,7 @@
       >
         <md-card>
           <md-card-content>
-            <div v-if="error" class="message">
-              <h3 style="text-align: center">{{ error }}</h3>
-            </div>
-            <div v-else-if="projectData.length > 0"></div>
+            <div v-if="projectData.length > 0"></div>
             <div class="projectContent" style="grid-template-columns: repeat(4, 1fr) !important;grid-auto-rows: auto;">
               <a
                 v-for="(project, index) in projectData"
@@ -49,7 +46,6 @@ export default {
   data() {
     return {
       projectData: [],
-      error: null,
       selectedProject: null,
       UpdateMessage: null,
       FailMessage: null,
@@ -62,10 +58,10 @@ export default {
     async projectList() {
       try {
         const { data, message } = await ProjectController.projectList();
-        this.error = message;
+        this.FailMessage = message;
         this.projectData = data;
       } catch (error) {
-        this.error = error.message;
+        this.FailMessage = error.message;
       }
     },
     handleProjectClick(project) {

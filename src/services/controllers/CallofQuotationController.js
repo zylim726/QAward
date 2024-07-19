@@ -1,6 +1,8 @@
 import { axios, config } from "@/services";
 import CallQuotationModels from "@/models/CallQuotationModels.js";
 import UnittypeModels from "@/models/UnittypeModels.js";
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
+
 
 const CallofQuotationController = {
   async accessCQ() {
@@ -14,14 +16,11 @@ const CallofQuotationController = {
 
       const processedData = CallQuotationModels.processResponseData(response.data);
 
-      console.log('processData api',processedData);
-   
       return processedData;
 
       
     } catch (error) {
-      const errorMessage = error.response.data.message;
-    
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
       
     }
@@ -37,7 +36,7 @@ const CallofQuotationController = {
 
       return getCQResponse.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },
@@ -51,7 +50,7 @@ const CallofQuotationController = {
       return response.data.data;
       
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
       
@@ -82,7 +81,7 @@ const CallofQuotationController = {
         combinedMessage = Array.from(uniqueMessages).join(' ');
         return combinedMessage;
     } catch (error) {
-        const errorMessage = error.response.data.message;
+        const errorMessage = handleApiError(error);
         throw { errorMessage };
     }
   },
@@ -98,7 +97,7 @@ const CallofQuotationController = {
       const processedData = CallQuotationModels.processResponseData(response.data);
       return processedData;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
       
@@ -116,7 +115,7 @@ const CallofQuotationController = {
       return response.data.data;
 
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
       
@@ -149,7 +148,7 @@ const CallofQuotationController = {
       return messages;
   
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },
@@ -172,7 +171,7 @@ const CallofQuotationController = {
                   });
                   latestMessage = cqResponse.data.message;
               } catch (error) {
-                  const errorMessage = error.response.data.message;
+                  const errorMessage = handleApiError(error);
                   throw errorMessage;
               }
           }
@@ -180,7 +179,7 @@ const CallofQuotationController = {
 
         return latestMessage; 
     } catch (error) {
-        const errorMessage = error.response.data.message;
+        const errorMessage = handleApiError(error);
         throw errorMessage; 
     }
   },
@@ -202,14 +201,14 @@ const CallofQuotationController = {
               });
               latestMessage = cqResponse.data.message;
           } catch (error) {
-              const errorMessage = error.response.data.message;
+              const errorMessage = handleApiError(error);
               throw errorMessage;
           }
         }
 
         return latestMessage; 
     } catch (error) {
-        const errorMessage = error.response.data.message;
+        const errorMessage = handleApiError(error);
         throw errorMessage; 
     }
   },
@@ -225,8 +224,7 @@ const CallofQuotationController = {
        return processedData;
       
     } catch (error) {
-      const errorMessage = error.response.data.message;
-    
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
       
     }

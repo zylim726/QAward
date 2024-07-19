@@ -1,6 +1,7 @@
 import { axios, config } from "@/services";
 import ProjectModels from "@/models/ProjectModels.js";
 import getProjectModels from "@/models/getProjectModels.js";
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
 const ProjectController = {
   async projectList() {
@@ -15,12 +16,8 @@ const ProjectController = {
         message: null, 
       };
     } catch (error) {
-      let errorMessage;
-
-      if (error.response && error.response.status === 403) {
-        errorMessage = error.response.data.message;
-      } 
-
+      const errorMessage = handleApiError(error);
+    
       return {
         data: null,
         message: errorMessage,
@@ -53,7 +50,7 @@ const ProjectController = {
       }
       return messages;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
     }
@@ -86,7 +83,7 @@ const ProjectController = {
       const response = await axios.delete(`${apiHost}/project_approval/remove/${deleteId}`, { headers });
       return response.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
     }
@@ -104,7 +101,7 @@ const ProjectController = {
       return processedData;
 
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },
@@ -140,7 +137,7 @@ const ProjectController = {
 
       return messages;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
 
     }
@@ -155,7 +152,7 @@ const ProjectController = {
       return response.data.data;
       
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
       
@@ -172,7 +169,7 @@ const ProjectController = {
       return response.data.data;
       
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
     
       throw { errorMessage };
       
@@ -214,7 +211,7 @@ const ProjectController = {
 
         return messages;
     } catch (error) {
-        const errorMessage = error.response.data.message;
+        const errorMessage = handleApiError(error);
         throw { errorMessage };
     }
   },
@@ -228,7 +225,7 @@ const ProjectController = {
 
       return UnitResponse.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },

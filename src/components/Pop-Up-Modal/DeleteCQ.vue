@@ -55,7 +55,7 @@ export default {
         this.$emit('message', UpdateMessage);
         this.$router.push('/callquotation'); 
       } catch (error) {
-        const FailMessage = "Error updating: " + error.errorMessage;
+        const FailMessage = `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     }

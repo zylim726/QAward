@@ -137,7 +137,7 @@ export default {
             selected: true 
           }));
         } else {
-          this.errorMessage = "An error occurred while fetching unit types.";
+          this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         }
       } catch (error) {
         this.handleFetchError(error);
@@ -152,7 +152,7 @@ export default {
             selected: true 
           }));
         } else {
-          this.errorMessage = "An error occurred while fetching call quotations.";
+          this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         }
       } catch (error) {
         this.handleFetchError(error);
@@ -177,18 +177,14 @@ export default {
 
       } catch (error) {
         this.loading = false;
-        const failMessage = "Error updating data: " + error.errorMessage;
+        const failMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         this.$emit('fail-message', failMessage);
       } finally {
         this.loading = false;
       }
     },
     handleFetchError(error) {
-      if (error.errorMessage === undefined) {
-        this.errorMessage = "Error fetching data: " + Error.getMessage(504);
-      } else {
-        this.errorMessage = "Error fetching data: " + error.errorMessage;
-      }
+      this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
     },
     displayDate(dateStr) {
       if (dateStr === "0000-00-00") {

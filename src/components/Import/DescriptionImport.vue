@@ -240,7 +240,7 @@ export default {
 
       } catch (error) {
         this.loading = false;
-        const FailMessage = "Error updating: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
       } finally {

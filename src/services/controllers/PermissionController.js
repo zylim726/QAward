@@ -1,5 +1,6 @@
 import { axios, config } from "@/services";
 import PermissionModels from "@/models/PermissionModels.js";
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
 const PermissionController = {
   async accessPermission() {
@@ -16,7 +17,7 @@ const PermissionController = {
       return processedData;
 
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
     }
   },
@@ -36,7 +37,7 @@ const PermissionController = {
       );
       return response.data.message;
     } catch (error) {
-      const errorMessage = error.response.data.message;
+      const errorMessage = handleApiError(error);
       throw { errorMessage };
 
     }
@@ -84,8 +85,8 @@ const PermissionController = {
   
       return message;
     } catch (error) {
-      console.error('Error updating permission:', error);
-      throw { errorMessage: 'An error occurred while updating permission.' };
+      const errorMessage = handleApiError(error);
+      throw { errorMessage };
     }
   }
 };
