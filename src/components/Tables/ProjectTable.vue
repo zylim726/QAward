@@ -6,7 +6,13 @@
     <div v-if="FailMessage" class="notification fail">
       {{ FailMessage }} <md-icon>cancel</md-icon>
     </div>
-    <div class="container" style="margin-top: 20px">
+    <div v-if="loading" class="spinner-border" role="status">
+      <span class="visually-hidden">   
+        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...</span>
+    </div>
+    <div v-if="!loading" class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
           <input
@@ -17,7 +23,7 @@
         </form>
       </div>
     </div>
-    <div class="table-container" style="max-height: 700px; overflow-y: auto">
+    <div v-if="!loading" class="table-container" style="max-height: 700px; overflow-y: auto">
       <table class="nested-table" v-if="projects.length">
         <thead>
           <tr>
@@ -60,7 +66,10 @@
           </tr>
         </tbody>
       </table>
-      <div  v-else-if="!failMessage && projectData.length === 0"  style="text-align: center;" >No projects available</div>
+      <div v-else style="text-align: center;" >
+        <div v-if="!FailMessage">
+        No projects available</div>
+        </div>
       <br />
     </div>
     <EditProject
@@ -135,7 +144,7 @@ export default {
         await this.updateUnitTypeColors();
       } catch (error) {
         this.loading = false;
-        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       } finally {
         this.loading = false;
       }
@@ -148,7 +157,7 @@ export default {
           this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'orange');
         }
       } catch (error) {
-        const failMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', failMessage);
       } finally {
         this.loading = false;

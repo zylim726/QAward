@@ -163,7 +163,7 @@ export default {
       try {
         this.processedData = await SubconController.getDetailSubcon(id);
       } catch (error) {
-        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },

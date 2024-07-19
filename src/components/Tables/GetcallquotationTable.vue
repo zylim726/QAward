@@ -137,7 +137,7 @@ export default {
             selected: true 
           }));
         } else {
-          this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+          this.errorMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         }
       } catch (error) {
         this.handleFetchError(error);
@@ -152,7 +152,7 @@ export default {
             selected: true 
           }));
         } else {
-          this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+          this.errorMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         }
       } catch (error) {
         this.handleFetchError(error);
@@ -177,14 +177,14 @@ export default {
 
       } catch (error) {
         this.loading = false;
-        const failMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', failMessage);
       } finally {
         this.loading = false;
       }
     },
     handleFetchError(error) {
-      this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+      this.errorMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
     },
     displayDate(dateStr) {
       if (dateStr === "0000-00-00") {

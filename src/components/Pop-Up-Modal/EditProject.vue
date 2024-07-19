@@ -158,7 +158,7 @@ export default {
         try {
           await ProjectController.removeProject(id);
         } catch (error) {
-          const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+          const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
           this.$emit('fail-message', FailMessage);
         }
       }

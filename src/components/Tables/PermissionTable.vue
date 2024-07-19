@@ -163,7 +163,7 @@ export default {
         this.accesss = processedData;
         this.filteredAccesss = processedData; 
       } catch (error) {
-        this.errorMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;;
+        this.errorMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;;
       }
     },
     async updatePermission(permission, module, accesslevel) {
@@ -174,7 +174,7 @@ export default {
           window.location.reload();
         }, 2000);
       } catch (error) {
-        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;;
         setTimeout(() => {
           window.location.reload();
         }, 2000);

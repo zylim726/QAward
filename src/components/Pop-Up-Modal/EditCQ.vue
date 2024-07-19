@@ -168,7 +168,7 @@ export default {
         const UpdateMessage = await CallofQuotationController.editCQ(id, updatedData, updatedUnit);
         this.$emit('editMessage', UpdateMessage);
       } catch (error) {
-        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },

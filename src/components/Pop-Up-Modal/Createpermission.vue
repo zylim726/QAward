@@ -72,7 +72,7 @@ export default {
             window.location.reload();
         }, 500); 
       } catch (error) {
-        const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },

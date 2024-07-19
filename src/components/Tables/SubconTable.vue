@@ -106,7 +106,7 @@ export default {
         this.subcons = processedData;
       } catch (error) {
         this.loading = false;
-        this.FailMessage = `Error Message: ${error.message || 'Unknown Data.'}`;
+        this.FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       } finally {
         this.loading = false;
       }

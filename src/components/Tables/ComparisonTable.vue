@@ -409,7 +409,7 @@ export default {
         const accessIds = ['Submit Approved'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
-        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       }
     },
     getRowData(rowIndex) {
@@ -742,7 +742,7 @@ export default {
           tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
         }
       } catch (error) {
-        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       } finally {
         this.isLoading = false;
       }
@@ -809,7 +809,7 @@ export default {
       try {
         this.projectData = await CallofQuotationController.getDetailCQ(id);
       } catch (error) {
-        this.FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       }
     },
     downloadExcelTemplate() {
@@ -937,7 +937,7 @@ export default {
 
       } catch (error) {
         this.isLoading = false;
-        this.FailMessage = 'Error: ' + error.message;
+        this.FailMessage = 'Error: ' + error.errorMessage;
         window.scrollTo({
           top: 0,
           behavior: 'smooth' 
