@@ -52,7 +52,6 @@
       </table>
       <br />
     </div>
-    <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
     <EditSubcon :edit-subcon="showEditModal" @editMessage="EditMessage" @editfail-message="EditErrorMessage"  @close="closeEditModal" :id="editId" title="Edit Subcon"></EditSubcon>
     <DeleteSubcon :delete-subcon="showDeleteModal" @deletemessage="DeleteMessage" @deletefail-message="DeleteErrorMessage" @close="closeDeleteModal" :id="deleteId" title="Delete Subcon"></DeleteSubcon>
   </div>
@@ -75,7 +74,6 @@ export default {
     return {
       subcons: [],
       searchText: "",
-      errorMessage: null,
       UpdateMessage: null,
       FailMessage: null,
       hasAccess: false,
@@ -83,7 +81,8 @@ export default {
       showEditModal: false,
       showDeleteModal: false,
       editId: null,
-      deleteId: null
+      deleteId: null,
+      loading: false,
     };
   },
   async created() {
@@ -102,10 +101,14 @@ export default {
   methods: {
     async accessSubcon() {
       try {
+        this.loading = true;
         const processedData = await SubconController.accessSubcon();
         this.subcons = processedData;
       } catch (error) {
-        this.errorMessage = "Error fetching subcon data: " + error.errorMessage;
+        this.loading = false;
+        this.FailMessage = "Error fetching subcon data: " + error.FailMessage;
+      } finally {
+        this.loading = false;
       }
     },
     editSub(subconId) {
@@ -165,7 +168,6 @@ export default {
         const accessIds = ['Add-Edit-Remove Subcon'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
-        console.error('Error checking permission:', error);
       }
     } 
   },

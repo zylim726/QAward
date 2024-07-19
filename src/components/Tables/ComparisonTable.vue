@@ -141,13 +141,13 @@
         </div>
       </template>
       <div>
-      <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && !cmAccessApproval && !cmAccesslevel ">
+      <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && !hasAccess && !cmAccesslevel ">
         <div class="confirmation-message">
           <p>Waiting CM Approval or Rejected Quotation.</p>
         </div>
       </template>
     </div>
-    <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
+    <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
       <div class="confirmation-message">
       <template v-if="cqApprovalData.length === 0" >
         <p>Please CM go to project control set up admin approval.</p>
@@ -162,7 +162,7 @@
       </template>
     </div>
   </template>
-    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
+    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
       <div class="confirmation-message">
         <p>It is the quotation is work order.</p> 
         <label>
@@ -286,7 +286,6 @@ export default {
       selectedQuotations: {},
       remarks: {},
       hasAccess: false,
-      cmAccessApproval: false,
       cmCQapproval:[],
       SubconListId:[],
       excelFile: null,
@@ -414,11 +413,8 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Admin Set Up Approved'];
-        const cmapproval = ['CM Set Up Checking'];
+        const accessIds = ['Submit Approved'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
-
-        this.cmAccessApproval = cmapproval.some(id => permission.includes(id));
       } catch (error) {
         this.FailMessage = 'Error checking permission:', error;
       }

@@ -10,11 +10,12 @@ const CallofQuotationController = {
 
       const response = await axios.get(`${apiHost}/call_for_quotation`, {
         headers,
-      });
-
+      })
 
       const processedData = CallQuotationModels.processResponseData(response.data);
-    
+
+      console.log('processData api',processedData);
+   
       return processedData;
 
       

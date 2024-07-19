@@ -60,10 +60,9 @@
           </tr>
         </tbody>
       </table>
-      <div v-else style="text-align: center;">No projects available</div>
+      <div v-else style="text-align: center;"  v-if="!FailMessage">No projects available</div>
       <br />
     </div>
-    <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
     <EditProject
       :edit-project="showEditModal"
       @editMessage="EditMessage"
@@ -92,7 +91,6 @@ export default {
       hasAccess: false,
       hasAdminAccess: false,
       searchText: "",
-      errorMessage: null,
       UpdateMessage: null,
       FailMessage: null,
       showModal: false,
@@ -125,21 +123,21 @@ export default {
         const accessIds = ['Set Up Unit Type'];
         const accessAdmin = ['Set Up Admin Approved'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
-        console.log('this.hasAccess',this.hasAccess);
         this.hasAdminAccess = accessAdmin.some(id => permission.includes(id));
-        console.log('this.hasAdminAccess',this.hasAdminAccess);
       } catch (error) {
-        console.error('Error checking permission:', error);
       }
     },
     async accessProject() {
       try {
+        this.loading = true;
         const processedData = await ProjectController.accessProject();
         this.projects = processedData;
         await this.updateUnitTypeColors();
       } catch (error) {
-        console.error('Error fetching project data:', error);
-        this.errorMessage = "Error fetching project data: " + error.message;
+        this.loading = false;
+        this.FailMessage = "Error fetching project data: " + error.message;
+      } finally {
+        this.loading = false;
       }
     },
     async updateUnitTypeColors() {
