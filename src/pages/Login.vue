@@ -62,18 +62,22 @@ export default {
   },
   methods: {
     async LoginSubmit() {
-      const { token, username, userid, accesslevel, message, success } = await LoginController.login(this.username, this.password);
-      localStorage.setItem('userid', userid);
+      try {
+        const { token, username, userid, accesslevel, message, success } = await LoginController.login(this.username, this.password);
+        localStorage.setItem('userid', userid);
+        
+        if (success) {
+          store.dispatch('setToken', { token, username, accesslevel });
       
-      if (success) {
-        store.dispatch('setToken', { token, username, accesslevel });
-    
-        this.$router.push({ name: 'Project List' });
+          this.$router.push({ name: 'Project List' });
 
-
-      } else {
-       this.$refs.errorModal.openModal('Error Message',message);
+        } else {
+        this.$refs.errorModal.openModal('Error Message',message);
+        }
+      } catch (error) {
+        this.$refs.errorModal.openModal('Error Message',error.errorMessage);
       }
+     
     },
   },
 };

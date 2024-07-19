@@ -125,11 +125,11 @@ export default {
         const FailMessage = "Error fetching unit types: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       } finally {
-        this.loading = false; // Reset loading state
+        this.loading = false; 
       }
     },
     async editProjs(id, updatedData) {
-      this.loading = true; // Set loading state
+      this.loading = true; 
       try {
         const SuccessMessage = await ProjectController.editProjs(id, updatedData);
         this.$emit("close");
@@ -143,7 +143,7 @@ export default {
         const FailMessage = "Error updating project: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       } finally {
-        this.loading = false; // Reset loading state
+        this.loading = false; 
       }
     },
     addUnitType() {
@@ -158,7 +158,7 @@ export default {
         try {
           await ProjectController.removeProject(id);
         } catch (error) {
-          const FailMessage = "Error deleting unit type: " + error.errorMessage;
+          const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
           this.$emit('fail-message', FailMessage);
         }
       }

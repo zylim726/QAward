@@ -6,7 +6,13 @@
     <div v-if="FailMessage" class="notification fail">
       {{ FailMessage }} <md-icon>cancel</md-icon>
     </div>
-    <div class="container" style="margin-top: 20px">
+    <div v-if="loading" class="spinner-border" role="status">
+      <span class="visually-hidden">   
+        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...</span>
+    </div>
+    <div v-if="!loading" class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
           <input
@@ -17,7 +23,7 @@
         </form>
       </div>
     </div>
-    <div class="table-container" style="max-height: 700px; overflow-y: auto">
+    <div v-if="!loading" class="table-container" style="max-height: 700px; overflow-y: auto">
       <table class="nested-table" v-if="projects.length">
         <thead>
           <tr>
@@ -27,8 +33,8 @@
             <th>Company Name</th>
             <th>Area</th>
             <th>Reg No</th>
-            <th style="text-align: center;">Unit Type</th>
-            <th>Admin Approved</th>
+            <th style="text-align: center;" v-if="hasAccess">Unit Type</th>
+            <th v-if="hasAdminAccess">Admin Approved</th>
           </tr>
         </thead>
         <tbody>
@@ -39,16 +45,16 @@
             <td>{{ project.billto }}</td>
             <td>{{ project.area }}</td>
             <td>{{ project.regno }}</td>
-            <td style="text-align: center">
-              <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;">
+            <td style="text-align: center" v-if="hasAccess">
+              <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;" >
                 <div class="tooltip">
                   <span class="tooltiptext">Set up unit type</span>
                   <md-icon   :style="{ color: getUnitTypeColor(project.id) }" >edit</md-icon>
                 </div>
               </button>
             </td>
-            <td style="text-align: center">
-              <a href="/projectcontrol">
+            <td style="text-align: center" v-if="hasAdminAccess" >
+              <a href="/projectcontrol" >
               <button class="transparentButton" style="margin-left: -6px;">
                 <div class="tooltip">
                   <span class="tooltiptext">Set up cm checkby and admin approved</span>
@@ -60,10 +66,12 @@
           </tr>
         </tbody>
       </table>
-      <div v-else style="text-align: center;">No projects available</div>
+      <div v-else style="text-align: center;" >
+        <div v-if="!FailMessage">
+        No projects available</div>
+        </div>
       <br />
     </div>
-    <div v-if="errorMessage" class="message">{{ errorMessage }}</div>
     <EditProject
       :edit-project="showEditModal"
       @editMessage="EditMessage"
@@ -78,6 +86,7 @@
 <script>
 import ProjectController from "@/services/controllers/ProjectController.js";
 import EditProject from "@/components/Pop-Up-Modal/EditProject.vue";
+import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
@@ -88,8 +97,9 @@ export default {
       projects: [],
       unitTypes: [],
       unitTypeColors: {},
+      hasAccess: false,
+      hasAdminAccess: false,
       searchText: "",
-      errorMessage: null,
       UpdateMessage: null,
       FailMessage: null,
       showModal: false,
@@ -100,6 +110,7 @@ export default {
   },
   mounted() {
     this.accessProject();
+    this.checkPermission();
   },
   computed: {
     filterProject() {
@@ -115,14 +126,27 @@ export default {
     },
   },
   methods: {
+    async checkPermission() {
+      try {
+        const permission = await checkAccess(); 
+        const accessIds = ['Set Up Unit Type'];
+        const accessAdmin = ['Set Up Approved'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+        this.hasAdminAccess = accessAdmin.some(id => permission.includes(id));
+      } catch (error) {
+      }
+    },
     async accessProject() {
       try {
+        this.loading = true;
         const processedData = await ProjectController.accessProject();
         this.projects = processedData;
         await this.updateUnitTypeColors();
       } catch (error) {
-        console.error('Error fetching project data:', error);
-        this.errorMessage = "Error fetching project data: " + error.message;
+        this.loading = false;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
+      } finally {
+        this.loading = false;
       }
     },
     async updateUnitTypeColors() {
@@ -130,12 +154,10 @@ export default {
     try {
         for (const project of this.projects) {
           const unitType = await ProjectController.getUnitTypes(project.id);
-          console.log('Unit type fetched for project ID', project.id, ':', unitType);
           this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'orange');
         }
       } catch (error) {
-        console.error('Error fetching unit types:', error);
-        const failMessage = "Error fetching unit types: " + error.message;
+        const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', failMessage);
       } finally {
         this.loading = false;

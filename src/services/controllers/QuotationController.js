@@ -1,5 +1,7 @@
 import {  config } from "@/services";
 import axios from 'axios';
+import { handleApiError } from "@/services/axios/handleApiError.js"; 
+
 
 const QuotationController = {
   async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id) {
@@ -48,7 +50,8 @@ const QuotationController = {
                     SubconListId = cqSubconResponse.data.data.id;
 
                 } catch (error) {
-                  throw error
+                    const errorMessage = handleApiError(error);
+                  throw errorMessage;
                 }
             } else {
                 SubconListId = subconIdToRetrieve;
@@ -85,7 +88,8 @@ const QuotationController = {
     
                     messages.push(quotationResponse.data.message);
                 } catch (quotationError) {
-                    throw quotationError;
+                    const errorMessage = handleApiError(quotationError);
+                    throw errorMessage;
                 }
             }
 
@@ -93,7 +97,8 @@ const QuotationController = {
             return messages;
         } 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async CMsubmitQuotation(remarksData, approvalDataArray){
@@ -108,14 +113,14 @@ const QuotationController = {
             status: 'Waiting Approval',
         }, { headers });
 
-        console.log('response',response);
         messages.push(response.data.message);
-            
+    
 
         return messages;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async getCQApproval(){
@@ -129,7 +134,8 @@ const QuotationController = {
         return response.data.data;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async getCMcqApproval(id){
@@ -142,7 +148,8 @@ const QuotationController = {
         return response.data.data;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async addCQApproval(approvalDataToSubmit){
@@ -181,7 +188,8 @@ const QuotationController = {
          return messages;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async rejectCQApproval(approvalDataToSubmit,documents){
@@ -252,14 +260,16 @@ const QuotationController = {
                 }
                     
             } catch (error) {
-                throw error;
+                const errorMessage = handleApiError(error);
+                throw errorMessage;
             }
         }
 
         return response.data.message;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async getCMSubmit(){
@@ -272,7 +282,8 @@ const QuotationController = {
         return response.data.data;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async approvalQuotation(cqId,getDataFile){
@@ -319,7 +330,8 @@ const QuotationController = {
         return CQresponse.data.message;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async addApproval(remarksData, selectedQuotation, CQid){
@@ -342,7 +354,8 @@ const QuotationController = {
         return response.data.message;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async CMrejectedQuotation(remarksData,CQid,getFile){
@@ -389,7 +402,8 @@ const QuotationController = {
         return getComparisonSummary.data.message;
 
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async removeSubcon(deleteId) {
@@ -402,7 +416,8 @@ const QuotationController = {
        
         return CQresponse.data.message;
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   },
   async updateWorkOrder(checked,cqId) {
@@ -424,7 +439,8 @@ const QuotationController = {
         
         return response.data.message;
     } catch (error) {
-        throw error;
+        const errorMessage = handleApiError(error);
+        throw errorMessage;
     }
   }
   

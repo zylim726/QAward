@@ -82,13 +82,6 @@
                   <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
                 </div>
               </button>
-              <!-- <div class="tooltip" >
-                <span class="tooltiptext" style="margin-bottom: -95px !important;margin-right: -6px;" >
-                Download Quotation Documents</span>
-              
-                <md-icon style="color:orange;margin-left: 26px;margin-top: 10px;">folder_open</md-icon>
-              </div> -->
-              <!-- <button @click="downloadDocument">Download Document</button> -->
             </th>
           </tr>
           <tr>
@@ -103,7 +96,7 @@
             </template>
             <th scope="col">BQ QTY</th>
             <th scope="col">(ADJ) QTY</th>
-            <th scope="col" v-if="hasRemeasurement">(Reamesurement) QTY</th>
+            <th scope="col" v-if="hasRemeasurement">(Remeasurement) QTY</th>
             <th 
               scope="col" 
               colspan="2" 
@@ -128,7 +121,7 @@
         <tbody>
         </tbody>
         <br>
-        <tfoot style="line-height: 22px !important;">
+        <tfoot style="line-height: 1px !important;">
         </tfoot>
       </table>
       <br />
@@ -141,13 +134,13 @@
         </div>
       </template>
       <div>
-      <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && !cmAccessApproval && !cmAccesslevel ">
+      <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && !hasAccess && !cmAccesslevel ">
         <div class="confirmation-message">
           <p>Waiting CM Approval or Rejected Quotation.</p>
         </div>
       </template>
     </div>
-    <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
+    <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
       <div class="confirmation-message">
       <template v-if="cqApprovalData.length === 0" >
         <p>Please CM go to project control set up admin approval.</p>
@@ -162,11 +155,11 @@
       </template>
     </div>
   </template>
-    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (cmAccessApproval || cmAccesslevel)">
-      <div class="confirmation-message">
+    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
+      <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
         <p>It is the quotation is work order.</p> 
-        <label>
-          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange" >
+        <label >
+          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
           Yes
         </label>
       </div>
@@ -286,7 +279,6 @@ export default {
       selectedQuotations: {},
       remarks: {},
       hasAccess: false,
-      cmAccessApproval: false,
       cmCQapproval:[],
       SubconListId:[],
       excelFile: null,
@@ -414,13 +406,10 @@ export default {
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
-        const accessIds = ['Approved By'];
-        const cmapproval = ['Checked By'];
+        const accessIds = ['Submit Approved'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
-
-        this.cmAccessApproval = cmapproval.some(id => permission.includes(id));
       } catch (error) {
-        this.FailMessage = 'Error checking permission:', error;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       }
     },
     getRowData(rowIndex) {
@@ -753,7 +742,7 @@ export default {
           tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
         }
       } catch (error) {
-        this.FailMessage = 'An error occurred while getting description data.';
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       } finally {
         this.isLoading = false;
       }
@@ -820,7 +809,7 @@ export default {
       try {
         this.projectData = await CallofQuotationController.getDetailCQ(id);
       } catch (error) {
-        this.FailMessage = 'Error get project details:', error;
+        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       }
     },
     downloadExcelTemplate() {
@@ -948,7 +937,7 @@ export default {
 
       } catch (error) {
         this.isLoading = false;
-        this.FailMessage = 'Error: ' + error.message;
+        this.FailMessage = 'Error: ' + error.errorMessage;
         window.scrollTo({
           top: 0,
           behavior: 'smooth' 

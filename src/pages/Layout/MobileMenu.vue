@@ -6,13 +6,6 @@
         <p>Dashboard</p></a
       >
     </li>
-    <!-- <li>
-      <a slot="title" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="material-icons">notifications</i>
-        <span class="notification">5</span>
-        <p>Notifications</p>
-      </a>
-    </li> -->
   </ul>
 </template>
 <script>

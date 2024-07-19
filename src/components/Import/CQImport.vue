@@ -107,9 +107,7 @@ export default {
       });
     },
     importData(data) {
-      // Filter out rows where all columns are empty
       const filteredData = data.filter(row => {
-        // Check if any value in the row is not empty
         return Object.values(row).some(value => value !== '');
       });
 
@@ -196,7 +194,7 @@ export default {
 
       } catch (error) {
         this.loading = false;
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
       } finally {

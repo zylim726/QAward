@@ -1,7 +1,13 @@
 <template>
   <div class="content">
-    <div v-if="error" class="message">
-      <h3 style="text-align: center">{{ error }}</h3>
+    <div v-if="loading" class="spinner-border" role="status">
+      <span class="visually-hidden">
+        <button class="transparentButton" style="margin-right: 10px; cursor: default;">
+          <md-icon style="color: red; margin-bottom: 10px;">autorenew</md-icon>
+        </button> Loading...
+      </span>
+    </div>
+    <div v-if="error" class="notification fail">{{ error }}<md-icon>cancel</md-icon>
     </div>
     <div v-else-if="projectData.length > 0">
       <div class="projectContent">
@@ -19,7 +25,6 @@
   </div>
 </template>
 
-
 <script>
 import ProjectController from "@/services/controllers/ProjectController.js";
 
@@ -28,6 +33,7 @@ export default {
     return {
       projectData: [],
       error: null,
+      loading: false,
     };
   },
   mounted() {
@@ -36,18 +42,23 @@ export default {
   methods: {
     async projectList() {
       try {
+        this.loading = true;
         const { data, message } = await ProjectController.projectList();
-        this.error = message;
-        this.projectData = data;
+        if (data) {
+          this.projectData = data;
+        } else {
+          this.error = message || "An unknown error occurred.";
+        }
       } catch (error) {
-        this.error = error.message;
+        this.error = `Error Message: ${error.message || 'Unknown error'}`;
+      } finally {
+        this.loading = false;
       }
     },
     setProjectId(projectId, projectName) {
-    localStorage.setItem('projectId', projectId);
-    localStorage.setItem('projectName', projectName);
-  },
+      localStorage.setItem('projectId', projectId);
+      localStorage.setItem('projectName', projectName);
+    },
   },
 };
 </script>
-

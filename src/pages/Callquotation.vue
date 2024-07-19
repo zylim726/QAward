@@ -244,15 +244,14 @@ export default {
       try {
         this.isLoading = true;
         const processedData = await CallofQuotationController.accessCQ();
-        if (processedData.length > 0) {
+        if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
-          console.log('thiscallquotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
-          this.FailMessage = "No more projects.";
+          this.errorMessage = "No data.";
         }
       } catch (error) {
-        this.FailMessage = ("Error Message :", error.errorMessage);
+        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
       } finally {
         this.isLoading = false;
       }
@@ -269,7 +268,7 @@ export default {
         const accessIds = ['Add-Edit-Remove CQ'];
         this.hasAccess = accessIds.some(id => permission.includes(id));
       } catch (error) {
-        this.FailMessage = ("Error checking permission :", error.errorMessage);
+        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
       }
     },
     formatDate(dateTimeString) {

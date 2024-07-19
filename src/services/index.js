@@ -1,6 +1,6 @@
 import axios from "axios";
-import Error from "@/models/error";
+import handleApiError from "@/services/axios/handleApiError";
 import config from "@/services/axios/config";
 import AccessControl from "@/services/axios/accessControl.js";
 
-export { axios, Error, config, AccessControl };
+export { axios, handleApiError, config, AccessControl };

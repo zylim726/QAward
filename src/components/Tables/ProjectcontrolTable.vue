@@ -114,7 +114,7 @@ export default {
         this.getUserHaveDT = response.data || [];
         this.adminSelection = this.getUserHaveDT.map(admin => admin.system_user_id || '');
       } catch (error) {
-        this.$emit('fail-message', error.message);
+        this.$emit('fail-message', error.errorMessage);
       }
     },
     async accessUsers() {

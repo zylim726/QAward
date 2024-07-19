@@ -176,7 +176,7 @@ export default {
         link.click();
         link.remove();
       } catch (error) {
-        const FailMessage = "Error exporting table headers:"+ error;
+        const FailMessage = "Error download template:"+ error;
         this.$emit('fail-message', FailMessage);
       }
     },
@@ -240,7 +240,7 @@ export default {
 
       } catch (error) {
         this.loading = false;
-        const FailMessage = "Error updating: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
       } finally {

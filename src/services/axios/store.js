@@ -25,6 +25,7 @@ export default new Vuex.Store({
       localStorage.removeItem("token");
       localStorage.removeItem("accesslevel");
       localStorage.removeItem("username");
+      sessionStorage.clear();
     },
   },
   actions: {
@@ -33,6 +34,7 @@ export default new Vuex.Store({
     },
     clearToken({ commit }) {
       commit("clearToken");
+      sessionStorage.clear();
     },
   },
 });

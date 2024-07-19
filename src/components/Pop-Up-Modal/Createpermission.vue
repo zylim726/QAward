@@ -72,7 +72,7 @@ export default {
             window.location.reload();
         }, 500); 
       } catch (error) {
-        const FailMessage = "Error updating access permission: " + error.errorMessage;
+        const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);
       }
     },

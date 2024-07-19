@@ -102,14 +102,12 @@ export default {
           this.Unittype = processedData[0].cqUnitType;
         }
       } catch (error) {
-        console.error('Error fetching Description:', error);
-        throw error;
+        this.FailMessage = 'Error fetching Description:', error;
       }
     },
     async saveAllData() {
       try {
         const dataToSave = this.Description.flatMap(formData => {
-           console.log('formdata',formData);
           return formData.cqUnitType.map(item => {
             const cqId = this.$route.query.cqId;
             const cqUnitTypeId = item.id;
@@ -119,13 +117,11 @@ export default {
           });
         });
 
-        console.log('Data to save:', dataToSave); 
         const SuccessMessage = await DescriptionController.editQuantity(dataToSave);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;
-        // this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId } }); // use actual route name and pass the query parameter
-
+        this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId } }); 
       } catch (error) {
         this.FailMessage = ("Failed to save data.",error.message);
       }

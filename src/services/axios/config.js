@@ -1,6 +1,7 @@
 const config = {
   hosts: {
-    production: "http://103.16.42.51:5000",
+    // todo: development
+    production: "http://103.16.42.51:500",
   },
 
   getTokenFromLocalStorage: () => {
