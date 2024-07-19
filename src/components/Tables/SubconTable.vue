@@ -2,6 +2,12 @@
   <div>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+    <div v-if="loading" class="spinner-border" role="status">
+        <span class="visually-hidden">   
+        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...</span>
+      </div>
     <div class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
@@ -12,6 +18,7 @@
           />
         </form>
       </div>
+      
       
       <div class="filter-container" style="margin-right: -15px">
         <button class="btn-save" @click="showModal = true" v-if="hasAccess">
