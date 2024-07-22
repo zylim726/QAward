@@ -114,21 +114,9 @@
                       <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
                       <td>{{ formatDate(callQuotation.actuallDoneDate) !== '0000-00-00' ? formatDate(callQuotation.actuallDoneDate) : '' }}</td>
-                      <template v-if="callQuotation.cqApprovals && callQuotation.cqApprovals.length > 0"  >
-                        <td v-for="(approval, index) in callQuotation.cqApprovals" :key="index">
-                          <span v-if="approval.approval_type === 'CM Approval'">{{ formatDate(approval.updatedAt) }} 
-                            <br><h9 style="font-size: 12px;">({{ approval.user[0].name }})</h9></span>
-                          <span v-else>{{ formatDate(approval.updatedAt) }}</span>
-                        </td>
-                      </template>
-                      <template v-else>
-                        <template v-if="projectApproval && projectApproval.length > 0">
-                          <td v-for="(approval, index) in callQuotation.projectApproval" :key="index"></td>
-                        </template>
-                        <template v-else>
-                          <td></td>
-                        </template>
-                      </template>
+                      <td v-for="(approval, i) in mergeApprovals(callQuotation)" :key="'approval-' + i">
+                        <span>{{ approval && approval.updatedAt ? (approval.updatedAt !== '0000-00-00' ? formatDate(approval.updatedAt) : '') : '' }}</span>
+                      </td>
                       <td>{{ formatDate(callQuotation.awadingtargetdate) !== '0000-00-00' ? formatDate(callQuotation.awadingtargetdate) : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
                       <template v-if="callQuotation.is_work_order === true">
@@ -218,6 +206,24 @@ export default {
     await this.checkPermission();
   },
   methods: {
+    mergeApprovals(quotation) {
+      const cqApprovals = quotation.cqApprovals || [];
+      const projectApproval = quotation.projectApproval || [];
+      const maxLength = Math.max(cqApprovals.length, projectApproval.length);
+      const approvals = [];
+
+      for (let i = 0; i < maxLength; i++) {
+        if (cqApprovals[i]) {
+          approvals.push(cqApprovals[i]);
+        } else if (projectApproval[i]) {
+          approvals.push({ updatedAt: '00-00-0000' });
+        } else {
+          approvals.push(null);
+        }
+      }
+
+      return approvals;
+    },
     formatAccounting(value) {
       if (!value) {
         return '0.00';
