@@ -45,14 +45,16 @@
                       <td v-for="(unitdata, index) in formData.cqUnitType" :key="'adj-' + index">
                         <input 
                           type="number" 
-                          v-model.number="unitdata.adj_quantity" 
+                          :value="unitdata.adj_quantity || 0" 
+                          @input="updateAdjQuantity(formIndex, index, $event.target.value)" 
                           :min="0" 
                           @keydown="blockNegativeInput">
                       </td>
                       <td v-for="(unitdata, index) in formData.cqUnitType" :key="'remeasurement-' + index">
                         <input 
                           type="number" 
-                          v-model.number="unitdata.remeasurement_quantity" 
+                          :value="unitdata.remeasurement_quantity || 0" 
+                          @input="updateRemeasurementQuantity(formIndex, index, $event.target.value)" 
                           :min="0" 
                           @keydown="blockNegativeInput">
                       </td>
@@ -111,9 +113,9 @@ export default {
           return formData.cqUnitType.map(item => {
             const cqId = this.$route.query.cqId;
             const cqUnitTypeId = item.id;
-            const adj_quantity = item.adj_quantity !== undefined ? item.adj_quantity : 0;
-            const remeasurement_quantity = item.remeasurement_quantity !== undefined ? item.remeasurement_quantity : 0;
-            return { cqId,cqUnitTypeId, adj_quantity, remeasurement_quantity };
+            const adj_quantity = item.adj_quantity || 0;
+            const remeasurement_quantity = item.remeasurement_quantity || 0;
+            return { cqId, cqUnitTypeId, adj_quantity, remeasurement_quantity };
           });
         });
 
@@ -130,6 +132,12 @@ export default {
       if (event.key === '-' || event.key === 'Minus') {
         event.preventDefault();
       }
+    },
+    updateAdjQuantity(formIndex, index, value) {
+      this.Description[formIndex].cqUnitType[index].adj_quantity = parseFloat(value) || 0;
+    },
+    updateRemeasurementQuantity(formIndex, index, value) {
+      this.Description[formIndex].cqUnitType[index].remeasurement_quantity = parseFloat(value) || 0;
     }
   },
 };

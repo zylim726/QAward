@@ -3,7 +3,10 @@
     <!-- Modal -->
     <div v-if="isModalVisible" class="modal-overlay">
       <div class="modal-content">
-        <h1 class="titleHeader">Select Subcon</h1><br>
+        <div class="modal-header">
+          <h1 class="titleHeader">Select Subcon</h1>
+          <span class="close-icon" @click="closeModal">&times;</span>
+        </div><br>
         <input type="text" v-model="searchTerm" placeholder="Search subcon name then select the subcon" class="dropdownSubcon" style="width: 59%;height: 15%;"><br><br>
         <div v-if="filteredSubconData.length > 0" style="height: 60%;">
           <div class="tooltip">
@@ -179,6 +182,9 @@ export default {
     },
     openModal() {
       this.isModalVisible = true;
+    },
+    closeModal() {
+      this.isModalVisible = false;
     },
     handleFileChange(event) {
       this.documents.file = event.target.files[0];
@@ -470,6 +476,7 @@ export default {
   width: 500px;
   overflow-y: clip;
   height: 300px;
+  position: relative;
 }
 
 .file-upload-container {
@@ -477,6 +484,15 @@ export default {
   align-items: center;
   margin: 20px 0px 18px 97px;
 }
+
+.close-icon {
+  position: absolute;
+    top: 28px;
+    right: 27px;
+    font-size: 26px;
+    cursor: pointer;
+}
+
 
 
 </style>

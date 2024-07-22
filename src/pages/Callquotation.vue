@@ -131,9 +131,16 @@
                       </template>
                       <td>{{ formatDate(callQuotation.awadingtargetdate) !== '0000-00-00' ? formatDate(callQuotation.awadingtargetdate) : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
-                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
-                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
-                      <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
+                      <template v-if="callQuotation.is_work_order === true">
+                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].Subcon.name : '' }}</td>
+                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].wo_code : '' }}</td>
+                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? formatDate(callQuotation.Wo[0].createdAt) : '' }}</td>
+                      </template>
+                      <template v-else>
+                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
+                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
+                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
+                      </template>
                       <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>
                       <td>{{ formatAccounting(callQuotation.adj_budget_amount) }}</td>
                       <td>{{ formatAccounting(callQuotation.subcontract_amount) }}</td>
@@ -246,6 +253,7 @@ export default {
         const processedData = await CallofQuotationController.accessCQ();
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
+          console.log('this CallQuotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
           this.errorMessage = "No data.";

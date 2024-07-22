@@ -9,6 +9,5 @@ export function handleApiError(error) {
   } else {
     errorMessage = error.message;
   }
-  console.log('In api js',errorMessage); // Log the error to the console
   return errorMessage;
 }
