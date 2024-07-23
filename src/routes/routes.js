@@ -3,6 +3,7 @@ import Login from "@/pages/Login.vue";
 import Logout from "@/pages/Logout.vue";
 import ProjectList from "@/pages/ProjectList.vue";
 import Callquotation from "@/pages/Callquotation.vue";
+import ApproveComparison from "@/pages/ApproveComparison.vue";
 import Comparison from "@/pages/Comparison.vue";
 import UserConfig from "@/pages/UserConfig.vue";
 import AccessPermission from "@/pages/AccessPermission.vue";
@@ -30,6 +31,13 @@ const routes = [
         path: "projectlist",
         name: "Project List",
         component: ProjectList,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "approveComparison",
+        name: "Approve Comparison",
+        component: ApproveComparison,
         meta: { requiresAuth: true },
       },
 

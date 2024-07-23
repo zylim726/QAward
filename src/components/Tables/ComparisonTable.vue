@@ -452,7 +452,7 @@ export default {
          }, 1000);
       } catch (error) {
         this.isLoading = false;
-        this.FailMessage = 'Error while submitting approval data:', error;
+        this.FailMessage = 'Error message : Erro while submitting approval data:', error;
       } finally {
         this.isLoading = false;
       }
@@ -533,7 +533,7 @@ export default {
         this.deleteId = matchedSubcons;
         this.delModal = true;
       } else {
-        this.FailMessage = 'No matching subcon_id found.';
+        this.FailMessage = 'Error Message: No matching subcon_id found.';
       }
       this.delModal = true;
     },
@@ -937,7 +937,7 @@ export default {
 
       } catch (error) {
         this.isLoading = false;
-        this.FailMessage = 'Error: ' + error.errorMessage;
+        this.FailMessage = 'Error Message: ' + error.errorMessage;
         window.scrollTo({
           top: 0,
           behavior: 'smooth' 
