@@ -3,6 +3,8 @@ const ApproveCQLaModels = {
     const dataArray = response.data;
 
     if (dataArray.length > 0) {
+      const processedData = dataArray.map(config => {
+        return {
           id: config.id,
           code: config.la_code,
           cqId: config.call_for_quotation_id,
