@@ -133,12 +133,12 @@
                       <td>{{ callQuotation.remarks }}</td>
                       <template v-if="callQuotation.is_work_order === true">
                         <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].Subcon.name : '' }}</td>
-                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].wo_code : '' }}</td>
+                        <td><a :href="'/approveComparison?woCqId=' + callQuotation.id" class="notify-status">{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].wo_code : '' }}</a></td>
                         <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? formatDate(callQuotation.Wo[0].createdAt) : '' }}</td>
                       </template>
                       <template v-else>
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
-                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
+                        <td><a :href="'/approveComparison?laCqId=' + callQuotation.id" class="notify-status">{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</a></td>
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
                       </template>
                       <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>

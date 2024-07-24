@@ -1,5 +1,6 @@
 import { axios, config } from "@/services";
 import CallQuotationModels from "@/models/CallQuotationModels.js";
+import LawoModels from "@/models/LawoModels.js";
 import UnittypeModels from "@/models/UnittypeModels.js";
 import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
@@ -15,6 +16,26 @@ const CallofQuotationController = {
       })
 
       const processedData = CallQuotationModels.processResponseData(response.data);
+
+      return processedData;
+
+      
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      throw { errorMessage };
+      
+    }
+  },
+  async accessCQApprove() {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+
+      const response = await axios.get(`${apiHost}/call_for_quotation`, {
+        headers,
+      })
+
+      const processedData = LawoModels.processResponseData(response.data);
 
       return processedData;
 
