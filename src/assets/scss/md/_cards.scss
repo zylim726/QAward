@@ -4,7 +4,7 @@
     width: 100%;
     margin: 25px 0;
     overflow: unset;
-    z-index: 0 !important;
+    z-index: auto !important;
 
     box-shadow: 0 1px 4px 0 $gray-lighter;
     border-radius: $border-radius-base;
