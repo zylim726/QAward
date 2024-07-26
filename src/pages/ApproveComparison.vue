@@ -18,8 +18,6 @@
                     <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
                   </button> Loading...</span>
               </div>
-              <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
-              <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
               <br>
               <div class="container" v-if="!isLoading">
                 <div class="search-container" >
@@ -31,15 +29,7 @@
                     />
                   </form>
                 </div>
-                <div class="filter-container" style="margin-right: -15px">
-                  <a href="createcq" v-if="hasAccess">
-                    <div class="tooltip">
-                      <span class="tooltiptext">Created Comparison Summary</span>
-                    <md-icon class="mdIcon" style="margin-right: 15px"
-                      >add</md-icon></div>
-                    </a
-                  >
-                </div>
+                
                 <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
                     <div class="tooltip">
                     <span class="tooltiptext">Export Comparison Summary</span>
@@ -202,9 +192,6 @@ export default {
     };
     this.accessCQ();
   },
-  async created() {
-    await this.checkPermission();
-  },
   methods: {
     mergeApprovals(quotation) {
       const cqApprovals = quotation.cqApprovals || [];
@@ -256,7 +243,7 @@ export default {
     async accessCQ() {
       try {
         this.isLoading = true;
-        const processedData = await CallofQuotationController.accessCQ();
+        const processedData = await CallofQuotationController.accessCQApprove();
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
           console.log('this CallQuotation',this.callQuotation);
@@ -275,15 +262,6 @@ export default {
         this.openedDropdown.dropdown.closeDropDown();
       }
       this.openedDropdown = clickedItem;
-    },
-    async checkPermission() {
-      try {
-        const permission = await checkAccess(); 
-        const accessIds = ['Add-Edit-Remove CQ'];
-        this.hasAccess = accessIds.some(id => permission.includes(id));
-      } catch (error) {
-        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
-      }
     },
     formatDate(dateTimeString) {
       if (!dateTimeString) return '';

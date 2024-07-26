@@ -33,7 +33,7 @@
         <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;">
           <label><b>{{ getAdminLabel(index) }}</b></label>
           <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="display: flex;">
-            <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
+            <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5" v-if="getDTProject.length <= 0">
               <button class="transparentButton" @click="deleteAdminField(index, $event)">
                 <md-icon style="color:orange;margin-top:5px;margin-left:-15px">delete_forever</md-icon>
               </button>
