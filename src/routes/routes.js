@@ -5,7 +5,6 @@ import ProjectList from "@/pages/ProjectList.vue";
 import Callquotation from "@/pages/Callquotation.vue";
 import ApproveComparison from "@/pages/ApproveComparison.vue";
 import LaWoSummaryList from "@/pages/LaWoSummaryList.vue";
-
 import Comparison from "@/pages/Comparison.vue";
 import UserConfig from "@/pages/UserConfig.vue";
 import AccessPermission from "@/pages/AccessPermission.vue";
@@ -46,6 +45,13 @@ const routes = [
         path: "laWoSummaryList",
         name: "LA / WO Details",
         component: LaWoSummaryList,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "approveComparison",
+        name: "Approve Comparison",
+        component: ApproveComparison,
         meta: { requiresAuth: true },
       },
 
