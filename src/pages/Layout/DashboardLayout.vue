@@ -15,7 +15,6 @@
         <md-icon>data_exploration</md-icon>
         <p class="nav-item">LA / WO Summary</p>
       </sidebar-link><br>
-
       <h4 class="menutitle">Master</h4>
       <sidebar-link class="navbar-link" to="/projectsetup">
         <md-icon>content_paste</md-icon>
@@ -24,7 +23,7 @@
       <sidebar-link class="navbar-link" to="/subcon">
         <md-icon>wysiwyg</md-icon>
         <p class="nav-item">Subcon List</p>
-      </sidebar-link>
+      </sidebar-link><br>
       <h4 class="menutitle">Admin</h4>
       <sidebar-link   v-if="hasAccess('User Access')" class="navbar-link" to="/userconfig">
         <md-icon>manage_accounts</md-icon>
