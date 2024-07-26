@@ -39,6 +39,7 @@ export default {
   mounted() {
     this.projectList();
   },
+  
   methods: {
     async projectList() {
       try {

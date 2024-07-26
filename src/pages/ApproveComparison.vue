@@ -1,151 +1,145 @@
 <template>
   <div class="content">
+    <div v-if="isLoading" class="spinner-border" role="status">
+      <span class="visually-hidden">
+        <button class="transparentButton" style="margin-right: 10px; cursor: default;">
+          <md-icon style="color: red; margin-bottom:10px;">autorenew</md-icon>
+        </button> Loading...
+      </span>
+    </div>
+    <div v-if="UpdateMessage" class="notification success">
+      {{ UpdateMessage }} 
+      <md-icon style="color:green">check_circle_outline</md-icon>
+    </div>
+    <div v-if="FailMessage" class="notification fail">
+      {{ FailMessage }} 
+      <md-icon>cancel</md-icon>
+    </div>
+    <br>
     <div class="md-layout">
-      <div class="row" style="margin-left: 16px">
+      <div v-if="!isLoading" class="row" style="margin-left: 16px">
         <h6>Project Name :</h6>
         <h3 class="titleHeader">{{ projectName }}</h3>
-        <br >
+        <br>
       </div>
-      <div
-        class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100"
-      >
-        <md-card>
-          <md-card-content style="font-size: 13px !important;line-height: 17px !important">
-            <div>
-              <div v-if="isLoading" class="spinner-border" role="status">
-                <span class="visually-hidden">   
-                  <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-                    <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-                  </button> Loading...</span>
-              </div>
-              <br>
-              <div class="container" v-if="!isLoading">
-                <div class="search-container" >
-                  <form class="Searchbar">
-                    <input
-                      type="text"
-                      v-model="searchQuery"
-                      placeholder="Search"
-                    />
-                  </form>
+
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
+        <div class="flex-container">
+          <!-- Left Side: Summary Cards -->
+          <div class="summary-container">
+            <md-card class="summary-item">
+              <md-card-content class="summary-card" style="border-right: 2px solid blue;">
+                <div class="card-header">
+                  <p>Provisional Sum</p>
+                  <div class="icon-circle" style="background-color: #F1F7FF;">
+                    <md-icon style="color: blue;">signal_cellular_alt</md-icon>
+                  </div>
                 </div>
-                
-                <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
-                    <div class="tooltip">
-                    <span class="tooltiptext">Export Comparison Summary</span>
-                    <md-icon class="mdIcon">system_update_alt</md-icon>
-                    </div>
-                </button>
-              </div>
-              <div class="table-container" style="min-height: 100px;max-height: 600px;">
-                <table>
-                  <thead>
-                    <tr >
-                      <th>Action</th>
-                      <th>ID</th>
-                      <th>Category</th>
-                      <th>Trade</th>
-                      <th>Location 1</th>
-                      <th>No.of Quote</th>
-                      <th>Actual Calling Quotation Date</th>
-                      <th>Prepare By</th>
-                      <th>Actual Done Date</th>
-                      <th>Check By</th>
-                      <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 1" 
-                          :colspan="callQuotation[0].projectApproval.length - 1">
-                        Approved By
-                      </th>
-                      <th v-else>
-                        Approved By
-                      </th>
-                      <th>Awarding Target Date</th>
-                      <th>Remarks</th>
-                      <th>Awarded to</th>
-                      <th>LA Ref</th>
-                      <th>LA Date</th>
-                      <th>Budget Amount (RM)</th>
-                      <th>Budget (ADJ) Amount (RM)</th>
-                      <th>Subcontract Amount (RM)</th>
-                      <th>Subcontract (ADJ) Amount (RM)</th>
-                      <th>Cost Saving / (Overrun) (RM)</th>
-                      <th>Provisional Sum</th>
-                      <th style="text-align: center">Status</th>
-                    </tr>
-                    <tr>
-                      <th></th>
-                      <th colspan="8"></th>
-                      <template v-if="projectApproval && projectApproval.length > 0">
-                        <th v-for="(approval, index) in projectApproval" 
-                          :key="index">
-                        {{ approval.user[0]?.name }}
-                      </th>
-                      </template>
-                      <template v-else>
-                        <th></th>
-                        <th></th>
-                      </template>
-                      <th colspan="12"></th>
-                    </tr>
-                  </thead>
-                  
-                  <tbody>
-                    <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
-                    <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
-                      <td><a :href="'/comparison?cqID=' + callQuotation.id"><button class="transparentButton" >
-                        <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
-                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
-                      </a></td>
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ callQuotation.tradeCategory }}</td>
-                      <td>{{ callQuotation.trade }}</td>
-                      <td>{{ callQuotation.location }}</td>
-                      <td>{{ callQuotation.numberOfQuotations }}</td>
-                      <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
-                      <td>{{ callQuotation.createdby }}</td>
-                      <td>{{ formatDate(callQuotation.actuallDoneDate) !== '0000-00-00' ? formatDate(callQuotation.actuallDoneDate) : '' }}</td>
-                      <td v-for="(approval, i) in mergeApprovals(callQuotation)" :key="'approval-' + i">
-                        <span>{{ approval && approval.updatedAt ? (approval.updatedAt !== '0000-00-00' ? formatDate(approval.updatedAt) : '') : '' }}</span>
-                      </td>
-                      <td>{{ formatDate(callQuotation.awadingtargetdate) !== '0000-00-00' ? formatDate(callQuotation.awadingtargetdate) : '' }}</td>
-                      <td>{{ callQuotation.remarks }}</td>
-                      <template v-if="callQuotation.is_work_order === true">
-                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].Subcon.name : '' }}</td>
-                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].wo_code : '' }}</td>
-                        <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? formatDate(callQuotation.Wo[0].createdAt) : '' }}</td>
-                      </template>
-                      <template v-else>
-                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
-                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</td>
-                        <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
-                      </template>
-                      <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation.adj_budget_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation.subcontract_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation.adj_subcontract_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation.total_saving) }}</td>
-                      <td>{{ formatAccounting(callQuotation.provisional_sum) }}</td>
-                      <td> 
-                        <span class="notify-status">{{ callQuotation.status }}</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </md-card-content>
-        </md-card>
+                <div class="card-content">
+                  <h2>{{ formatAccounting(lawoComparison.provisional_sum) }}</h2>
+                </div>
+              </md-card-content>
+            </md-card>
+
+            <md-card class="summary-item">
+              <md-card-content class="summary-card" style="border-right: 2px solid red;">
+                <div class="card-header">
+                  <p>Contact Sum</p>
+                  <div class="icon-circle" style="background-color: #FFF1F1;">
+                    <md-icon style="color: red;">query_stats</md-icon>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <h2>{{ formatAccounting(lawoComparison.contract_sum) }}</h2>
+                </div>
+              </md-card-content>
+            </md-card>
+
+            <md-card class="summary-item">
+              <md-card-content class="summary-card" style="border-right: 2px solid green;">
+                <div class="card-header">
+                  <p>Retention</p>
+                  <div class="icon-circle" style="background-color: #F1FFF6;">
+                    <md-icon style="color: green;">area_chart</md-icon>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <h2>{{ formatAccounting(lawoComparison.retention) }}</h2>
+                </div>
+              </md-card-content>
+            </md-card>
+
+            <md-card class="summary-item">
+              <md-card-content class="summary-card" style="border-right: 2px solid orange;">
+                <div class="card-header">
+                  <p>Skilled Worker Rate</p>
+                  <div class="icon-circle" style="background-color: #FEF5E8;">
+                    <md-icon style="color: orange;">ssid_chart</md-icon>
+                  </div>
+                </div>
+                <div class="card-content">
+                  <h2>{{ formatAccounting(lawoComparison.skilled_worker_rate) }}</h2>
+                </div>
+              </md-card-content>
+            </md-card>
+          </div>
+
+          <!-- Right Side: Detailed Information -->
+          <div class="right-side" style="width: 100% !important;">
+            <md-card class="comparison-card">
+              <md-card-content>
+                <div class="comparison-item">
+                  <span class="label">Code:</span>
+                  <span class="value">{{ lawoComparison.code }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Subcon Name:</span>
+                  <span class="value">{{ lawoComparison.subconName }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Trade:</span>
+                  <span class="value">{{ lawoComparison.trade }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Category:</span>
+                  <span class="value">{{ lawoComparison.category }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Sub Element:</span>
+                  <span class="value">{{ lawoComparison.sub_element }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Sub Sub Element:</span>
+                  <span class="value">{{ lawoComparison.sub_sub_element }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Created By:</span>
+                  <span class="value">{{ lawoComparison.updateBy }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Date:</span>
+                  <span class="value">{{ formatDate(lawoComparison.updateDate) }}</span>
+                </div>
+                <div class="comparison-item">
+                  <span class="label">Remarks:</span>
+                  <span class="value">{{ lawoComparison.remarks }}</span>
+                </div>
+              </md-card-content>
+            </md-card>
+          </div>
+        </div>
       </div>
     </div>
-    </div>
+  </div>
 </template>
+
+
+
 
 <script>
 const XLSX = require('xlsx');
 import { ref } from "vue";
-import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-
-import { checkAccess } from "@/services/axios/accessControl.js";
+import LaController from "@/services/controllers/LaController.js";
 
 export default {
   components: {
@@ -154,34 +148,12 @@ export default {
   data() {
     return {
       show: ref(false),
-      searchQuery: "",
-      openedDropdown: null,
-      projectName: "",
-      errorMessage: "",
-      callQuotation: [],
-      projectApproval:[],
+      lawoComparison: [],
       UpdateMessage: null,
       FailMessage: null,
-      item: null,
-      hasAccess: false,
       isLoading: false,
+      projectName: "",
     };
-  },
-  computed: {
-    SearchcallQuotation() {
-      let searchData = this.callQuotation;
-
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase().trim();
-        searchData = searchData.filter(
-          (callQuotation) =>
-            callQuotation.trade.toLowerCase().includes(query) ||
-            callQuotation.tradeCategory.toLowerCase().includes(query) ||
-            callQuotation.location.toLowerCase().includes(query)
-        );
-      }
-      return searchData;
-    },
   },
   mounted() {
     const projectName = localStorage.getItem('projectName');
@@ -190,78 +162,43 @@ export default {
     } else {
       this.FailMessage = "Project ID not found in localStorage";
     };
-    this.accessCQ();
+    this.accessCQApprove();
   },
   methods: {
-    mergeApprovals(quotation) {
-      const cqApprovals = quotation.cqApprovals || [];
-      const projectApproval = quotation.projectApproval || [];
-      const maxLength = Math.max(cqApprovals.length, projectApproval.length);
-      const approvals = [];
-
-      for (let i = 0; i < maxLength; i++) {
-        if (cqApprovals[i]) {
-          approvals.push(cqApprovals[i]);
-        } else if (projectApproval[i]) {
-          approvals.push({ updatedAt: '00-00-0000' });
-        } else {
-          approvals.push(null);
-        }
-      }
-
-      return approvals;
-    },
     formatAccounting(value) {
       if (!value) {
         return '0.00';
       }
       return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     },
-    downloadExcelTemplate() {
-      const wb = XLSX.utils.book_new();
-      const table = document.querySelector('table');
-      const clonedTable = table.cloneNode(true);
-
-      // Remove first column from each row (Actions column)
-      clonedTable.querySelectorAll('tr').forEach(row => {
-        row.deleteCell(0);
-      });
-
-      // Update table cells based on conditions
-      clonedTable.querySelectorAll('td').forEach(cell => {
-        // Replace cell content with empty string if it matches '0000-00-00'
-        if (cell.textContent.trim() === '0000-00-00') {
-          cell.textContent = '';
-        }
-      });
-
-      const ws = XLSX.utils.table_to_sheet(clonedTable);
-      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
-
-      XLSX.writeFile(wb, 'summary.xlsx');
-    },
-    async accessCQ() {
+    async accessCQApprove() {
       try {
         this.isLoading = true;
-        const processedData = await CallofQuotationController.accessCQApprove();
-        if (Array.isArray(processedData) && processedData.length > 0) {
-          this.callQuotation = processedData;
-          console.log('this CallQuotation',this.callQuotation);
-          this.projectApproval = processedData[0].projectApproval;
+        const queryParams = this.$route.query;
+        if (queryParams.woCqId) {
+          const processedData = await LaController.accessWO(queryParams.woCqId);
+          if (Array.isArray(processedData) && processedData.length > 0) {
+            this.lawoComparison = processedData[0];
+            console.log('this lawoComparison', this.lawoComparison);
+          } else {
+            this.FailMessage = "No data.";
+          }
+        } else if (queryParams.laCqId) {
+          const processedData = await LaController.accessLa(queryParams.laCqId);
+          if (Array.isArray(processedData) && processedData.length > 0) {
+            this.lawoComparison = processedData[0];
+            console.log('this lawoComparison', this.lawoComparison);
+          } else {
+            this.FailMessage = "No data.";
+          }
         } else {
-          this.errorMessage = "No data.";
+          this.FailMessage = "Error Message : No valid query parameter.";
         }
       } catch (error) {
         this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
       } finally {
         this.isLoading = false;
       }
-    },
-    closeOtherDropDowns(clickedItem) {
-      if (this.openedDropdown && this.openedDropdown !== clickedItem) {
-        this.openedDropdown.dropdown.closeDropDown();
-      }
-      this.openedDropdown = clickedItem;
     },
     formatDate(dateTimeString) {
       if (!dateTimeString) return '';
@@ -284,27 +221,58 @@ export default {
 };
 </script>
 
-<style>
-table {
+
+<style scoped>
+.flex-container {
+  display: flex;
+  gap: 20px; 
+}
+
+.summary-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 20px; 
+  width: 100%; 
+}
+
+.summary-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-header {
   width: 100%;
-  border-collapse: collapse;
-  font-family: Arial, sans-serif;
-  color: #333;
-  overflow-x: auto; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-thead th {
-  background-color: #fef4e4;
-  border-bottom: none;
-  padding: 10px;
-  text-align: left;
-
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-tbody td {
-  padding: 12px;
-  text-align: left;
-  white-space: nowrap; 
-  border: 1px solid #ddd;
+.comparison-card {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
 }
+
+.comparison-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+
 </style>

@@ -1,4 +1,4 @@
-const ApproveCQModels = {
+const ApproveCQLaModels = {
   processResponseData(response) {
     const dataArray = response.data;
 
@@ -6,9 +6,9 @@ const ApproveCQModels = {
       const processedData = dataArray.map(config => {
         return {
           id: config.id,
-          code: config.wo_code,
-          trade: config.trade,
+          code: config.la_code,
           cqId: config.call_for_quotation_id,
+          trade: config.trade,
           sub_element: config.sub_element,
           sub_sub_element: config.sub_sub_element,
           skilled_worker_rate: config.skilled_worker_rate,
@@ -31,4 +31,4 @@ const ApproveCQModels = {
   },
 };
 
-export default ApproveCQModels;
+export default ApproveCQLaModels;

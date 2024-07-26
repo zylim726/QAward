@@ -1,6 +1,6 @@
 import { axios, config } from "@/services";
 import CallQuotationModels from "@/models/CallQuotationModels.js";
-import ApproveCQModels from "@/models/ApproveCQModels.js";
+import LawoModels from "@/models/LawoModels.js";
 import UnittypeModels from "@/models/UnittypeModels.js";
 import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
@@ -34,7 +34,7 @@ const CallofQuotationController = {
         headers,
       })
 
-      const processedData = ApproveCQModels.processResponseData(response.data);
+      const processedData = LawoModels.processResponseData(response.data);
 
       return processedData;
 
