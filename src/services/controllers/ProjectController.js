@@ -34,12 +34,15 @@ const ProjectController = {
       
       for (const adminId of adminIds) {
 
+        console.log('adminId',adminId);
+
         if (adminId.id === 0) {
             const response = await axios.post(`${apiHost}/project_approval/add`, {
               project_id: formData.projectId,
               system_user_id: adminId.system_user_id 
             }, { headers });
             messages.push(response.data.message);
+
         }else {
             const response = await axios.put(`${apiHost}/project_approval/edit/${adminId.id}`, {
               project_id: formData.projectId,
