@@ -11,6 +11,10 @@
         <md-icon>check_circle_outline</md-icon>
         <p class="nav-item">Comparison Summary</p>
       </sidebar-link>
+      <sidebar-link class="navbar-link" to="/laWoSummaryList" style="">
+        <md-icon>data_exploration</md-icon>
+        <p class="nav-item">LA / WO Summary</p>
+      </sidebar-link><br>
 
       <h4 class="menutitle">Master</h4>
       <sidebar-link class="navbar-link" to="/projectsetup">
