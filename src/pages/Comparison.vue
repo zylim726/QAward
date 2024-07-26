@@ -95,7 +95,6 @@
 <script>
 import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import { Error } from "@/services";
 import { EditCQ,DeleteCQ }  from "@/components";
 
 export default {

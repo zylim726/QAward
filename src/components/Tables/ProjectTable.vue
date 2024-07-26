@@ -44,7 +44,7 @@
             <td>{{ project.name }}</td>
             <td>{{ project.billto }}</td>
             <td>{{ project.area }}</td>
-            <td>{{ project.regno }}</td>
+            <td>{{ project.regno }}</td> 
             <td style="text-align: center" v-if="hasAccess">
               <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;" >
                 <div class="tooltip">
