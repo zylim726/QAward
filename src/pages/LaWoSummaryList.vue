@@ -16,91 +16,110 @@
       <md-icon>cancel</md-icon>
     </div>
     <br>
+    <div class="row" style="margin-left: 16px">
+      <h6>Project Name :</h6>
+      <h3 class="titleHeader">{{ projectName }}</h3>
+      <br>
+    </div>
     <div class="md-layout">
-      <div class="row" style="margin-left: 16px">
-        <h6>Project Name :</h6>
-        <h3 class="titleHeader">{{ projectName }}</h3>
-        <br>
-      </div>
-      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
-        <div class="table-container" style="display: flex; justify-content: space-between;">
-          
-          <md-card class="table-wrapper" style="width: 48%;">
-            <md-card-content style="font-size: 13px !important; line-height: 17px !important">
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-50">
+        <div class="table-wrapper">
+          <md-card class="table-card">
+            <md-card-content class="table-content">
               <div class="container" v-if="!isLoading">
-                <div class="search-container"></div>
-                <button type="button" class="transparentButton" style="margin-left: 15px;" @click="exportTables">
+                <button type="button" class="transparentButton" @click="exportTables">
                   <div class="tooltip">
-                    <span class="tooltiptext" style="margin-bottom: -130px;">Download LA Summary List</span>
+                    <span class="tooltiptext">Download LA Summary List</span>
                     <md-icon class="mdIcon">system_update_alt</md-icon>
                   </div>
                 </button>
               </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Code</th>
-                    <th>Subcon Name</th>
-                    <th>Provisional Sum</th>
-                    <th>Contact Sum</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(laData, index) in LaData" :key="index">
-                    <td><a :href="'/approveComparison?laCqId=' + laData.cqId"><button class="transparentButton" >
-                        <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see La detail.</span>
-                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
-                      </a></td>
-                    <td>{{ laData.code }}</td>
-                    <td>{{ laData.subconName }}</td>
-                    <td>{{ laData.provisional_sum }}</td>
-                    <td>{{ laData.contract_sum }}</td>
-                    <td>{{ laData.updateDate }}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>LA Ref</th>
+                      <th>Trade</th>
+                      <th>Subcon Name</th>
+                      <th>Provisional Sum</th>
+                      <th>Contact Sum</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(laData, index) in LaData" :key="index">
+                      <td>
+                        <a :href="'/approveComparison?laCqId=' + laData.cqId">
+                          <button class="transparentButton">
+                            <div class="tooltip">
+                              <span class="tooltiptext">Go to see La detail.</span>
+                              <md-icon style="color: orange;">arrow_outward</md-icon>
+                            </div>
+                          </button>
+                        </a>
+                      </td>
+                      <td>{{ laData.code }}</td>
+                      <td>{{ laData.trade }}</td>
+                      <td>{{ laData.subconName }}</td>
+                      <td>{{ laData.provisional_sum }}</td>
+                      <td>{{ laData.contract_sum }}</td>
+                      <td>{{ laData.updateDate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </md-card-content>
           </md-card>
-          <md-card class="table-wrapper" style="width: 48%;">
-            <md-card-content style="font-size: 13px !important; line-height: 17px !important">
+        </div>
+      </div>
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-50">
+        <div class="table-wrapper">
+          <md-card class="table-card">
+            <md-card-content class="table-content">
               <div class="container" v-if="!isLoading">
-                <div class="search-container"></div>
-                <button type="button" class="transparentButton" style="margin-left: 15px;" @click="exportTables">
-                  <div class="tooltip" >
-                    <span class="tooltiptext" style="margin-bottom: -140px;">Download Work Order Summary List</span>
+                <button type="button" class="transparentButton" @click="exportTables">
+                  <div class="tooltip">
+                    <span class="tooltiptext">Download Work Order Summary List</span>
                     <md-icon class="mdIcon">system_update_alt</md-icon>
                   </div>
                 </button>
               </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Code</th>
-                    <th>Subcon Name</th>
-                    <th>Provisional Sum</th>
-                    <th>Contact Sum</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(woData, index) in WoData" :key="index">
-                    <td><a :href="'/approveComparison?woCqId=' + woData.cqId"><button class="transparentButton" >
-                        <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see work order details.</span>
-                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
-                      </a></td>
-                    <td>{{ woData.code }}</td>
-                    <td>{{ woData.subconName }}</td>
-                    <td>{{ woData.provisional_sum }}</td>
-                    <td>{{ woData.contract_sum }}</td>
-                    <td>{{ woData.updateDate }}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Work Order Ref</th>
+                      <th>Trade</th>
+                      <th>Subcon Name</th>
+                      <th>Provisional Sum</th>
+                      <th>Contact Sum</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(woData, index) in WoData" :key="index">
+                      <td>
+                        <a :href="'/approveComparison?woCqId=' + woData.cqId">
+                          <button class="transparentButton">
+                            <div class="tooltip">
+                              <span class="tooltiptext">Go to see work order details.</span>
+                              <md-icon style="color: orange;">arrow_outward</md-icon>
+                            </div>
+                          </button>
+                        </a>
+                      </td>
+                      <td>{{ woData.code }}</td>
+                      <td>{{ woData.trade }}</td>
+                      <td>{{ woData.subconName }}</td>
+                      <td>{{ woData.provisional_sum }}</td>
+                      <td>{{ woData.contract_sum }}</td>
+                      <td>{{ woData.updateDate }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </md-card-content>
           </md-card>
         </div>
@@ -108,6 +127,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 const XLSX = require('xlsx');
@@ -280,15 +300,38 @@ export default {
 </script>
 
 <style scoped>
-.table-container {
-  display: flex;
-  justify-content: space-between;
+.table-wrapper {
+  width: 100%; /* Ensure the card takes the full width of its container */
+  overflow: hidden; /* Hide any overflow from the table container */
+}
+
+.table-card {
+  width: 100%; /* Ensure the card takes the full width of its container */
+}
+
+.table-content {
+  font-size: 13px !important;
+  line-height: 17px !important;
+}
+
+.table-scroll {
+  overflow-x: auto; /* Enable horizontal scroll if table overflows */
+}
+
+table {
+  width: 100%; /* Ensure table takes the full width of its container */
+  border-collapse: collapse; /* Ensure borders collapse for consistent spacing */
+}
+
+th, td {
+  padding: 8px; /* Add some padding for better readability */
+  text-align: left; /* Align text to the left */
 }
 
 tbody td {
   border: none !important;
 }
 
-
-
 </style>
+
+
