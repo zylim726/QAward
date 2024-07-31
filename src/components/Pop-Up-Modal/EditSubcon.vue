@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': editSubcon }">
     <div class="modal-background" @click="closeeditSub"></div>
-    <div class="modal-content" style="width: 35%;max-height: 100vh !important;">
+    <div class="modal-content" style="width: 35%;max-height: 300vh !important;">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
@@ -117,6 +117,18 @@
             />
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <p>Area : </p>
+            <input
+              type="text"
+              v-model="processedData[0].area"
+              placeholder="Area"
+              class="typeInput"
+            />
+          </div>
+          
+        </div>
         <!-- Add more rows as needed -->
         <button class="btn-save" aria-label="close" @click.stop="closeeditSub">Close</button>
         <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal()">Save</button>
@@ -162,6 +174,7 @@ export default {
     async getDetailSubcon(id) {
       try {
         this.processedData = await SubconController.getDetailSubcon(id);
+        console.log('this processdata',this.processedData[0]);
       } catch (error) {
         const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);

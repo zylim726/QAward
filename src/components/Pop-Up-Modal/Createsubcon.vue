@@ -84,6 +84,13 @@
           class="typeInput"
           @focus="onInputFocus('short_code')"
         />
+        <input
+          type="text"
+          v-model="area"
+          placeholder="Area"
+          class="typeInput"
+          @focus="onInputFocus('area')"
+        />
       </div>
       <button
       class="btn-save"
@@ -123,6 +130,7 @@ export default {
       email_2: "",
       email_3: "",
       short_code: "",
+      area: "",
     };
   },
   methods: {
@@ -139,7 +147,9 @@ export default {
       this.email_2 ="";
       this.email_3 ="";
       this.short_code ="";
+      this.area ="";
     },
+    
     saveAndCloseModal() {
       const subconData = {
         name: this.name,
@@ -152,7 +162,8 @@ export default {
         email_1: this.email_1,
         email_2: this.email_2,
         email_3: this.email_3,
-        short_code: this.short_code
+        short_code: this.short_code,
+        area: this.area
       };
       this.addSubconToServer(subconData);
       this.closeModal();

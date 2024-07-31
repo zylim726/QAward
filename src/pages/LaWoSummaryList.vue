@@ -301,12 +301,12 @@ export default {
 
 <style scoped>
 .table-wrapper {
-  width: 100%; /* Ensure the card takes the full width of its container */
-  overflow: hidden; /* Hide any overflow from the table container */
+  width: 100%; 
+  overflow: hidden;
 }
 
 .table-card {
-  width: 100%; /* Ensure the card takes the full width of its container */
+  width: 100%; 
 }
 
 .table-content {
@@ -315,17 +315,17 @@ export default {
 }
 
 .table-scroll {
-  overflow-x: auto; /* Enable horizontal scroll if table overflows */
+  overflow-x: auto; 
 }
 
 table {
-  width: 100%; /* Ensure table takes the full width of its container */
-  border-collapse: collapse; /* Ensure borders collapse for consistent spacing */
+  width: 100%; 
+  border-collapse: collapse; 
 }
 
 th, td {
-  padding: 8px; /* Add some padding for better readability */
-  text-align: left; /* Align text to the left */
+  padding: 8px;
+  text-align: left;
 }
 
 tbody td {
