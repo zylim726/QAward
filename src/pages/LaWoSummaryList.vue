@@ -24,45 +24,7 @@
       </div>
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
         <div class="table-container" style="display: flex; justify-content: space-between;">
-          <md-card class="table-wrapper" style="width: 48%;">
-            <md-card-content style="font-size: 13px !important; line-height: 17px !important">
-              <div class="container" v-if="!isLoading">
-                <div class="search-container"></div>
-                <button type="button" class="transparentButton" style="margin-left: 15px;" @click="exportTables">
-                  <div class="tooltip" >
-                    <span class="tooltiptext" style="margin-bottom: -140px;">Download Work Order Summary List</span>
-                    <md-icon class="mdIcon">system_update_alt</md-icon>
-                  </div>
-                </button>
-              </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Code</th>
-                    <th>Subcon Name</th>
-                    <th>Provisional Sum</th>
-                    <th>Contact Sum</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(woData, index) in WoData" :key="index">
-                    <td><a :href="'/approveComparison?woCqId=' + woData.cqId"><button class="transparentButton" >
-                        <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see work order details.</span>
-                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
-                      </a></td>
-                    <td>{{ woData.code }}</td>
-                    <td>{{ woData.subconName }}</td>
-                    <td>{{ woData.provisional_sum }}</td>
-                    <td>{{ woData.contract_sum }}</td>
-                    <td>{{ woData.updateDate }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </md-card-content>
-          </md-card>
+          
           <md-card class="table-wrapper" style="width: 48%;">
             <md-card-content style="font-size: 13px !important; line-height: 17px !important">
               <div class="container" v-if="!isLoading">
@@ -97,6 +59,45 @@
                     <td>{{ laData.provisional_sum }}</td>
                     <td>{{ laData.contract_sum }}</td>
                     <td>{{ laData.updateDate }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </md-card-content>
+          </md-card>
+          <md-card class="table-wrapper" style="width: 48%;">
+            <md-card-content style="font-size: 13px !important; line-height: 17px !important">
+              <div class="container" v-if="!isLoading">
+                <div class="search-container"></div>
+                <button type="button" class="transparentButton" style="margin-left: 15px;" @click="exportTables">
+                  <div class="tooltip" >
+                    <span class="tooltiptext" style="margin-bottom: -140px;">Download Work Order Summary List</span>
+                    <md-icon class="mdIcon">system_update_alt</md-icon>
+                  </div>
+                </button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Code</th>
+                    <th>Subcon Name</th>
+                    <th>Provisional Sum</th>
+                    <th>Contact Sum</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(woData, index) in WoData" :key="index">
+                    <td><a :href="'/approveComparison?woCqId=' + woData.cqId"><button class="transparentButton" >
+                        <div class="tooltip" >
+                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see work order details.</span>
+                        <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
+                      </a></td>
+                    <td>{{ woData.code }}</td>
+                    <td>{{ woData.subconName }}</td>
+                    <td>{{ woData.provisional_sum }}</td>
+                    <td>{{ woData.contract_sum }}</td>
+                    <td>{{ woData.updateDate }}</td>
                   </tr>
                 </tbody>
               </table>
