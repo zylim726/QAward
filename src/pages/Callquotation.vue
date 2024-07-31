@@ -62,7 +62,7 @@
                       <th>Actual Done Date</th>
                       <th>Check By</th>
                       <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 1" 
-                          :colspan="callQuotation[0].projectApproval.length - 1">
+                          :colspan="callQuotation[0].cqApprovals.length - 1">
                         Approved By
                       </th>
                       <th v-else>
@@ -85,10 +85,9 @@
                       <th></th>
                       <th colspan="8"></th>
                       <template v-if="projectApproval && projectApproval.length > 0">
-                        <th v-for="(approval, index) in projectApproval" 
-                          :key="index">
-                        {{ approval.user[0]?.name }}
-                      </th>
+                        <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
+                          {{ approval.user[0]?.name || '' }}
+                        </th>
                       </template>
                       <template v-else>
                         <th></th>
@@ -192,6 +191,9 @@ export default {
       }
       return searchData;
     },
+    maxprojectApprovalData() {
+      return this.maxprojectApproval();
+    }
   },
   mounted() {
     const projectName = localStorage.getItem('projectName');
@@ -206,24 +208,46 @@ export default {
     await this.checkPermission();
   },
   methods: {
-    mergeApprovals(quotation) {
-      const cqApprovals = quotation.cqApprovals || [];
-      const projectApproval = quotation.projectApproval || [];
-      const maxLength = Math.max(cqApprovals.length, projectApproval.length);
-      const approvals = [];
-
-      for (let i = 0; i < maxLength; i++) {
-        if (cqApprovals[i]) {
-          approvals.push(cqApprovals[i]);
-        } else if (projectApproval[i]) {
-          approvals.push({ updatedAt: '00-00-0000' });
-        } else {
-          approvals.push(null);
-        }
+    getMaxCqApprovalsLength() {
+    let maxLength = 0;
+    this.callQuotation.forEach(quotation => {
+      const cqApprovalsLength = (quotation.cqApprovals || []).length;
+      if (cqApprovalsLength > maxLength) {
+        maxLength = cqApprovalsLength;
       }
+    });
 
-      return approvals;
+    return maxLength;
+  },
+  maxprojectApproval() {
+      const maxLength = this.getMaxCqApprovalsLength();
+      const pjApproval = this.projectApproval || [];
+
+      // Create a list up to maxLength, fill missing data with 'Empty Data'
+      return Array.from({ length: maxLength }, (_, index) => {
+        return pjApproval[index] ? pjApproval[index] : { user: [{ name: '' }] };
+      });
     },
+  mergeApprovals(quotation) {
+    const maxLength = this.getMaxCqApprovalsLength();
+    
+    // Get cqApprovals for the current quotation
+    const cqApprovals = quotation.cqApprovals || [];
+    
+    // Initialize an array to hold the merged results
+    const approvals = [];
+    
+    // Loop through the maximum length
+    for (let i = 0; i < maxLength; i++) {
+      // Add cqApprovals data or '00-00-0000' if no data
+      approvals.push(cqApprovals[i] || { updatedAt: '00-00-0000' });
+    }
+    
+    // Log the approvals array for debugging
+    console.log('Approvals Array:', approvals);
+    
+    return approvals;
+  },
     formatAccounting(value) {
       if (!value) {
         return '0.00';
