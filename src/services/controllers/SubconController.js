@@ -37,7 +37,8 @@ const SubconController = {
           email_1: subconData.email_1,
           email_2: subconData.email_2,
           email_3: subconData.email_3,
-          short_code: subconData.short_code
+          short_code: subconData.short_code,
+          area: subconData.area
         },
         { headers }
       );
@@ -59,6 +60,7 @@ const SubconController = {
         headers,
       });
       return response.data.data;
+    
       
     } catch (error) {
       const errorMessage = handleApiError(error);
@@ -83,7 +85,8 @@ const SubconController = {
           email_1: updatedData.email_1,
           email_2: updatedData.email_2,
           email_3: updatedData.email_3,
-          short_code: updatedData.short_code
+          short_code: updatedData.short_code,
+          area: updatedData.area
         }, { headers });
         return response.data.message;
     } catch (error) {
