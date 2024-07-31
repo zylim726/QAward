@@ -85,8 +85,8 @@
                       <th></th>
                       <th colspan="8"></th>
                       <template v-if="projectApproval && projectApproval.length > 0">
-                        <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
-                          {{ approval.user[0]?.name || '' }}
+                        <th v-for="(approval, index) in projectApproval" :key="index">
+                          {{ approval }}
                         </th>
                       </template>
                       <template v-else>
@@ -191,9 +191,9 @@ export default {
       }
       return searchData;
     },
-    maxprojectApprovalData() {
-      return this.maxprojectApproval();
-    }
+    // maxprojectApprovalData() {
+    //   return this.projectApproval;
+    // }
   },
   mounted() {
     const projectName = localStorage.getItem('projectName');
@@ -209,25 +209,26 @@ export default {
   },
   methods: {
     getMaxCqApprovalsLength() {
-    let maxLength = 0;
-    this.callQuotation.forEach(quotation => {
-      const cqApprovalsLength = (quotation.cqApprovals || []).length;
-      if (cqApprovalsLength > maxLength) {
-        maxLength = cqApprovalsLength;
-      }
-    });
-
-    return maxLength;
-  },
-  maxprojectApproval() {
-      const maxLength = this.getMaxCqApprovalsLength();
-      const pjApproval = this.projectApproval || [];
-
-      // Create a list up to maxLength, fill missing data with 'Empty Data'
-      return Array.from({ length: maxLength }, (_, index) => {
-        return pjApproval[index] ? pjApproval[index] : { user: [{ name: '' }] };
+      let maxLength = 0;
+      this.callQuotation.forEach(quotation => {
+        const cqApprovalsLength = (quotation.cqApprovals || []).length;
+        const projectApprovalLength = (quotation.projectApproval || []).length;
+        maxLength = Math.max(maxLength, cqApprovalsLength, projectApprovalLength);
       });
+
+      console.log('maxlength', maxLength);
+
+      return maxLength;
     },
+  // maxprojectApproval() {
+  //     const maxLength = this.getMaxCqApprovalsLength();
+  //     const pjApproval = this.projectApproval || [];
+
+  //     // Create a list up to maxLength, fill missing data with 'Empty Data'
+  //     return Array.from({ length: maxLength }, (_, index) => {
+  //       return pjApproval[index] ? pjApproval[index] : { user: [{ name: '' }] };
+  //     });
+  //   },
   mergeApprovals(quotation) {
     const maxLength = this.getMaxCqApprovalsLength();
     

@@ -13,6 +13,8 @@ const CallQuotationModels = {
         return false;
       }
     });
+
+    console.log('filtered Data',filteredData);
     if (filteredData.length > 0) {
       const processedData = filteredData.map(config => ({
         id: config.id,
