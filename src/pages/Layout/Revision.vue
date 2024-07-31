@@ -68,7 +68,6 @@ export default {
       try {
         const id = this.$route.query.cqId;
         const processedData = await RevisionController.accessRevision(id);
-        console.log('processedData',processedData);
         this.revision = processedData;
       } catch (error) {
         this.errorMessage = "Error: " + error.message;

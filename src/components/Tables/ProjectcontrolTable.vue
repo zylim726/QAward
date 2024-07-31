@@ -1,12 +1,16 @@
 <template>
   <md-card-content>
+    <!-- Modal Popup -->
     <div v-if="isModalVisible" class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="titleHeader">Select Admin</h1>
           <span class="close-icon" @click="closeModal">&times;</span>
+        </div>
+        <div class="header-row">
+          <h5>Selected: {{ SelecName }}</h5>
+          <input type="text" v-model="searchTerm" placeholder="Search username" class="dropdownSubcon" style="height: 31px !important;">
         </div><br>
-        <input type="text" v-model="searchTerm" placeholder="Search username" class="dropdownSubcon" style="margin-right: 60%; height: 8%;"><br><br>
         <div style="height: 60%; overflow-y: auto;">
           <table class="user-table">
             <thead>
@@ -19,7 +23,11 @@
             <tbody>
               <tr v-for="user in filteredUsers" :key="user.id">
                 <td>
-                  <input type="checkbox" v-model="selectedUsers" :value="user.id">
+                  <input 
+                    type="radio" 
+                    :value="user.id"
+                    v-model="selectedUserId"
+                  >
                 </td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.name }}</td>
@@ -28,12 +36,13 @@
           </table>
         </div>
         <br>
-        <button type="button" class="btn-save" @click="confirmSelection">Add</button>
+        <button type="button" class="btn-save" @click="confirmSelection">Submit</button>
       </div>
     </div>
 
     <!-- Form HTML -->
-    <label class="titleHeader">Project Control Approval:</label><br />
+    <label class="titleHeader">Project Control Approval:</label>
+    <br />
     <form @submit.prevent="submitForm">
       <div class="form-group">
         <label><b>Project Site:</b></label>
@@ -41,57 +50,29 @@
         <h3 class="titleHeader" v-else>{{ projectData.name }}</h3>
       </div>
 
-      <div v-if="!hasExistingAdmins">
-        <div class="admin-fields">
-          <div v-for="(admin, index) in adminList" :key="index" class="form-group">
-            <label><b>{{ getAdminLabel(index) }}:</b></label>
-            <select
-              v-model="adminSelection[index]"
-              id="Admin"
-              class="form-control Admin-dropdown"
-              required
-              style="height: 38px !important;"
-            >
-              <option value="">Select Admin</option>
-              <option v-for="user in availableUsers(index)" :key="user.id" :value="user.id">
-                {{ user.username }}
-              </option>
-            </select>
+      <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;">
+        <label><b>{{ getAdminLabel(index) }}</b></label>
+        <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="display: flex;">
+          <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
+            <button type="button" class="transparentButton" @click="deleteAdminField(index, $event)">
+              <md-icon style="color:orange;margin-top:5px;margin-left:-15px">delete_forever</md-icon>
+            </button>
+          </div>
+          <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-90">
+            <button type="button" class="form-control Admin-dropdown" @click="openModal(index)" style="border: none">
+              {{ getAdminName(index) }} 
+            </button>
+          </div>
+          <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
+            <button type="button" class="transparentButton" @click="openModal(index)" >
+              <md-icon style="margin:3px 0px -11px -79px; color: orange;">arrow_drop_down_circle</md-icon>
+            </button>
           </div>
         </div>
-        <button type="button" class="btn-save" @click="openModal" v-if="projectData">Add Admin Access</button><br />
       </div>
-
-      <div v-else>
-        <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;">
-          <label><b>{{ getAdminLabel(index) }}</b></label>
-          <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="display: flex;">
-            <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
-              <!-- <button type="button" class="transparentButton" @click="deleteAdminField(index, $event)">
-                <md-icon style="color:orange;margin-top:5px;margin-left:-15px">delete_forever</md-icon>
-              </button> -->
-            </div>
-            <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-95">
-              <select
-                v-model="getUserHaveDT[index].system_user_id"
-                id="Admin"
-                class="form-control Admin-dropdown"
-                required
-                style="height: 38px !important; width: 100%;"
-              >
-                <option value="">Select Admin</option>
-                <option v-for="user in availableUsers(index)" :key="user.id" :value="user.id">
-                  {{ user.username }}
-                </option>
-              </select>
-              <br />
-            </div>
-          </div>
-        </div>
-        <br>
-        <button type="submit" class="btn-save">Update</button>
-        <button type="button" class="btn-save" @click="openModal" v-if="projectData">Add Admin Access</button><br />
-      </div>
+      <br>
+      <button type="button" class="btn-save" @click="addNewAdminField" v-if="projectData">Add Admin Access</button>
+      <br />
     </form>
     <br />
   </md-card-content>
@@ -114,9 +95,12 @@ export default {
       getDTProject: null,
       getUserHaveDT: [],
       isModalVisible: false,
-      selectedUsers: [],  // Track selected user IDs from the modal
       searchTerm: '',
-      selectedUserDetails: [] // To store selected user details from modal
+      selectedUserId: null,
+      currentAdminIndex: null,
+      selectedUsers: [],
+      selectedUserDetails: [],
+      SelecName: null,
     };
   },
   async mounted() {
@@ -126,11 +110,23 @@ export default {
   },
   computed: {
     filteredUsers() {
-      return this.users.filter(user =>
-        user.username.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        user.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    },
+    // Extract IDs from getUserHaveDT, excluding the current index
+    const excludedUserIds = this.getUserHaveDT
+      .filter((_, index) => index !== this.currentAdminIndex) // Exclude current index
+      .map(admin => admin.system_user_id);
+
+    // Include the currently selected user ID if the modal is open for that user
+    if (this.currentAdminIndex !== null && this.getUserHaveDT[this.currentAdminIndex]) {
+      excludedUserIds.push(this.getUserHaveDT[this.currentAdminIndex].system_user_id);
+    }
+
+    // Filter users based on excluded IDs and search term
+    return this.users.filter(user =>
+      !excludedUserIds.includes(user.id) &&
+      (user.username.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+       user.name.toLowerCase().includes(this.searchTerm.toLowerCase()))
+    );
+  },
     availableUsers() {
       return (adminIndex) => {
         const selectedAdmins = this.adminSelection.filter((adminId, index) => index !== adminIndex && adminId !== '');
@@ -139,7 +135,7 @@ export default {
     },
     hasExistingAdmins() {
       return this.getUserHaveDT && this.getUserHaveDT.length > 0;
-    },
+    }
   },
   watch: {
     projectData(newValue) {
@@ -147,24 +143,43 @@ export default {
     }
   },
   methods: {
-    openModal() {
+    getAdminName(index) {
+      const userHaveDT = this.getUserHaveDT[index];
+      if (userHaveDT && userHaveDT.system_user_id) {
+        const user = this.users.find(user => user.id === userHaveDT.system_user_id);
+        if (user) {
+          return user.username;
+        }
+      }
+      return 'Select Admin';
+    },
+    openModal(index) {
       this.isModalVisible = true;
+      this.currentAdminIndex = index;
+      this.selectedUserId = this.getUserHaveDT[index]?.system_user_id || null;
+      this.SelecName = this.getUserHaveDT[index]?.systemuser[0].username || null;
     },
     closeModal() {
       this.isModalVisible = false;
     },
     confirmSelection() {
-
-      const formData = {
-        projectId: this.projectData.id,
-        admins: this.selectedUsers.map(userId => ({
-          id: 0, // Placeholder value for id
-          system_user_id: userId // Use userId from selectedUsers
-        }))
-      };
-
-      this.projectcontrol(formData);
-      this.closeModal();
+      if (this.selectedUserId !== null) {
+        this.getUserHaveDT[this.currentAdminIndex].system_user_id = this.selectedUserId;
+        
+        console.log('confirmSelection - selectedUsers:', this.selectedUsers);
+        const formData = {
+          projectId: this.projectData.id,
+          admins: this.getUserHaveDT.map(admin => ({
+            id: admin.id || 0,
+            system_user_id: admin.system_user_id
+          }))
+        };
+        console.log('confirmSelection - formData:', formData);
+        this.projectcontrol(formData);
+        this.closeModal();
+      } else {
+        console.error('No user selected!');
+      }
     },
     getAdminLabel(index) {
       if (index === 0) return 'Check By';
@@ -197,24 +212,18 @@ export default {
         // Remove the admin from local data arrays
         this.getUserHaveDT.splice(index, 1);
         this.adminSelection.splice(index, 1);
-        
+
         // Set adminDeleted flag to true to indicate admin deletion
         this.adminDeleted = true;
       } catch (error) {
         this.$emit('fail-message', error);
       }
     },
-    submitForm() {
-      const formData = {
-        projectId: this.projectData.id,
-        admins: this.hasExistingAdmins
-          ? this.getUserHaveDT.map(admin => ({ id: admin.id, system_user_id: admin.system_user_id }))
-          : this.adminList.map((admin, index) => ({ id: admin.id, system_user_id: this.adminSelection[index] }))
-      };
-      this.projectcontrol(formData);
+    addNewAdminField() {
+      this.getUserHaveDT.push({ id: null, system_user_id: '', username: 'Select Admin' });
+      this.adminSelection.push('');
     },
     async projectcontrol(formData) {
-      console.log('formData',formData);
       try {
         const successMessage = await ProjectController.projectcontrol(formData);
         const concatenatedMessage = successMessage.join(', ');
@@ -223,10 +232,11 @@ export default {
       } catch (error) {
         this.$emit('fail-message', error);
       }
-    },
+    }
   }
 };
 </script>
+
 
 
 <style>
@@ -265,4 +275,10 @@ export default {
     cursor: pointer;
 }
 
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 </style>
