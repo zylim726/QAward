@@ -167,8 +167,6 @@ export default {
         remarks: unit["Remarks"],
       }));
 
-    
-
       try {
         const Message = await CallofQuotationController.addCQ(selectedFormData, transformedCQImport);
         const UpdateMessage = Message[0]; 
@@ -190,7 +188,7 @@ export default {
         });
 
          this.selectAll = false;
-         window.location.reload();
+        
 
       } catch (error) {
         this.loading = false;

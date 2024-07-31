@@ -84,7 +84,6 @@
 
 <script>
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-import { Error } from "@/services";
 
 export default {
   props: {
@@ -174,6 +173,8 @@ export default {
             this.callQuotation.splice(index, 1);
           }
         });
+
+        this.$router.push({ path: 'callquotation' });
 
       } catch (error) {
         this.loading = false;

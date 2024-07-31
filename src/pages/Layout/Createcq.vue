@@ -64,7 +64,8 @@ export default {
         this.UpdateMessage = message;
         setTimeout(() => {
           this.UpdateMessage = '';
-        }, 2000);
+        }, 1000);
+        this.activeStep = 2;  
       }
     },
     ImportErrorMessage(message) {
