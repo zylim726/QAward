@@ -82,6 +82,13 @@
                   <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
                 </div>
               </button>
+              <button style="margin-left: -9px !important;" type="button" class="transparentButton" >
+                <div class="tooltip" >
+                  <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
+                  Download Quotation</span>
+                  <md-icon style="color:orange;margin-top: 10px;">picture_as_pdf</md-icon>
+                </div>
+              </button>
             </th>
           </tr>
           <tr>
@@ -558,7 +565,7 @@ export default {
       
         const searchQuery = this.searchQuery.toLowerCase().trim();
 
-        console.log('id',id);
+        console.log('processedData',processedData);
         
         this.ApprovalDataArray.push(Number(id));
         
@@ -610,6 +617,7 @@ export default {
               head2Counter++;
 
             this.QuotationName = getQuotation;
+            console.log('this Quotation Name',this.QuotationName);
 
               let quotationTDs = '';
               const seenSubconIds = new Set();
