@@ -22,12 +22,7 @@ export default new Vuex.Store({
       state.token = null;
       state.accesslevel = null;
       state.username = null;
-      localStorage.removeItem("token");
-      localStorage.removeItem("accesslevel");
-      localStorage.removeItem("username");
-      localStorage.removeItem("userid");
-      localStorage.removeItem("projectId");
-      localStorage.removeItem("projectName");
+      localStorage.clear();
     },
   },
   actions: {
