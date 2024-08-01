@@ -25,12 +25,9 @@ export default new Vuex.Store({
       localStorage.removeItem("token");
       localStorage.removeItem("accesslevel");
       localStorage.removeItem("username");
-<<<<<<< Updated upstream
-=======
       localStorage.removeItem("userid");
       localStorage.removeItem("projectId");
       localStorage.removeItem("projectName");
->>>>>>> Stashed changes
     },
   },
   actions: {
