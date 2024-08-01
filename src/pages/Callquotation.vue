@@ -232,21 +232,12 @@ export default {
     },
     mergeApprovals(quotation) {
       const maxLength = this.getMaxCqApprovalsLength();
-      
-      // Get cqApprovals for the current quotation
+  
       const cqApprovals = quotation.cqApprovals || [];
-      
-      // Initialize an array to hold the merged results
-      const approvals = [];
-      
-      // Loop through the maximum length
+      const approvals = []; 
       for (let i = 0; i < maxLength; i++) {
-        // Add cqApprovals data or '00-00-0000' if no data
         approvals.push(cqApprovals[i] || { updatedAt: '00-00-0000' });
       }
-      
-      // Log the approvals array for debugging
-      console.log('Approvals Array:', approvals);
       
       return approvals;
     },
