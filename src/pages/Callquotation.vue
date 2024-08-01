@@ -210,7 +210,6 @@ export default {
         let cqApprovalsLength = (quotation.cqApprovals || []).length;
 
         if (cqApprovalsLength === 0) {
-          // If cqApprovalsLength is zero, use the length of projectApproval
           cqApprovalsLength = (quotation.projectApproval || []).length;
         }
 
@@ -222,21 +221,12 @@ export default {
       return maxLength;
     },
     maxprojectApproval() {
-      // Get the maximum length from the getMaxCqApprovalsLength method
       const maxLength = this.getMaxCqApprovalsLength();
-      console.log('length', maxLength);
-
-      // Get the projectApproval array
       const pjApproval = this.projectApproval || [];
-      console.log('pjApproval', pjApproval);
 
-      // Create a list up to maxLength, fill missing data with 'Empty Data'
       const result = Array.from({ length: maxLength }, (_, index) => {
         return pjApproval[index] ? pjApproval[index] : { user: [{ name: '' }] };
       });
-
-      // Log the final result array
-      console.log('result', result);
 
       return result;
     },
