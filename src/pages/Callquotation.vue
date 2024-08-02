@@ -60,12 +60,7 @@
                       <th>Actual Calling Quotation Date</th>
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
-                      <th>Check By</th>
-                      <th v-if="callQuotation && callQuotation.length > 0 && callQuotation[0].projectApproval && callQuotation[0].projectApproval.length > 1" 
-                          :colspan="callQuotation[0].cqApprovals.length - 1">
-                        Approved By
-                      </th>
-                      <th v-else>
+                      <th :colspan="getMaxCqApprovalsLength()">
                         Approved By
                       </th>
                       <th>Awarding Target Date</th>
@@ -84,15 +79,9 @@
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <template v-if="projectApproval && projectApproval.length > 0">
-                        <th v-for="(approval, index) in projectApproval" :key="index">
-                          {{ approval }}
-                        </th>
-                      </template>
-                      <template v-else>
-                        <th></th>
-                        <th></th>
-                      </template>
+                      <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
+                        {{ approval.user.name || approval.user[0].name }}
+                      </th>
                       <th colspan="12"></th>
                     </tr>
                   </thead>
@@ -107,7 +96,15 @@
                       </a></td>
                       <td>{{ index + 1 }}</td>
                       <td>{{ callQuotation.tradeCategory }}</td>
-                      <td>{{ callQuotation.trade }}</td>
+                      <td v-if="callQuotation.status === 'Approved'">
+                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: darkseagreen !important;" >check_circle</md-icon>
+                      </td>
+                      <td v-else-if="callQuotation.status === 'Pending'">
+                      {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: lightgray !important;" >pending</md-icon>
+                      </td>
+                      <td v-else>
+                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: lightcoral !important;">error</md-icon>
+                      </td>
                       <td>{{ callQuotation.location }}</td>
                       <td>{{ callQuotation.numberOfQuotations }}</td>
                       <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
@@ -120,12 +117,24 @@
                       <td>{{ callQuotation.remarks }}</td>
                       <template v-if="callQuotation.is_work_order === true">
                         <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].Subcon.name : '' }}</td>
-                        <td><a :href="'/approveComparison?woCqId=' + callQuotation.id" class="notify-status">{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].wo_code : '' }}</a></td>
+                        <td>
+                          <a v-if="callQuotation.Wo && callQuotation.Wo.length > 0" 
+                            :href="'/approveComparison?woCqId=' + callQuotation.id" 
+                            class="notify-status">
+                            {{ callQuotation.Wo[0].wo_code }}
+                          </a>
+                        </td>
                         <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? formatDate(callQuotation.Wo[0].createdAt) : '' }}</td>
                       </template>
                       <template v-else>
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
-                        <td><a :href="'/approveComparison?laCqId=' + callQuotation.id" class="notify-status">{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</a></td>
+                        <td>
+                          <a v-if="callQuotation.La && callQuotation.La.length > 0" 
+                            :href="'/approveComparison?laCqId=' + callQuotation.id" 
+                            class="notify-status">
+                            {{ callQuotation.La[0].la_code }}
+                          </a>
+                        </td>
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
                       </template>
                       <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>
@@ -134,9 +143,7 @@
                       <td>{{ formatAccounting(callQuotation.adj_subcontract_amount) }}</td>
                       <td>{{ formatAccounting(callQuotation.total_saving) }}</td>
                       <td>{{ formatAccounting(callQuotation.provisional_sum) }}</td>
-                      <td> 
-                        <span class="notify-status">{{ callQuotation.status }}</span>
-                      </td>
+                      <td>{{ callQuotation.status }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -191,9 +198,9 @@ export default {
       }
       return searchData;
     },
-    // maxprojectApprovalData() {
-    //   return this.projectApproval;
-    // }
+    maxprojectApprovalData() {
+      return this.maxprojectApproval();
+    }
   },
   mounted() {
     const projectName = localStorage.getItem('projectName');
@@ -211,44 +218,79 @@ export default {
     getMaxCqApprovalsLength() {
       let maxLength = 0;
       this.callQuotation.forEach(quotation => {
-        const cqApprovalsLength = (quotation.cqApprovals || []).length;
-        const projectApprovalLength = (quotation.projectApproval || []).length;
-        maxLength = Math.max(maxLength, cqApprovalsLength, projectApprovalLength);
-      });
+        const combinedApprovals = [...quotation.cqApprovals, ...quotation.projectApproval];
+        const uniqueApprovals = Array.from(
+          new Map(combinedApprovals.map(item => [item.system_user_id, item])).values()
+        );
 
-      console.log('maxlength', maxLength);
+        let cqApprovalsLength = (uniqueApprovals || []).length;
+
+        if (cqApprovalsLength > maxLength) {
+          maxLength = cqApprovalsLength;
+        }
+
+      });
 
       return maxLength;
     },
-  // maxprojectApproval() {
-  //     const maxLength = this.getMaxCqApprovalsLength();
-  //     const pjApproval = this.projectApproval || [];
+    maxprojectApproval() {
+      const maxLength = this.getMaxCqApprovalsLength();
 
-  //     // Create a list up to maxLength, fill missing data with 'Empty Data'
-  //     return Array.from({ length: maxLength }, (_, index) => {
-  //       return pjApproval[index] ? pjApproval[index] : { user: [{ name: '' }] };
-  //     });
-  //   },
-  mergeApprovals(quotation) {
-    const maxLength = this.getMaxCqApprovalsLength();
-    
-    // Get cqApprovals for the current quotation
-    const cqApprovals = quotation.cqApprovals || [];
-    
-    // Initialize an array to hold the merged results
-    const approvals = [];
-    
-    // Loop through the maximum length
-    for (let i = 0; i < maxLength; i++) {
-      // Add cqApprovals data or '00-00-0000' if no data
-      approvals.push(cqApprovals[i] || { updatedAt: '00-00-0000' });
-    }
-    
-    // Log the approvals array for debugging
-    console.log('Approvals Array:', approvals);
-    
-    return approvals;
-  },
+      // Combine all approvals from each quotation
+      const combinedApprovals = this.callQuotation.flatMap(quotation => 
+        [...quotation.cqApprovals, ...quotation.projectApproval]
+      );
+
+      // Remove duplicates based on system_user_id
+      const uniqueApprovals = Array.from(
+        new Map(combinedApprovals.map(item => [item.system_user_id, item])).values()
+      );
+
+      // Create the result array with the maxLength
+      const result = Array.from({ length: maxLength }, (_, index) => {
+        return uniqueApprovals[index] || { user: [{ name: '' }] };
+      });
+
+      return result;
+    },
+    mergeApprovals(quotation) {
+      const maxLength = this.getMaxCqApprovalsLength();
+
+      const cqApprovals = quotation.cqApprovals || [];
+      const projectApprovals = quotation.projectApproval || [];
+
+      const combinedApprovals = [...cqApprovals, ...projectApprovals];
+
+      const uniqueApprovals = Array.from(
+        new Map(combinedApprovals.map(item => [item.system_user_id, item])).values()
+      );
+
+      const maxProjectApprovalIds = this.maxprojectApproval();
+                       
+      const filledApprovals = [];
+      const seenUserIds = new Set();
+
+      for (let i = 0; i < maxLength; i++) {
+        const userId = maxProjectApprovalIds[i]?.system_user_id;
+      
+        if (userId !== undefined) {
+          const approval = cqApprovals.find(app => app.system_user_id === userId);
+          filledApprovals.push(approval || { system_user_id: userId, updatedAt: '00-00-0000' });
+          seenUserIds.add(userId);
+        } else {
+          const remainingApproval = uniqueApprovals.find(app => !seenUserIds.has(app.system_user_id));
+
+          if (remainingApproval) {
+            filledApprovals.push(remainingApproval);
+            seenUserIds.add(remainingApproval.system_user_id);
+          } else {
+            filledApprovals.push({ system_user_id: '', updatedAt: '00-00-0000' });
+          }
+        }
+      }
+
+      return filledApprovals;
+    },
     formatAccounting(value) {
       if (!value) {
         return '0.00';
