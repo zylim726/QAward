@@ -60,8 +60,7 @@
                       <th>Actual Calling Quotation Date</th>
                       <th>Prepare By</th>
                       <th>Actual Done Date</th>
-                      <th>Check By</th>
-                      <th  :colspan="getMaxCqApprovalsLength() - 1">
+                      <th :colspan="getMaxCqApprovalsLength()">
                         Approved By
                       </th>
                       <th>Awarding Target Date</th>
@@ -80,15 +79,9 @@
                     <tr>
                       <th></th>
                       <th colspan="8"></th>
-                      <template v-if="projectApproval && projectApproval.length > 0">
-                        <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
-                          {{ approval.user.name || '' }}
-                        </th>
-                      </template>
-                      <template v-else>
-                        <th></th>
-                        <th></th>
-                      </template>
+                      <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
+                        {{ approval.user.name || approval.user[0].name }}
+                      </th>
                       <th colspan="12"></th>
                     </tr>
                   </thead>
@@ -103,7 +96,15 @@
                       </a></td>
                       <td>{{ index + 1 }}</td>
                       <td>{{ callQuotation.tradeCategory }}</td>
-                      <td>{{ callQuotation.trade }}</td>
+                      <td v-if="callQuotation.status === 'Approved'">
+                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: darkseagreen !important;" >check_circle</md-icon>
+                      </td>
+                      <td v-else-if="callQuotation.status === 'Pending'">
+                      {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: lightgray !important;" >pending</md-icon>
+                      </td>
+                      <td v-else>
+                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: lightcoral !important;">error</md-icon>
+                      </td>
                       <td>{{ callQuotation.location }}</td>
                       <td>{{ callQuotation.numberOfQuotations }}</td>
                       <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
@@ -116,12 +117,24 @@
                       <td>{{ callQuotation.remarks }}</td>
                       <template v-if="callQuotation.is_work_order === true">
                         <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].Subcon.name : '' }}</td>
-                        <td><a :href="'/approveComparison?woCqId=' + callQuotation.id" class="notify-status">{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? callQuotation.Wo[0].wo_code : '' }}</a></td>
+                        <td>
+                          <a v-if="callQuotation.Wo && callQuotation.Wo.length > 0" 
+                            :href="'/approveComparison?woCqId=' + callQuotation.id" 
+                            class="notify-status">
+                            {{ callQuotation.Wo[0].wo_code }}
+                          </a>
+                        </td>
                         <td>{{ callQuotation.Wo && callQuotation.Wo.length > 0 ? formatDate(callQuotation.Wo[0].createdAt) : '' }}</td>
                       </template>
                       <template v-else>
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
-                        <td><a :href="'/approveComparison?laCqId=' + callQuotation.id" class="notify-status">{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].la_code : '' }}</a></td>
+                        <td>
+                          <a v-if="callQuotation.La && callQuotation.La.length > 0" 
+                            :href="'/approveComparison?laCqId=' + callQuotation.id" 
+                            class="notify-status">
+                            {{ callQuotation.La[0].la_code }}
+                          </a>
+                        </td>
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? formatDate(callQuotation.La[0].createdAt) : '' }}</td>
                       </template>
                       <td>{{ formatAccounting(callQuotation.budget_amount) }}</td>
@@ -130,9 +143,7 @@
                       <td>{{ formatAccounting(callQuotation.adj_subcontract_amount) }}</td>
                       <td>{{ formatAccounting(callQuotation.total_saving) }}</td>
                       <td>{{ formatAccounting(callQuotation.provisional_sum) }}</td>
-                      <td> 
-                        <span class="notify-status">{{ callQuotation.status }}</span>
-                      </td>
+                      <td>{{ callQuotation.status }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -224,10 +235,20 @@ export default {
     },
     maxprojectApproval() {
       const maxLength = this.getMaxCqApprovalsLength();
-      const pjApproval = this.projectApproval || [];
 
+      // Combine all approvals from each quotation
+      const combinedApprovals = this.callQuotation.flatMap(quotation => 
+        [...quotation.cqApprovals, ...quotation.projectApproval]
+      );
+
+      // Remove duplicates based on system_user_id
+      const uniqueApprovals = Array.from(
+        new Map(combinedApprovals.map(item => [item.system_user_id, item])).values()
+      );
+
+      // Create the result array with the maxLength
       const result = Array.from({ length: maxLength }, (_, index) => {
-        return pjApproval[index] ? pjApproval[index] : { user: [{ name: '' }] };
+        return uniqueApprovals[index] || { user: [{ name: '' }] };
       });
 
       return result;
