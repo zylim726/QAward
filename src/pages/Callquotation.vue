@@ -207,15 +207,17 @@ export default {
     getMaxCqApprovalsLength() {
       let maxLength = 0;
       this.callQuotation.forEach(quotation => {
-        let cqApprovalsLength = (quotation.cqApprovals || []).length;
+        const combinedApprovals = [...quotation.cqApprovals, ...quotation.projectApproval];
+        const uniqueApprovals = Array.from(
+          new Map(combinedApprovals.map(item => [item.system_user_id, item])).values()
+        );
 
-        if (cqApprovalsLength === 0) {
-          cqApprovalsLength = (quotation.projectApproval || []).length;
-        }
+        let cqApprovalsLength = (uniqueApprovals || []).length;
 
         if (cqApprovalsLength > maxLength) {
           maxLength = cqApprovalsLength;
         }
+
       });
 
       return maxLength;
@@ -232,14 +234,41 @@ export default {
     },
     mergeApprovals(quotation) {
       const maxLength = this.getMaxCqApprovalsLength();
-  
+
       const cqApprovals = quotation.cqApprovals || [];
-      const approvals = []; 
+      const projectApprovals = quotation.projectApproval || [];
+
+      const combinedApprovals = [...cqApprovals, ...projectApprovals];
+
+      const uniqueApprovals = Array.from(
+        new Map(combinedApprovals.map(item => [item.system_user_id, item])).values()
+      );
+
+      const maxProjectApprovalIds = this.maxprojectApproval();
+                       
+      const filledApprovals = [];
+      const seenUserIds = new Set();
+
       for (let i = 0; i < maxLength; i++) {
-        approvals.push(cqApprovals[i] || { updatedAt: '00-00-0000' });
-      }
+        const userId = maxProjectApprovalIds[i]?.system_user_id;
       
-      return approvals;
+        if (userId !== undefined) {
+          const approval = cqApprovals.find(app => app.system_user_id === userId);
+          filledApprovals.push(approval || { system_user_id: userId, updatedAt: '00-00-0000' });
+          seenUserIds.add(userId);
+        } else {
+          const remainingApproval = uniqueApprovals.find(app => !seenUserIds.has(app.system_user_id));
+
+          if (remainingApproval) {
+            filledApprovals.push(remainingApproval);
+            seenUserIds.add(remainingApproval.system_user_id);
+          } else {
+            filledApprovals.push({ system_user_id: '', updatedAt: '00-00-0000' });
+          }
+        }
+      }
+
+      return filledApprovals;
     },
     formatAccounting(value) {
       if (!value) {
