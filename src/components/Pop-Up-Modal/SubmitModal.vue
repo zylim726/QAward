@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': submitModal }">
     <div class="modal-background" @click="closesubmitModal"></div>
-    <div class="modal-content" style="width: 30%">
+    <div class="modal-content" style="width: 30%;max-height: 380px;">
       <div v-if="isLoading" class="spinner-border" role="status">
         <span class="visually-hidden">   
           <button class="transparentButton" style="margin-right: 10px;cursor: default;">
