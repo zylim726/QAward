@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': delModal }">
     <div class="modal-background" @click="deleteModal"></div>
-    <div class="modal-content" style="width: 25%">
+    <div class="modal-content" style="width: 25%;max-height: 300px !important;">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />

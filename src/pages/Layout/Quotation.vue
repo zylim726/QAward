@@ -2,7 +2,7 @@
   <div class="content">
     <!-- Modal -->
     <div v-if="isModalVisible" class="modal-overlay">
-      <div class="modal-content">
+      <div class="modal-content" style="max-height: 300px;">
         <div class="modal-header">
           <h1 class="titleHeader">Select Subcon</h1>
           <span class="close-icon" @click="closeModal">&times;</span>
@@ -31,6 +31,12 @@
 
 
     <div class="md-layout">
+      <div v-if="isLoading" class="spinner-border" role="status">
+        <span class="visually-hidden">   
+          <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+            <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+          </button> Loading...</span>
+      </div>
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px"> 
           <button @click="openModal" class="transparentButton" style="margin-right: 10px; float: right">
           <div class="tooltip" >
@@ -149,6 +155,7 @@ export default {
       remarks: "",
       discount: 0,
       documents: {},
+      isLoading: false,
     };
   },
   mounted() {
@@ -364,6 +371,8 @@ export default {
     },
     async saveData(QuotationData,id) {
         try {
+            this.isLoading = true;
+            window.scrollTo(0, 0);
             const SubConName = this.selectedSubconName;
             const Discount = this.discount;
             const Remarks = this.remarks;
@@ -382,15 +391,13 @@ export default {
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
               const concatenatedMessage = SuccessMessage.join(', ');
               this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
-              setTimeout(() => {
-                this.UpdateMessage = '';
-              }, 2500);
-              const routeData = this.$router.resolve({
+              window.scrollTo(0, 0); 
+
+              this.$router.push({
                   name: 'Subcon Comparison',
                   query: { cqID: this.$route.query.cqId }
               });
 
-                window.open(routeData.href, '_blank');
             } else {
               this.FailMessage = "Error: Rate data is empty";
               setTimeout(() => {
@@ -406,6 +413,8 @@ export default {
               this.UpdateMessage = '';
               window.location.reload();
             }, 2000);
+        } finally {
+          this.isLoading = false;
         }
     },
     downloadExcelTemplate() {

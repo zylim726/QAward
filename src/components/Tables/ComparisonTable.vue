@@ -82,13 +82,15 @@
                   <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
                 </div>
               </button>
-              <button style="margin-left: -9px !important;" type="button" class="transparentButton" >
-                <div class="tooltip" >
+              <button v-if="quotationData.document_api" style="margin-left: -9px !important;" type="button" class="transparentButton" @click="downloadDocument(quotationData.document_api)">
+                <div class="tooltip">
                   <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
-                  Download Quotation</span>
+                    Download Quotation
+                  </span>
                   <md-icon style="color:orange;margin-top: 10px;">picture_as_pdf</md-icon>
                 </div>
               </button>
+
             </th>
           </tr>
           <tr>
@@ -134,7 +136,7 @@
       <br />
     </div>
     <div v-for="(project, index) in projectData" :key="index">
-      <template v-if="project.status === 'Pending' && QuotationName.length > 1">
+      <template v-if="project.status === 'Pending' && QuotationName.length > 2">
         <div class="confirmation-message">
           <p>Ready to submit cost comparison?</p>
           <button class="btn-save" @click="approvalQuotation">Submit</button>
@@ -253,6 +255,7 @@ import RejectModal from '@/components/Pop-Up-Modal/RejectModal.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
+import {  config } from "@/services";
 
 export default {
   components: {
@@ -340,6 +343,44 @@ export default {
     },
   },
   methods: {
+    async downloadDocument(url) {
+      try {
+        console.log('Starting download...');
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const fullUrl = `${apiHost}${url}`;
+
+        console.log('Full URL:', fullUrl);
+        console.log('Headers:', headers);
+
+        const response = await fetch(fullUrl, {
+          headers,
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response status text:', response.statusText);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        console.log('Blob created:', blob);
+
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "revision.xlsx");
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log('Download initiated.');
+      } catch (error) {
+        this.errorMessage = "Error issue : download revision document fail: " + error.message;
+        console.error(this.errorMessage); // Log the error to the console
+      }
+    },
     async handleCheckboxChange() {
        if (event && event.target) {
         const isChecked = event.target.checked; 
@@ -353,7 +394,7 @@ export default {
     getDisplayName(budgetId, name) {
       budgetId = parseFloat(budgetId);
       if (isNaN(budgetId)) {
-        return name; // Return the name if budgetId is invalid
+        return name; 
       }
       if (budgetId === 1) {
         return 'Budget ADJ';
@@ -377,33 +418,21 @@ export default {
     generateExcelFile() {
       
       const wb = XLSX.utils.book_new();
-      
-      // Clone the original table
+    
       const originalTable = this.$refs.dataTable;
       const clonedTable = originalTable.cloneNode(true);
 
-      // Remove headers from the cloned table (optional)
       const firstRow = clonedTable.querySelector('thead tr');
       if (firstRow) {
         firstRow.parentNode.removeChild(firstRow);
       }
-
-      // Convert cloned table to worksheet
       const ws = XLSX.utils.table_to_sheet(clonedTable);
 
-      // Add worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
 
-      // Generate Excel file as ArrayBuffer
       const excelFileContent = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-
-      // Convert ArrayBuffer to Blob
       const blob = new Blob([excelFileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-      // Create a File from Blob
       const excelFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-      // Return the File object
       return excelFile;
     },
     CMsubmitQuotation() {
@@ -565,8 +594,6 @@ export default {
       
         const searchQuery = this.searchQuery.toLowerCase().trim();
 
-        console.log('processedData',processedData);
-        
         this.ApprovalDataArray.push(Number(id));
         
         if (searchQuery) {
@@ -579,7 +606,6 @@ export default {
 
         }
 
-        const projectStatus = this.projectData;
         if (!Array.isArray(processedData)) {
           processedData = [];
         }
@@ -592,53 +618,43 @@ export default {
           let head1Counter = 0;
           let head2Counter = 0;
 
-          const totalQuotationAmounts = [];
-
+          let maxLength = 0;
+          let maxQuotation = [];
           for (const formData of processedData) {
             const getQuotation = formData.quotation;
+            
             this.Unittype = formData.cqUnitType;
 
             if (getQuotation.length <= 0 || getQuotation[0].quote_rate === 0) {
               head1Counter++;
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                <td><b>${head1Counter}</b></td>
-                <td><b>${formData.element || ''}</b></td>
-                <td><b>${formData.sub_element || ''}</b></td>
-                <td><b>${formData.description_sub_sub_element || ''}</b></td>
-                <td style="padding-left:10px !important" class="td-max-width"><b>${formData.description_item}</b></td>
+                <td><b><u>${head1Counter}</u></b></td>
+                <td><b><u>${formData.element || ''}</u></b></td>
+                <td><b><u>${formData.sub_element || ''}</u></b></td>
+                <td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>
+                <td style="padding-left:10px !important" class="td-max-width"><b><u>${formData.description_item}</u></b></td>
               `;
               tableBody.appendChild(head1Row);
 
               head2Counter = 0;
             }
 
-            if (getQuotation.length > 0 && getQuotation[0].quote_rate !== 0) {
+            if (getQuotation.length > 0 && getQuotation[0].quote_rate !== 0 && getQuotation[0].total_quote_amount !== 0) {
               head2Counter++;
-
-            this.QuotationName = getQuotation;
-            console.log('this Quotation Name',this.QuotationName);
+              if (getQuotation.length > maxLength) {
+                  maxLength = getQuotation.length;
+                  maxQuotation = [getQuotation]; 
+              }
 
               let quotationTDs = '';
-              const seenSubconIds = new Set();
               for (const quotationRate of getQuotation) {
-                const SubconId = quotationRate.Call_For_Quotation_Subcon_List.subcon_id;
-                const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-                const exists = totalQuotationAmounts.some(entry => entry.subcon_id === SubconId);
-
-                if (!exists) {
-                  totalQuotationAmounts.push({
-                    subcon_id: SubconId,
-                    data: totalQuotation,
-                  });
-                }
-
+          
                 quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
                                 <td style="text-align:right;border-right:1px solid #ddd !important">${this.formatAccounting(quotationRate.total_quote_amount)}</td>`;
               }
               let unitQuantityTDs = '';
               formData.cqUnitType.forEach((cqUnit) => {
-            
                 unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adj_quantity}</td>`;
               });
 
@@ -668,6 +684,8 @@ export default {
             }
           }
 
+          this.QuotationName = maxQuotation.length > 0 ? maxQuotation[0] : [];
+
           const UnitType = this.Unittype;
           const numberOfArrays = UnitType.length;
           const getRemeauserement = UnitType[0].is_remeasurement;
@@ -685,14 +703,16 @@ export default {
           let winnerTDs = '';
           let rateTDs = '';
           let remarks = '';
-          for (const DatasubconAmount of Object.values(totalQuotationAmounts)) {
-            const subconAmount = DatasubconAmount.data;
-            if (subconAmount[0].subcon_id > 1.5) {
-              discountGivenTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].discount_given)}</td>`;
-              afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].afterADJDiscount_give)}</td>`;
-              overrumTDs += `<td colspan="2">${this.formatAccounting(subconAmount[0].adj_totalSaving)}</td>`;
-              winnerTDs += `<td colspan="2" ><b>${this.formatAccounting(subconAmount[0].winner)}</b></td>`;
-              rateTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].rate)}</td>`;
+          for (const DatasubconAmount of this.QuotationName) {
+             const SubconId = DatasubconAmount.Call_For_Quotation_Subcon_List.Subcon.id;
+             const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
+
+            if (totalQuotation[0].subcon_id > 1.5) {
+              discountGivenTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].discount_given)}</td>`;
+              afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].afterADJDiscount_give)}</td>`;
+              overrumTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].adj_totalSaving)}</td>`;
+              winnerTDs += `<td colspan="2" ><b>${ totalQuotation[0].winner }</b></td>`;
+              rateTDs += `<td colspan="2" >${ totalQuotation[0].rate }</td>`;
             } else {
               discountGivenTDs += `<td colspan="2"></td>`;
               afterADJDiscountTDs += `<td colspan="2"></td>`;
@@ -700,10 +720,10 @@ export default {
               winnerTDs += `<td colspan="2" ><b></b></td>`;
               rateTDs += `<td colspan="2" ></td>`;
             }
-            bqTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].bq_totalAmount)}</td>`;
-            adjTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].totalSubconAmount)}</td>`;
-            remasurementTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(subconAmount[0].remeasurement_totalAmount)}</td>`;
-            remarks += `<td colspan="2" style="white-space: pre-wrap;line-height:25px">${subconAmount[0].remark ? subconAmount[0].remark : ''}</td>`;
+            bqTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].bq_totalAmount)}</td>`;
+            adjTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].totalSubconAmount)}</td>`;
+            remasurementTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].remeasurement_totalAmount)}</td>`;
+            remarks += `<td colspan="2" style="white-space: pre-wrap;line-height:25px">${totalQuotation[0].remark ? totalQuotation[0].remark : ''}</td>`;
           }
 
           const tableFoot = document.querySelector('.nested-table tfoot');

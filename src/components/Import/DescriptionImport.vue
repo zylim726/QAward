@@ -236,8 +236,7 @@ export default {
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.$emit('message', Message);
-        this.$router.push({ path: '/comparison', query: { cqID: cqId } });
-
+        await this.$router.push({ path: '/comparison', query: { cqID: cqId } });
       } catch (error) {
         this.loading = false;
         const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
