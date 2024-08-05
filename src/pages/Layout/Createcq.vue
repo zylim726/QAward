@@ -55,19 +55,31 @@ export default {
       activeStep: 1, 
     };
   },
+  mounted() {
+  // Retrieve the active step from session storage if it exists
+  const activeStep = sessionStorage.getItem('activeStep');
+  if (activeStep) {
+    this.activeStep = parseInt(activeStep, 10);
+    // Clear the active step from session storage after using it
+    sessionStorage.removeItem('activeStep');
+  }
+},
   methods: {
     cqformSubmit(formDataUnit) {
       this.formDataList.push(formDataUnit);
     },
     ImportMessage(message) {
-      if (!this.UpdateMessage) {
-        this.UpdateMessage = message;
-        setTimeout(() => {
-          this.UpdateMessage = '';
-        }, 1000);
-        this.activeStep = 2;  
-      }
-    },
+    if (!this.UpdateMessage) {
+      this.UpdateMessage = message;
+      setTimeout(() => {
+        this.UpdateMessage = '';
+        // Store the active step in session storage before reloading
+        sessionStorage.setItem('activeStep', 2);
+        // Reload the window
+        window.location.reload();
+      }, 1000);
+    }
+  },
     ImportErrorMessage(message) {
       this.FailMessage = message; 
       setTimeout(() => {
