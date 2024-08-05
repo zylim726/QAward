@@ -29,36 +29,42 @@ const ProjectController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
-      const adminIds = formData.admins;
+      const adminIds = formData.admins || []; // Ensure adminIds is an array
       const messages = [];
-      
-      for (const adminId of adminIds) {
-
-        console.log('adminId',adminId);
-
-        if (adminId.id === 0) {
-            const response = await axios.post(`${apiHost}/project_approval/add`, {
-              project_id: formData.projectId,
-              system_user_id: adminId.system_user_id 
-            }, { headers });
-            messages.push(response.data.message);
-
-        }else {
-            const response = await axios.put(`${apiHost}/project_approval/edit/${adminId.id}`, {
-              project_id: formData.projectId,
-              system_user_id: adminId.system_user_id 
-            }, { headers });
-            messages.push(response.data.message);
-
+  
+      for (const admin of adminIds) {
+        if (!admin || typeof admin.id === 'undefined' || typeof admin.system_user_id === 'undefined') {
+          console.error('Invalid admin data:', admin);
+          continue; // Skip this iteration if admin data is invalid
+        }
+  
+        if (Number(admin.id) === 0) {
+          // Add request
+          const response = await axios.post(`${apiHost}/project_approval/add`, {
+            project_id: formData.projectId,
+            system_user_id: admin.system_user_id 
+          }, { headers });
+  
+          messages.push(response.data.message);
+        } else {
+          // Edit request
+          const response = await axios.put(`${apiHost}/project_approval/edit/${admin.id}`, {
+            project_id: formData.projectId,
+            system_user_id: admin.system_user_id 
+          }, { headers });
+  
+          messages.push(response.data.message);
         }
       }
-      return messages;
+  
+      return messages; // Ensure messages are returned
+  
     } catch (error) {
       const errorMessage = handleApiError(error);
-    
-      throw { errorMessage };
+      console.error(errorMessage);
+      throw new Error(errorMessage); // Use Error object for throwing exceptions
     }
-  },
+  },  
   async getProjectData(projectDt) {
     try {
       const apiHost = config.getHost();
