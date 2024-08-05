@@ -50,6 +50,7 @@
                 <div class="tooltip">
                   <span class="tooltiptext">Set up unit type</span>
                   <md-icon   :style="{ color: getUnitTypeColor(project.id) }" >edit</md-icon>
+                  <md-icon v-if="getUnitTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
                 </div>
               </button>
             </td>
@@ -59,6 +60,7 @@
                 <div class="tooltip">
                   <span class="tooltiptext">Set up cm checkby and admin approved</span>
                   <md-icon :style="{ color: getUnitTypeColor(project.id) }" >manage_accounts</md-icon>
+                  <md-icon v-if="getUnitTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
                 </div>
               </button>
               </a>
@@ -154,7 +156,7 @@ export default {
     try {
         for (const project of this.projects) {
           const unitType = await ProjectController.getUnitTypes(project.id);
-          this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'orange');
+          this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'red');
         }
       } catch (error) {
         const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
@@ -164,7 +166,7 @@ export default {
       }
     },
     getUnitTypeColor(projectId) {
-      return this.unitTypeColors[projectId] || 'orange';
+      return this.unitTypeColors[projectId] || 'red';
     },
     editProj(projectId) {
       this.editId = projectId;
