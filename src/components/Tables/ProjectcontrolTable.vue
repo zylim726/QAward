@@ -1,14 +1,14 @@
 <template>
-  <md-card-content>
+  <md-card-content >
     <!-- Modal Popup -->
     <div v-if="isModalVisible" class="modal-overlay">
-      <div class="modal-content">
+      <div class="modal-content" style="max-height:510px !important;">
         <div class="modal-header">
           <h1 class="titleHeader">Select Admin</h1>
           <span class="close-icon" @click="closeModal">&times;</span>
         </div>
         <div class="header-row">
-          <h5>Selected: {{ SelecName }}</h5>
+          <h5>Selected: <b style="font-size: 18px;">{{ SelecName }}</b></h5>
           <input type="text" v-model="searchTerm" placeholder="Search username" class="dropdownSubcon" style="height: 31px !important;">
         </div><br>
         <div style="height: 60%; overflow-y: auto;">
@@ -166,7 +166,6 @@ export default {
       if (this.selectedUserId !== null) {
         this.getUserHaveDT[this.currentAdminIndex].system_user_id = this.selectedUserId;
         
-        console.log('confirmSelection - selectedUsers:', this.selectedUsers);
         const formData = {
           projectId: this.projectData.id,
           admins: this.getUserHaveDT.map(admin => ({
@@ -174,7 +173,6 @@ export default {
             system_user_id: admin.system_user_id
           }))
         };
-        console.log('confirmSelection - formData:', formData);
         this.projectcontrol(formData);
         this.closeModal();
       } else {
@@ -204,16 +202,14 @@ export default {
       }
     },
     async deleteAdminField(index, event) {
-      event.preventDefault(); // Prevent the default action of the button click event
+      event.preventDefault(); 
       try {
         const adminToDelete = this.getUserHaveDT[index];
         await ProjectController.deleteProjectControl(adminToDelete.id);
 
-        // Remove the admin from local data arrays
         this.getUserHaveDT.splice(index, 1);
         this.adminSelection.splice(index, 1);
 
-        // Set adminDeleted flag to true to indicate admin deletion
         this.adminDeleted = true;
       } catch (error) {
         this.$emit('fail-message', error);
@@ -274,10 +270,10 @@ export default {
     cursor: pointer;
 }
 
-
 .header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 </style>

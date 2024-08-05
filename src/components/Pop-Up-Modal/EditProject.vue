@@ -65,8 +65,8 @@
             
           </div>
         </div>
-        <div v-if="!loading && unitTypes.length === 0">
-          <p>No unit types found.</p>
+        <div v-if="!loading && unitTypes.length === 0" style="margin-bottom: 350px;">
+          <p>No unit types found.</p><br><br>
         </div>
         
         <!-- Buttons -->
