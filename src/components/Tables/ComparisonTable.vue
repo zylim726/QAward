@@ -369,7 +369,7 @@ export default {
 
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "revision.xlsx");
+        link.setAttribute("download", "download-quotation.xlsx");
 
         document.body.appendChild(link);
         link.click();
@@ -377,7 +377,7 @@ export default {
 
         console.log('Download initiated.');
       } catch (error) {
-        this.errorMessage = "Error issue : download revision document fail: " + error.message;
+        this.errorMessage = "Error issue : download quotation document fail: " + error.message;
         console.error(this.errorMessage); // Log the error to the console
       }
     },
