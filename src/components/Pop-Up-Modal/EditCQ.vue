@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': editModal }">
     <div class="modal-background" @click="closeEditModal"></div>
-    <div class="modal-content">
+    <div class="modal-content" style="max-height: 740px;">
       <div class="box" style="width: 100% !important;">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />

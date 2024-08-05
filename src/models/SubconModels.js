@@ -2,7 +2,11 @@ const SubconModels = {
   processResponseData(response) {
     const dataArray = response.data;
 
-    const processedData = dataArray.map((config) => ({
+    // Filter out entries with id === 1
+    const filteredData = dataArray.filter(config => config.id !== 1);
+
+    // Process the filtered data
+    const processedData = filteredData.map(config => ({
       id: config.id,
       name: config.name, 
       updatedAt: config.updatedAt,
@@ -23,4 +27,3 @@ const SubconModels = {
 };
 
 export default SubconModels;
-
