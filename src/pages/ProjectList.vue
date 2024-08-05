@@ -15,9 +15,9 @@
           v-for="(project, index) in projectData"
           :key="index"
           class="project-card"
+          v-if="project.title" 
           :href="'/callquotation?projectId=' + project.id"
           @click="setProjectId(project.id, project.title)">
-          <img :src="require(`@/assets/img/project1.jpg`)" />
           <h3 style="text-align: center">{{ project.title }}</h3>
         </a>
       </div>
