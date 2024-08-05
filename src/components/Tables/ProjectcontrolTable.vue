@@ -253,7 +253,6 @@ export default {
   text-align: center;
   width: 500px;
   overflow-y: clip;
-  height: 600px !important;
   position: relative;
 }
 
