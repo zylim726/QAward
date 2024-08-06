@@ -55,15 +55,13 @@
               </button>
             </td>
             <td style="text-align: center" v-if="hasAdminAccess" >
-              <a href="/projectcontrol" >
-              <button class="transparentButton" style="margin-left: -6px;">
+              <button class="transparentButton" style="margin-left: -6px;" @click="goToProjectControl(project)">
                 <div class="tooltip">
                   <span class="tooltiptext">Set up cm checkby and admin approved</span>
                   <md-icon :style="{ color: getUnitTypeColor(project.id) }" >manage_accounts</md-icon>
                   <md-icon v-if="getUnitTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
                 </div>
               </button>
-              </a>
             </td>
           </tr>
         </tbody>
@@ -128,6 +126,12 @@ export default {
     },
   },
   methods: {
+    goToProjectControl(project) {
+      this.$router.push({ 
+        path: '/projectcontrol', 
+        query: { name: project.name, id: project.id }
+      });
+    },
     async checkPermission() {
       try {
         const permission = await checkAccess(); 

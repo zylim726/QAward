@@ -54,13 +54,14 @@ export default {
   data() {
     return {
       projectData: [],
-      selectedProject: JSON.parse(localStorage.getItem('projectData')) || null,
+      selectedProject: null, // Initialize as null
       UpdateMessage: null,
       FailMessage: null,
     };
   },
-  mounted() {
-    this.projectList();
+  async mounted() {
+    await this.projectList();
+    this.initializeSelectedProject();
   },
   watch: {
     selectedProject(newValue) {
@@ -73,20 +74,27 @@ export default {
         const { data, message } = await ProjectController.projectList();
         this.FailMessage = message;
         this.projectData = data;
-        // Restore the selected project from localStorage if available
-        this.selectedProject = JSON.parse(localStorage.getItem('projectData')) || this.selectedProject;
       } catch (error) {
         this.FailMessage = error.message;
       }
     },
+    initializeSelectedProject() {
+      const queryParams = new URLSearchParams(this.$route.query);
+      const name = queryParams.get('name');
+      const id = queryParams.get('id');
+
+      if (name && id) {
+        this.selectedProject = { name, id: parseInt(id, 10) };
+      } else {
+        this.selectedProject = JSON.parse(localStorage.getItem('projectData')) || null;
+      }
+    },
     handleProjectClick(project) {
       this.selectedProject = { name: project.title, id: project.id };
-      // No need to manually save here; it's handled by the watcher
     },
     ImportMessage(message) {
       if (!this.UpdateMessage) {
         this.UpdateMessage = message;
-        // Update the page state as needed without a page reload
         setTimeout(() => {
           this.UpdateMessage = '';
         }, 500);

@@ -155,15 +155,14 @@ export default {
       this.isModalVisible = false;
     },
     openModal(index) {
-    this.isModalVisible = true; // Show the modal
-    this.currentAdminIndex = index; // Set the current admin index
+      this.isModalVisible = true; 
+      this.currentAdminIndex = index;
 
-    // Initialize the selected user ID and name based on the current index
-    const currentAdmin = this.getUserHaveDT[index];
-    this.selectedUserId = currentAdmin?.system_user_id || null;
-    this.SelecName = currentAdmin?.username || 'Select Admin';
-  },
-  confirmSelection() {
+      const currentAdmin = this.getUserHaveDT[index];
+      this.selectedUserId = currentAdmin?.system_user_id || null;
+      this.SelecName = currentAdmin?.username || 'Select Admin';
+    },
+    confirmSelection() {
       if (this.selectedUserId !== null) {
         // Find the selected user object
         const selectedUser = this.users.find(user => user.id === this.selectedUserId);
