@@ -1,27 +1,41 @@
 <template>
   <div class="content">
-    <div v-if="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">
-        <button class="transparentButton" style="margin-right: 10px; cursor: default;">
-          <md-icon style="color: red; margin-bottom: 10px;">autorenew</md-icon>
-        </button> Loading...
-      </span>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input
+        type="text"
+        v-model="searchQuery"
+        @input="filterProjects"
+        placeholder="Search projects..."
+        class="search-input"
+      />
     </div>
-    <div v-if="error" class="notification fail">{{ error }}<md-icon>cancel</md-icon>
+
+    <!-- Loading Indicator -->
+    <div v-if="loading" class="spinner-container">
+      <md-icon class="spinner-icon" style="color: red;">autorenew</md-icon>
+      Loading...
     </div>
-    <div v-else-if="projectData.length > 0">
-      <div class="projectContent">
+
+    <!-- Error Message -->
+    <div v-if="error" class="notification fail">{{ error }}<md-icon>cancel</md-icon></div>
+
+    <!-- Display Filtered Projects -->
+    <div v-else-if="filteredProjects.length > 0" class="card-container">
+      <div v-for="(project, index) in filteredProjects" :key="index" class="project-card">
+        <h3 class="project-title">{{ project.title }}</h3>
         <a
-          v-for="(project, index) in projectData"
-          :key="index"
-          class="project-card"
-        
           :href="'/callquotation?projectId=' + project.id"
-          @click="setProjectId(project.id, project.title)">
-          <h3 style="text-align: center">{{ project.title }}</h3>
+          @click="setProjectId(project.id, project.title)"
+          class="project-link"
+        >
+          View Details
         </a>
       </div>
     </div>
+
+    <!-- No Projects Found -->
+    <div v-else class="no-results">No projects found.</div>
   </div>
 </template>
 
@@ -32,8 +46,10 @@ export default {
   data() {
     return {
       projectData: [],
+      filteredProjects: [],
       error: null,
       loading: false,
+      searchQuery: '',
     };
   },
   mounted() {
@@ -47,6 +63,7 @@ export default {
         const { data, message } = await ProjectController.projectList();
         if (data) {
           this.projectData = data;
+          this.filteredProjects = data; // Initialize filteredProjects
         } else {
           this.error = message || "An unknown error occurred.";
         }
@@ -56,6 +73,12 @@ export default {
         this.loading = false;
       }
     },
+    filterProjects() {
+      const query = this.searchQuery.toLowerCase();
+      this.filteredProjects = this.projectData.filter(project =>
+        project.title && project.title.toLowerCase().includes(query)
+      );
+    },
     setProjectId(projectId, projectName) {
       localStorage.setItem('projectId', projectId);
       localStorage.setItem('projectName', projectName);
@@ -63,3 +86,50 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 600px;
+  padding: 10px;
+  border: 1px solid orange;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.project-card {
+  background-color: #ffffff;
+  border: 0.5px solid orange; /* Orange border color */
+  border-radius: 8px;
+  padding: 0px 0px 20px 15px;
+  width: 300px; 
+}
+
+
+@media (max-width: 768px) {
+  .project-card {
+    width: calc(50% - 20px); /* 2 cards per row on medium screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .project-card {
+    width: calc(100% - 20px); /* 1 card per row on small screens */
+  }
+}
+</style>
