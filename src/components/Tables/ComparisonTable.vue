@@ -34,7 +34,7 @@
         </button>
       </div>
     </div>
-    <div class="table-container">
+    <div class="table-container" style="min-height: 350px;max-height: 600px;">
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr>
@@ -87,13 +87,13 @@
                   <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
                     Download Quotation
                   </span>
-                  <md-icon style="color:orange;margin-top: 10px;">picture_as_pdf</md-icon>
+                  <md-icon style="color:orange;margin-top: 10px;">file_present</md-icon>
                 </div>
               </button>
 
             </th>
           </tr>
-          <tr>
+          <tr  class="header-row-1">
             <th scope="col">Item</th>
             <th scope="col">Element</th>
             <th scope="col">Sub Element</th>
@@ -117,7 +117,7 @@
             </th>
 
           </tr>
-          <tr>
+          <tr  class="header-row-2">
             <th colspan="6"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
@@ -164,7 +164,7 @@
       </template>
     </div>
   </template>
-    <template v-if="(project.status === 'Waiting Approval' || project.status === 'Approved' ) && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
+    <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
       <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
         <p>It is the quotation is work order.</p> 
         <label >
@@ -173,7 +173,7 @@
         </label>
       </div>
       <div class="cqapprovalBox-container">
-        <template ><br>
+        <template><br>
           <div class="container" style="width: 100%;">
             <div class="row"  v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
               <div class="cqbox">
@@ -227,6 +227,41 @@
                     <p style="margin: 8px 0 10px;">Remarks:</p>
                     <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+    <template v-if="(project.status === 'Approved' ) && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
+      <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
+        <p>It is the quotation is work order.</p> 
+        <label >
+          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
+          Yes
+        </label>
+      </div>
+      <div class="cqapprovalBox-container">
+        <template><br>
+          <div class="container" style="width: 100%;">
+            <div class="row"  v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
+              <div class="cqbox">
+                <div class="left-container">
+                  <div class="md-card-avatar" style="margin-bottom: 315px;">
+                    <img class="img" src="@/assets/img/admin.png" />
+                  </div>
+                </div>
+                <div class="right-container">
+                  <div class="user-info">
+                    <p class="user-name">Name: {{  cmapproval.user[0].name }}</p>
+                  </div>
+                  <p style="margin: 8px 0 10px;">Recommend Award To:</p>
+                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}</p>
+                  <p style="margin: 8px 0 10px;">Date:</p>
+                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ formatDate(cmapproval.updatedAt) }}</p>
+                  <p style="margin: 8px 0 10px;">Remarks:</p>
+                  <p  class="quotation-select" style="background-color: #EFEFEF4D;height: 180px;" disabled>{{ cmapproval.approval_remarks }}</p>
                 </div>
               </div>
             </div>
@@ -610,6 +645,7 @@ export default {
           processedData = [];
         }
         this.processedData = processedData;
+        console.log('this.proceesedData',this.processedData);
 
         if (processedData.length > 0) {
           const tableBody = document.querySelector('.nested-table tbody');
@@ -625,7 +661,7 @@ export default {
             
             this.Unittype = formData.cqUnitType;
 
-            if (getQuotation.length <= 0 || getQuotation[0].quote_rate === 0) {
+            if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
               head1Counter++;
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
@@ -640,7 +676,7 @@ export default {
               head2Counter = 0;
             }
 
-            if (getQuotation.length > 0 && getQuotation[0].quote_rate !== 0 && getQuotation[0].total_quote_amount !== 0) {
+            if (getQuotation.length > 0 && parseFloat(formData.adj_quantity) !== 0.00 ) {
               head2Counter++;
               if (getQuotation.length > maxLength) {
                   maxLength = getQuotation.length;
@@ -650,20 +686,21 @@ export default {
               let quotationTDs = '';
               for (const quotationRate of getQuotation) {
           
-                quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${quotationRate.quote_rate}</td>
+                quotationTDs += `<td style="text-align:center;border-left:1px solid #ddd !important">${this.formatAccounting(quotationRate.quote_rate)}</td>
                                 <td style="text-align:right;border-right:1px solid #ddd !important">${this.formatAccounting(quotationRate.total_quote_amount)}</td>`;
               }
               let unitQuantityTDs = '';
               formData.cqUnitType.forEach((cqUnit) => {
-                unitQuantityTDs += `<td style="text-align:center;">${cqUnit.adj_quantity}</td>`;
+                unitQuantityTDs += `<td style="text-align:center;">${this.formatAccounting(cqUnit.adj_quantity)}</td>`;
               });
 
               let remeasuremntQuantityTDs = '';
-              if (formData.remeasurement_quantity !== null) {
-                remeasuremntQuantityTDs = `<td>${formData.remeasurement_quantity}</td>`;
+              if (formData.remeasurement_quantity >= 0) {
+                remeasuremntQuantityTDs = `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>`;
               }
 
-              const getHideHTML = `<td>${formData.bq_quantity}</td>`;
+
+              const getHideHTML = `<td>${this.formatAccounting(formData.bq_quantity)}</td>`;
               const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
 
               const head2Row = document.createElement('tr');
@@ -676,7 +713,7 @@ export default {
                 <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
-                <td>${formData.adj_quantity}</td>
+                <td>${this.formatAccounting(formData.adj_quantity)}</td>
                 ${remeasuremntQuantityTDs}
                 ${quotationTDs}
               `;
@@ -699,6 +736,7 @@ export default {
           let discountGivenTDs = '';
           let afterADJDiscountTDs = '';
           let remasurementTotalAmountTDs = '';
+          let previsionalSumTDs = '';
           let overrumTDs = '';
           let winnerTDs = '';
           let rateTDs = '';
@@ -706,23 +744,41 @@ export default {
           for (const DatasubconAmount of this.QuotationName) {
              const SubconId = DatasubconAmount.Call_For_Quotation_Subcon_List.Subcon.id;
              const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-
             if (totalQuotation[0].subcon_id > 1.5) {
               discountGivenTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].discount_given)}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].afterADJDiscount_give)}</td>`;
               overrumTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].adj_totalSaving)}</td>`;
               winnerTDs += `<td colspan="2" ><b>${ totalQuotation[0].winner }</b></td>`;
               rateTDs += `<td colspan="2" >${ totalQuotation[0].rate }</td>`;
+              previsionalSumTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].provisional_sum)}</td>`;
             } else {
               discountGivenTDs += `<td colspan="2"></td>`;
               afterADJDiscountTDs += `<td colspan="2"></td>`;
               overrumTDs += `<td colspan="2"></td>`;
               winnerTDs += `<td colspan="2" ><b></b></td>`;
               rateTDs += `<td colspan="2" ></td>`;
+              previsionalSumTDs +=  `<td colspan="2" ></td>`;
             }
-            bqTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].bq_totalAmount)}</td>`;
-            adjTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].totalSubconAmount)}</td>`;
-            remasurementTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].remeasurement_totalAmount)}</td>`;
+
+            if (totalQuotation[0].subcon_id === 0.5 || totalQuotation[0].subcon_id > 1.5){
+              bqTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].bq_totalAmount)}</td>`;
+            }else {
+              bqTotalAmountTDs +=  `<td colspan="2" ></td>`;
+            }
+
+            if (totalQuotation[0].subcon_id === 1.0 || totalQuotation[0].subcon_id > 1.5){
+              adjTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].totalSubconAmount)}</td>`;
+            }else {
+              adjTotalAmountTDs +=  `<td colspan="2" ></td>`;
+            }
+
+
+            if (totalQuotation[0].subcon_id === 1.5 || totalQuotation[0].subcon_id > 1.5){
+              remasurementTotalAmountTDs += `<td colspan="2" >${this.formatAccounting(totalQuotation[0].remeasurement_totalAmount)}</td>`;
+            }else {
+              remasurementTotalAmountTDs +=  `<td colspan="2" ></td>`;
+            }
+
             remarks += `<td colspan="2" style="white-space: pre-wrap;line-height:25px">${totalQuotation[0].remark ? totalQuotation[0].remark : ''}</td>`;
           }
 
@@ -749,19 +805,24 @@ export default {
               ${afterADJDiscountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Total Saving / Overrun (RM)</b></td>
+              <td colspan="${colspan}"><b>Total Saving / Overrun (RM)
+                </b></td>
               ${overrumTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"></td>
+              <td colspan="${colspan}"><b>Total Saving / Overrun (%)</b></td>
               ${rateTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"></td>
+              <td colspan="${colspan}"><b>Ranking</b></td>
               ${winnerTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}">Remarks</td>
+              <td colspan="${colspan}"><b>Provisional Sum (RM)</b></td>
+              ${previsionalSumTDs}
+            </tr>
+            <tr>
+              <td colspan="${colspan}"><b>Remarks</b></td>
               ${remarks}
             </tr>
           `;
@@ -780,7 +841,6 @@ export default {
         return '0.00';
       }
 
-      // Handle negative formatted string
       if (this.isNegativeFormatted(value)) {
         const numericValue = parseFloat(value.replace(/[()]/g, '').trim()) * -1;
         return `(${Math.abs(numericValue).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`;
@@ -828,7 +888,6 @@ export default {
         const id = this.cqId;
         const response = await QuotationController.getCMcqApproval(id);
         this.cmCQapproval = response.filter(approval => approval.approval_status === 'Approved');
-  
       } catch (error) {
          //this.FailMessage = 'Error CM approval:', error;
       }
@@ -843,44 +902,33 @@ export default {
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
       const originalTable = this.$refs.dataTable;
-      
-      // Clone the original table
       const clonedTable = originalTable.cloneNode(true);
-
-      // Remove the first row containing <th> elements from the cloned table
       const firstRow = clonedTable.querySelector('thead tr');
       if (firstRow) {
         firstRow.parentNode.removeChild(firstRow);
       }
 
-      // Remove the first row containing <td> elements from the cloned table body
       const firstBodyRow = clonedTable.querySelector('tbody tr');
       if (firstBodyRow) {
         firstBodyRow.parentNode.removeChild(firstBodyRow);
       }
 
-      // Remove the first row containing <td> elements from the cloned table footer
       const firstFooterRow = clonedTable.querySelector('tfoot tr');
       if (firstFooterRow) {
         firstFooterRow.parentNode.removeChild(firstFooterRow);
       }
 
-      // Handle hidden elements
       const hiddenElements = clonedTable.querySelectorAll('[style*="display: none"]');
       hiddenElements.forEach(element => {
         element.style.display = '';
       });
 
-      // Convert cloned table to worksheet
       const ws = XLSX.utils.table_to_sheet(clonedTable);
       
-      // Append worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
       
-      // Write workbook to file
       XLSX.writeFile(wb, 'subconComparison.xlsx');
 
-      // Re-hide hidden elements
       hiddenElements.forEach(element => {
         element.style.display = 'none';
       });
@@ -946,11 +994,8 @@ export default {
 
         XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
 
-        // Generate Excel file as ArrayBuffer
         const excelFileContent = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-        // Convert ArrayBuffer to Blob
         const blob = new Blob([excelFileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        // Create a File from Blob
         const getDataFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
         this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId, getDataFile);
@@ -998,6 +1043,18 @@ export default {
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.header-row-1 th {
+  position: sticky;
+  top: 0; 
+  z-index: 2; 
+}
+
+.header-row-2 th {
+  position: sticky;
+  top: 35px; 
+  z-index: 1; 
 }
 
 </style>
