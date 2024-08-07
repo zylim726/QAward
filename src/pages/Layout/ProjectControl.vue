@@ -83,6 +83,7 @@ export default {
       const name = queryParams.get('name');
       const id = queryParams.get('id');
 
+      
       if (name && id) {
         this.selectedProject = { name, id: parseInt(id, 10) };
       } else {
