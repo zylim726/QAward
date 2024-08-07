@@ -50,8 +50,8 @@
               <div class="table-container" style="min-height: 100px;max-height: 600px;">
                 <table>
                   <thead>
-                    <tr >
-                      <th>Action</th>
+                    <tr  class="header-row-1">
+                      <th >Action</th>
                       <th>ID</th>
                       <th>Category</th>
                       <th>Trade</th>
@@ -76,8 +76,8 @@
                       <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
-                    <tr>
-                      <th></th>
+                    <tr  class="header-row-2">
+                      <th ></th>
                       <th colspan="8"></th>
                       <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
                         {{ approval.user.name || approval.user[0].name }}
@@ -292,10 +292,27 @@ export default {
       return filledApprovals;
     },
     formatAccounting(value) {
-      if (!value) {
-        return '0.00';
+      if (typeof value === 'string') {
+        // Remove parentheses and check if the value is negative
+        const cleanedValue = value.replace(/[()]/g, '');
+        const isNegative = value.includes('(');
+
+        // Parse the cleaned value to a float
+        const numberValue = parseFloat(cleanedValue);
+        
+        if (isNaN(numberValue)) {
+          return '0.00'; // or handle as needed
+        }
+
+        // Format the number with two decimal places
+        const formattedValue = numberValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+        // Add parentheses if the value is negative
+        return isNegative ? `(${formattedValue})` : formattedValue;
       }
-      return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      // Handle cases where value is not a string or invalid
+      return '0.00';
     },
     downloadExcelTemplate() {
       const wb = XLSX.utils.book_new();
@@ -373,27 +390,39 @@ export default {
 };
 </script>
 
+
+
 <style>
+
 table {
   width: 100%;
   border-collapse: collapse;
   font-family: Arial, sans-serif;
   color: #333;
-  overflow-x: auto; 
 }
 
-thead th {
-  background-color: #fef4e4;
-  border-bottom: none;
-  padding: 10px;
-  text-align: left;
-
+.header-row-1 th {
+  position: sticky;
+  top: 0; 
+  z-index: 2; 
 }
 
+.header-row-2 th {
+  position: sticky;
+  top: 80px; 
+  z-index: 1; 
+}
+
+/* Body styling */
 tbody td {
   padding: 12px;
   text-align: left;
-  white-space: nowrap; 
+  white-space: nowrap;
   border: 1px solid #ddd;
 }
+
+
+
+
+
 </style>
