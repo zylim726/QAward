@@ -46,6 +46,7 @@ const CallQuotationModels = {
         cqApprovals: config.cqApprovals,
         Wo: config.Wos,
         is_work_order: config.is_work_order,
+        Sum: config.projectSum,
 
       }));
       
