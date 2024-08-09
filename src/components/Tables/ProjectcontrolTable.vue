@@ -53,7 +53,7 @@
       </div>
 
       <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;">
-        <label><b>Admin {{ index + 1 }}</b></label>
+        <label><b>Approval {{ index + 1 }}</b></label>
         <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="display: flex;">
           <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
             <button type="button" class="transparentButton" @click="deleteAdminField(index, $event)">
