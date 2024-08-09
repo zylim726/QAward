@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': editSubcon }">
     <div class="modal-background" @click="closeeditSub"></div>
-    <div class="modal-content" style="width: 35%;max-height: 300vh !important;">
+    <div class="modal-content" style="width: 40%;max-height: 650px !important;">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />
@@ -133,6 +133,7 @@
         <button class="btn-save" aria-label="close" @click.stop="closeeditSub">Close</button>
         <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal()">Save</button>
       </div>
+      <br><br>
     </div>
   </div>
 </template>
