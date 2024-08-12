@@ -29,14 +29,15 @@
       </div>
     </div>
 
-
-    <div class="md-layout">
-      <div v-if="isLoading" class="spinner-border" role="status">
+    <div v-if="isLoading" class="spinner-border" role="status">
         <span class="visually-hidden">   
           <button class="transparentButton" style="margin-right: 10px;cursor: default;">
             <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
           </button> Loading...</span>
       </div>
+
+
+    <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px"> 
           <button @click="openModal" class="transparentButton" style="margin-right: 10px; float: right">
           <div class="tooltip" >
@@ -226,12 +227,15 @@ export default {
     },
     async getNewDescription(id) {
       try {
+        this.isLoading = true;
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
         this.cqUnit = processedData[0].cqUnitType || [];
       } catch (error) {
         this.FailMessage = ('Error fetching Description:', error);
         throw error;
+      } finally{
+        this.isLoading = false;
       }
     },
     importDataFromFiles(event) {

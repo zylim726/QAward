@@ -4,6 +4,12 @@
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
         <md-card>
           <md-card-content>
+            <div v-if="isLoading" class="spinner-border" role="status">
+              <span class="visually-hidden">   
+                <button class="transparentButton" style="margin-right: 10px;cursor: default;">
+                  <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
+                </button> Loading...</span>
+            </div>
             <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
             <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
             <br>
@@ -45,26 +51,29 @@
                       <td class="td-max-width">{{ formData.description_item }}</td>
                       <td>{{ formData.description_unit || '' }}</td>
                       <template v-for="(unitdata, index) in formData.cqUnitType">
-                        <td style="border-left: 1px solid #ddd;">{{ unitdata.bq_quantity || 0 }}</td>
-                        <td >
-                          <input 
-                            style="width: 100px;"
-                            type="number" 
-                            :value="unitdata.adj_quantity || 0" 
-                            @input="updateAdjQuantity(formIndex, index, $event.target.value)" 
-                            :min="0" 
-                            @keydown="blockNegativeInput">
-                        </td>
-                        <td style="border-right: 1px solid #ddd;">
-                          <input 
-                            style="width: 100px;"
-                            type="number" 
-                            :value="unitdata.remeasurement_quantity || 0" 
-                            @input="updateRemeasurementQuantity(formIndex, index, $event.target.value)" 
-                            :min="0" 
-                            @keydown="blockNegativeInput">
-                        </td>
-                      </template>
+  <td :key="'bq-quantity-' + formIndex + '-' + index" style="border-left: 1px solid #ddd;">
+    {{ unitdata.bq_quantity || 0 }}
+  </td>
+  <td :key="'adj-quantity-' + formIndex + '-' + index">
+    <input 
+      style="width: 100px;"
+      type="number" 
+      :value="unitdata.adj_quantity || 0" 
+      @input="updateAdjQuantity(formIndex, index, $event.target.value)" 
+      :min="0" 
+      @keydown="blockNegativeInput">
+  </td>
+  <td :key="'remeasurement-quantity-' + formIndex + '-' + index" style="border-right: 1px solid #ddd;">
+    <input 
+      style="width: 100px;"
+      type="number" 
+      :value="unitdata.remeasurement_quantity || 0" 
+      @input="updateRemeasurementQuantity(formIndex, index, $event.target.value)" 
+      :min="0" 
+      @keydown="blockNegativeInput">
+  </td>
+</template>
+
                     </template>
                   </tr>
                 </tbody>
@@ -95,6 +104,7 @@ export default {
       Unittype: [],
       Description: [],
       RateInput: {}, 
+      isLoading: false,
     };
   },
   computed: {
@@ -113,6 +123,7 @@ export default {
   methods: {
     async getNewDescription(id) {
       try {
+        this.isLoading = true;
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
         if (processedData.length > 0) {
@@ -120,10 +131,13 @@ export default {
         }
       } catch (error) {
         this.FailMessage = 'Error fetching Description:', error;
+      } finally {
+        this.isLoading = false;
       }
     },
     async saveAllData() {
       try {
+        this.isLoading = true;
         const dataToSave = this.Description.flatMap(formData => {
           return formData.cqUnitType.map(item => {
             const cqId = this.$route.query.cqId;
@@ -141,6 +155,8 @@ export default {
         this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId } }); 
       } catch (error) {
         this.FailMessage = ("Failed to save data.",error.message);
+      } finally {
+        this.isLoading = false;
       }
     },
     blockNegativeInput(event) {
