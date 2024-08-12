@@ -86,6 +86,26 @@ const ProjectController = {
       };
     }
   },
+  async getProjectManage(projectId) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+      const response = await axios.get(`${apiHost}/project_approval/showByProject/${projectId}`, { headers });
+;
+      return response.data.data;
+    } catch (error) {
+      let errorMessage;
+
+      if (error.response && error.response.status === 403) {
+        errorMessage = error.response.data.message;
+      } 
+
+      return {
+        data: null,
+        message: errorMessage,
+      };
+    }
+  },
   async deleteProjectControl(deleteId) {
     try {
       const apiHost = config.getHost();

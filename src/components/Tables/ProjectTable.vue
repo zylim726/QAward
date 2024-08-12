@@ -57,9 +57,9 @@
             <td style="text-align: center" v-if="hasAdminAccess" >
               <button class="transparentButton" style="margin-left: -6px;" @click="goToProjectControl(project)">
                 <div class="tooltip">
-                  <span class="tooltiptext">Set up cm checkby and admin approved</span>
-                  <md-icon :style="{ color: getUnitTypeColor(project.id) }" >manage_accounts</md-icon>
-                  <md-icon v-if="getUnitTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
+                  <span class="tooltiptext">Set up admin approved</span>
+                  <md-icon :style="{ color: getManageTypeColor(project.id) }" >manage_accounts</md-icon>
+                  <md-icon v-if="getManageTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
                 </div>
               </button>
             </td>
@@ -97,6 +97,7 @@ export default {
       projects: [],
       unitTypes: [],
       unitTypeColors: {},
+      manageTypeColors: {},
       hasAccess: false,
       hasAdminAccess: false,
       searchText: "",
@@ -146,8 +147,9 @@ export default {
       try {
         this.loading = true;
         const processedData = await ProjectController.accessProject();
-        this.projects = processedData;
+         this.projects = processedData;
         await this.updateUnitTypeColors();
+        await this.updateManageTypeColors();
       } catch (error) {
         this.loading = false;
         this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
@@ -171,6 +173,24 @@ export default {
     },
     getUnitTypeColor(projectId) {
       return this.unitTypeColors[projectId] || 'red';
+    },
+    async updateManageTypeColors() {
+
+    this.loading = true;
+    try {
+        for (const project of this.projects) {
+          const manager = await ProjectController.getProjectManage(project.id);
+          this.$set(this.manageTypeColors, project.id, manager.length > 0 ? 'grey' : 'red');
+        }
+      } catch (error) {
+        const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
+        this.$emit('fail-message', failMessage);
+      } finally {
+        this.loading = false;
+      }
+    },
+    getManageTypeColor(projectId) {
+      return this.manageTypeColors[projectId] || 'red';
     },
     editProj(projectId) {
       this.editId = projectId;

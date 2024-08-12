@@ -158,14 +158,29 @@ export default {
       this.isModalVisible = true; 
       this.currentAdminIndex = index;
 
-      const currentAdmin = this.getUserHaveDT[index];
-      this.selectedUserId = currentAdmin?.system_user_id || null;
-      this.SelecName = currentAdmin?.username || 'Select Admin';
+      const userHaveDT = this.getUserHaveDT[index];
+      if (userHaveDT && userHaveDT.system_user_id !== '') {
+        const user = this.users.find(user => user.id === userHaveDT.system_user_id);
+        if (user) {
+          this.selectedUserId = user.id;
+          this.SelecName = user.username;
+        }else {
+          this.selectedUserId = null;
+        }
+      }else {
+        this.selectedUserId = null;
+        this.SelecName = 'Select Admin';
+      }
     },
     confirmSelection() {
-      if (this.selectedUserId !== null) {
+      console.log('this.selectedUserId',this.selectedUserId);
+        console.log('this option',this.currentAdminIndex);
+
+      if (this.selectedUserId !== null && this.currentAdminIndex !== null) {
         // Find the selected user object
         const selectedUser = this.users.find(user => user.id === this.selectedUserId);
+      
+        console.log('this.getUserHaveDt',this.getUserHaveDT);
 
         // Update only the current admin's data with the selected user info
         this.getUserHaveDT[this.currentAdminIndex] = {
@@ -177,15 +192,15 @@ export default {
         // Prepare the form data and submit
         const formData = {
           projectId: this.projectData.id,
-          admins: this.getUserHaveDT.map(admin => ({
-            id: admin.id || 0,
-            system_user_id: admin.system_user_id
-          }))
+          admins: [{
+            id: this.getUserHaveDT[this.currentAdminIndex].id || 0,
+            system_user_id: this.getUserHaveDT[this.currentAdminIndex].system_user_id
+          }]
         };
         this.projectcontrol(formData);
         this.closeModal();
       } else {
-        console.error('No user selected!');
+        console.error('No user selected or invalid index!');
       }
     },
     async getProjectData(projectDt) {
@@ -226,7 +241,7 @@ export default {
     },
     async projectcontrol(formData) {
       try {
-        console.log
+        console.log('formData',formData);
         const successMessage = await ProjectController.projectcontrol(formData);
         const concatenatedMessage = successMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
