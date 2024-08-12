@@ -76,7 +76,7 @@
                       <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
-                    <tr  class="header-row-2">
+                    <tr  class="header-title-2">
                       <th ></th>
                       <th colspan="8"></th>
                       <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
@@ -401,27 +401,11 @@ table {
   color: #333;
 }
 
-.header-row-1 th {
+.header-title-2 th {
   position: sticky;
-  top: 0; 
-  z-index: 2; 
-}
-
-.header-row-2 th {
-  position: sticky;
-  top: 80px; 
+  top: 70px; 
   z-index: 1; 
 }
-
-/* Body styling */
-tbody td {
-  padding: 12px;
-  text-align: left;
-  white-space: nowrap;
-  border: 1px solid #ddd;
-}
-
-
 
 
 

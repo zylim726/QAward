@@ -144,13 +144,87 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-      let csv = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awading Target Date (dd/mm/yyyy),Remarks\n';
+      const csvHeader = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awading Target Date (dd/mm/yyyy),Remarks\n';
 
+      const csvRows = [
+        ',PROJECT SIGNAGE,,,,',
+        ',TEMPORARY HOARDING WORK,,,,',
+        ',SITE PREPARATION WORK,,,,',
+        ',TEMPORARY ACMV,,,,',
+        ',TEMPORARY ELECTICAL,,,,',
+        ',TEMPORARY WATER SUPPLY,,,,',
+        ',CONSULTATION,,,,',
+        ',DILAPIDATION WORKS,,,,',
+        ',NOISE MONITORING & WASTE WATER ANALYSIS,,,,',
+        ',SURVEY WORK,,,,',
+        ',TEMPORARY BUILDING,,,,',
+        ',TEMPORARY SUPPORT,,,,',
+        ',SCAFFOLDING,,,,',
+        ',MOSQUITO CONTROL/FOGGING,,,,',
+        ',PROTECTION WORK,,,,',
+        ',COW,,,,',
+        ',SITE STAFF,,,,',
+        ',DEFECT WORK,,,,',
+        ',CLEANING WORK,,,,',
+        ',CONCRETE WORK,,,,',
+        ',ALUMINUM FORMWORK,,,,',
+        ',METAL FORMWORK,,,,',
+        ',TIMBER FORMWORK,,,,',
+        ',REINFORCEMENT WORK,,,,',
+        ',PILING WORK,,,,',
+        ',ANTI-TERMITE WORK,,,,',
+        ',BRICKWORK,,,,',
+        ',BLOCKWORK,,,,',
+        ',WATERPROOFING WORK,,,,',
+        ',ALUMINIUM & GLAZING WORKS,,,,',
+        ',DOOR & IRONMONGERIES AND TIMBER HANDRAIL INSTALLATION,,,,',
+        ',FRP DOOR,,,,',
+        ',METAL ROOFING & FLASHING WORK,,,,',
+        ',ROOF TILES INSTALLER,,,,',
+        ',ROOF TRUSS & FASCIA BOARD WORK,,,,',
+        ',RAINWATER GOODS,,,,',
+        ',RAINWATER HARVESTING SYSTEM,,,,',
+        ',MILD STEEL WORK,,,,',
+        ',STEEL LINTOL,,,,',
+        ',STEEL STRUCTURAL WORK,,,,',
+        ',STAINLESS STEEL WORK,,,,',
+        ',TILING WORK,,,,',
+        ',PLASTERING WORK,,,,',
+        ',SKIMCOAT WORK,,,,',
+        ',SKIM RENDERING WORK,,,,',
+        ',PAINTING WORK,,,,',
+        ',CEILING WORK,,,,',
+        ',ROLLER SHUTTER,,,,',
+        ',LAMINATED FLOORING WORK,,,,',
+        ',FLOOR HARDENER & POWER FLOAT,,,,',
+        ',EARTHWORK & EXCAVATION,,,,',
+        ',DRAINAGE WORK,,,,',
+        ',EXTERNAL SEWERAGE WORK,,,,',
+        ',EXTERNAL WATER RETICULATION WORK,,,,',
+        ',RETAINING WALL WORK,,,,',
+        ',EXTERNAL FENCING WORK,,,,',
+        ',CONCRETE IMPRINT & BROOM FINISH,,,,',
+        ',ROADWORKS,,,,',
+        ',ROAD MARKING,,,,',
+        ',ROAD SIGNAGE,,,,',
+        ',INTERLOCKING PAVER,,,,',
+        ',UNDERGROUND MAPPING,,,,',
+        ',SUNDRIES WORK,,,,',
+        ',HOUSE NUMBER PLATE & SIGNAGE,,,,',
+        ',HARDSCAPE WORK,,,,',
+        ',SOFTSCAPE WORK,,,,',
+        ',COLD WATER & SANITARY PLUMBING WORKS,,,,',
+        ',ELECTRICAL WORK,,,,',
+        ',ACMV WORK,,,,',
+        ',FIRE PROTECTION WORK,,,,',
+        ',SECURITY SYSTEM,,,,',
+    ];
+
+      const csvContent = csvHeader + csvRows.join('\n');
       const hiddenElement = document.createElement('a');
-      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvContent);
       hiddenElement.target = '_blank';
-
-      hiddenElement.download = 'La_template.csv';
+      hiddenElement.download = 'la_template.csv';
       hiddenElement.click();
     },
     async saveData() {
