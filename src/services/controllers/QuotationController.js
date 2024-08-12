@@ -170,7 +170,7 @@ const QuotationController = {
             });
 
             if (foundId){
-
+            
                 const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
                     approval_remarks: data.remark,
                     approval_type: 'QS',
@@ -182,6 +182,18 @@ const QuotationController = {
                 
                 messages.push(response.data.message);
                 
+            }else {
+
+                const response = await axios.post(`${apiHost}/cq_approval/add`, {
+                    approval_remarks: data.remark,
+                    approval_type: 'CM',
+                    approval_status: 'Approved',
+                    call_for_quotation_id: data.cqId,
+                    call_for_quotation_subcon_list_id: data.callForQuotationListId
+                }, { headers });
+
+                messages.push(response.data.message);
+             
             }
         }
         
@@ -324,34 +336,10 @@ const QuotationController = {
                 );
 
         const CQresponse = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-            status: 'Waiting Checking',
+            status: 'Waiting Approval',
         }, { headers });
 
         return CQresponse.data.message;
-
-    } catch (error) {
-        const errorMessage = handleApiError(error);
-        throw errorMessage;
-    }
-  },
-  async addApproval(remarksData, selectedQuotation, CQid){
-    try {
-        const apiHost = config.getHost();
-        const headers = config.getHeadersWithToken();
-        
-
-        const getComparisonSummary = await axios.put(`${apiHost}/call_for_quotation/edit/${CQid}`, {
-            status: 'Waiting Approval'
-        }, { headers });
-
-        const response = await axios.post(`${apiHost}/cq_approval/add`, {
-            approval_remarks: remarksData,
-            approval_type: 'CM',
-            call_for_quotation_id: CQid,
-            call_for_quotation_subcon_list_id: selectedQuotation
-        }, { headers });
-
-        return response.data.message;
 
     } catch (error) {
         const errorMessage = handleApiError(error);
