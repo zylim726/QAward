@@ -72,8 +72,10 @@
   min-width: 300px;
 }
 
-.tbody td {
-  padding: 6px !important;
+tbody td {
+  padding: 8px !important;
+  text-align: left;
+  border: 1px solid #ddd;
 }
 
 .Searchbar {
@@ -245,6 +247,7 @@ unittype-container {
   background-color: $orangeLight;
   border:none;
   vertical-align: baseline;
+  padding: 10px;
 }
 
 .unityQuantityClass{
@@ -306,6 +309,15 @@ label {
 }
 
 thead th{
-  padding: 10px;
   background-color: $orangeLight;
 }
+
+.header-row-1 th {
+  position: sticky;
+  top: 0; 
+  z-index: 2; 
+}
+
+
+
+
