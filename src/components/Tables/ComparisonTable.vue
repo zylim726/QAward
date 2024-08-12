@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!--  -->
     <div v-if="isLoading" class="spinner-border" role="status">
       <span class="visually-hidden">   
         <button class="transparentButton" style="margin-right: 10px;cursor: default;">
@@ -143,27 +142,7 @@
         </div>
       </template>
       <div>
-      <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && !hasAccess && !cmAccesslevel ">
-        <div class="confirmation-message">
-          <p>Waiting CM Approval or Rejected Quotation.</p>
-        </div>
-      </template>
     </div>
-    <template v-if="project.status === 'Waiting Checking' && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
-      <div class="confirmation-message">
-      <template v-if="cqApprovalData.length === 0" >
-        <p>Please CM go to project control set up admin approval.</p>
-        <a href="projectcontrol">
-          <button class="btn-save">Project Control</button>
-        </a>  
-      </template>
-      <template v-else>
-        <p>Approval / reject cost comparison</p>  
-        <button class="btn-save" @click="CMsubmitQuotation">Approve</button>
-        <button class="btn-save" @click="CMrejectedQuotation">Reject</button>
-      </template>
-    </div>
-  </template>
     <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
       <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
         <p>It is the quotation is work order.</p> 
@@ -270,8 +249,6 @@
       </div>
     </template>
   </div> 
-    <SubmitModal :submit-modal="submitModal"  @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closesubmitModal" 
-    title="Submit Approval" :ApprovalData="ApprovalDataArray" :excelFile="excelFile"></SubmitModal>
     <RejectModal :reject-modal="rejectModal"   @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closerejectModal" 
     title="Reject Approval" :ApprovalData="ApprovalDataArray"  :excelFile="excelFile"></RejectModal>
     <DelSubcon :del-modal="delModal" @editSubconMessage="EditSubconMessage" @editfail-message="EditErrorMessage" @closeDelete="closeEditModal" :id="deleteId"  title="Delete Subcon"></DelSubcon>
@@ -285,7 +262,6 @@ import { ref } from 'vue';
 import DescriptionController from '@/services/controllers/DescriptionController.js';
 import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
-import SubmitModal from '@/components/Pop-Up-Modal/SubmitModal.vue';
 import RejectModal from '@/components/Pop-Up-Modal/RejectModal.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
@@ -294,7 +270,6 @@ import {  config } from "@/services";
 
 export default {
   components: {
-    SubmitModal,
     DelSubcon,
     RejectModal
   },
@@ -314,7 +289,6 @@ export default {
       isHide: true,
       delModal: false,
       deleteId: [],
-      submitModal: false,
       rejectModal: false,
       UpdateMessage: null,
       FailMessage: null,
@@ -470,10 +444,6 @@ export default {
       const excelFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       return excelFile;
     },
-    CMsubmitQuotation() {
-      this.excelFile = this.generateExcelFile() || null;
-      this.submitModal = true;
-    },
     async checkPermission() {
       try {
         const permission = await checkAccess(); 
@@ -508,15 +478,16 @@ export default {
       });
 
       try {
-         const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
-          const concatenatedMessage = SuccessMessage.join(', ');
-          const Message = concatenatedMessage.split(',')[0].trim();
-          this.UpdateMessage = Message;
           window.scrollTo({
             top: 0,
             behavior: 'smooth' 
           });
 
+          const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
+          const concatenatedMessage = SuccessMessage.join(', ');
+          const Message = concatenatedMessage.split(',')[0].trim();
+          this.UpdateMessage = Message;
+        
           setTimeout(() => {
             this.UpdateMessage = '';
             window.location.reload();
@@ -547,16 +518,15 @@ export default {
 
 
       try {
-
-         const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit,documents);
-          const concatenatedMessage = SuccessMessage.join(', ');
-          const Message = concatenatedMessage.split(',')[0].trim();
-          this.UpdateMessage = Message;
           window.scrollTo({
             top: 0,
             behavior: 'smooth' 
           });
-
+          const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit,documents);
+          const concatenatedMessage = SuccessMessage.join(', ');
+          const Message = concatenatedMessage.split(',')[0].trim();
+          this.UpdateMessage = Message;
+         
           setTimeout(() => {
             this.UpdateMessage = '';
             window.location.reload();
@@ -575,9 +545,6 @@ export default {
       } finally {
         this.isLoading = false;
       }
-    },
-    closesubmitModal() {
-      this.submitModal = false;
     },
     closerejectModal(){
       this.rejectModal = false;
@@ -1045,15 +1012,11 @@ export default {
   object-fit: cover;
 }
 
-.header-row-1 th {
-  position: sticky;
-  top: 0; 
-  z-index: 2; 
-}
+
 
 .header-row-2 th {
   position: sticky;
-  top: 35px; 
+  top: 38px; 
   z-index: 1; 
 }
 

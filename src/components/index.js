@@ -11,7 +11,6 @@ import ProjectTable from "./Tables/ProjectTable.vue";
 
 // MODAL
 import Modal from "./Pop-Up-Modal/Modal.vue";
-import SubmitModal from "./Pop-Up-Modal/SubmitModal.vue";
 import RejectModal from "./Pop-Up-Modal/RejectModal.vue";
 import Createpermission from "./Pop-Up-Modal/Createpermission.vue";
 import Createsubcon from "./Pop-Up-Modal/Createsubcon.vue";
@@ -33,7 +32,6 @@ export {
   Modal,
   CreatecqTable,
   DescriptionImport,
-  SubmitModal,
   RejectModal,
   ProjectcontrolTable,
   AccessuserTable,
