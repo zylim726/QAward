@@ -146,7 +146,23 @@
                       <td>{{ callQuotation.status }}</td>
                     </tr>
                   </tbody>
-                </table>
+                  <tfoot>
+                    <tr class="summary-row">
+                      <th ></th>
+                      <td colspan="8"></td>
+                      <td v-for="(approval, index) in maxprojectApprovalData" :key="'tfoot-approval-' + index" style="text-align: center;">
+                      </td>
+                      <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
+                      <td>{{ formatAccounting(callQuotation[0].Sum.budget_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation[0].Sum.adj_budget_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation[0].Sum.subcontract_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation[0].Sum.adj_subcontract_amount) }}</td>
+                      <td>{{ formatAccounting(callQuotation[0].Sum.total_saving) }}</td>
+                      <td>{{ formatAccounting(callQuotation[0].Sum.provisional_sum) }}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table><br><br>
               </div>
             </div>
           </md-card-content>
@@ -315,28 +331,40 @@ export default {
       return '0.00';
     },
     downloadExcelTemplate() {
-      const wb = XLSX.utils.book_new();
-      const table = document.querySelector('table');
-      const clonedTable = table.cloneNode(true);
-
-      // Remove first column from each row (Actions column)
-      clonedTable.querySelectorAll('tr').forEach(row => {
-        row.deleteCell(0);
-      });
-
-      // Update table cells based on conditions
-      clonedTable.querySelectorAll('td').forEach(cell => {
-        // Replace cell content with empty string if it matches '0000-00-00'
-        if (cell.textContent.trim() === '0000-00-00') {
-          cell.textContent = '';
-        }
-      });
-
-      const ws = XLSX.utils.table_to_sheet(clonedTable);
-      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
-
-      XLSX.writeFile(wb, 'summary.xlsx');
-    },
+  // Create a new workbook
+  const wb = XLSX.utils.book_new();
+  
+  // Select the table element
+  const table = document.querySelector('table');
+  
+  // Clone the table to avoid altering the original DOM
+  const clonedTable = table.cloneNode(true);
+  
+  // Remove the first column from each row (Actions column)
+  clonedTable.querySelectorAll('tr').forEach(row => {
+    if (row.cells.length > 0) {
+      row.deleteCell(0);
+    }
+  });
+  
+  // Update table cells based on conditions
+  clonedTable.querySelectorAll('td').forEach(cell => {
+    // Replace cell content with an empty string if it matches '0000-00-00'
+    if (cell.textContent.trim() === '0000-00-00') {
+      cell.textContent = '';
+    }
+  });
+  
+  // Convert the cloned table to a worksheet
+  const ws = XLSX.utils.table_to_sheet(clonedTable);
+  
+  // Append the worksheet to the workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+  
+  // Write the workbook to a file
+  XLSX.writeFile(wb, 'summary.xlsx');
+}
+,
     async accessCQ() {
       try {
         this.isLoading = true;
@@ -407,6 +435,15 @@ table {
   z-index: 1; 
 }
 
+
+.summary-row {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.summary-row td {
+  border-top: 2px solid #ddd;
+}
 
 
 </style>

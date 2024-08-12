@@ -187,7 +187,7 @@ const QuotationController = {
                 const response = await axios.post(`${apiHost}/cq_approval/add`, {
                     approval_remarks: data.remark,
                     approval_type: 'CM',
-                    approval_status: 'Approved',
+                    approval_status: 'Approved',  
                     call_for_quotation_id: data.cqId,
                     call_for_quotation_subcon_list_id: data.callForQuotationListId
                 }, { headers });
@@ -216,6 +216,8 @@ const QuotationController = {
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: approvalDataToSubmit[0].cqId,
         }, { headers });
+
+        console.log('revisionRespeonse',revisionResponse);
 
 
         const revisionId = revisionResponse.data.data.id;
@@ -251,6 +253,7 @@ const QuotationController = {
                     }
                 });
 
+                console.log('foundId',foundId);
 
                 if (foundId){
 
@@ -269,6 +272,13 @@ const QuotationController = {
                     }, { headers });
 
                     messages.push(cqApprovalResponse.data.message);
+                }else {
+
+                    const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
+                        status: 'Pending',
+                    }, { headers });
+
+                    messages.push(response.data.message);
                 }
                     
             } catch (error) {

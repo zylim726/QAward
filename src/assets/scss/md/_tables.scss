@@ -72,7 +72,7 @@
   min-width: 300px;
 }
 
-tbody td {
+tbody td,tfoot td {
   padding: 8px !important;
   text-align: left;
   border: 1px solid #ddd;
