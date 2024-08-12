@@ -147,21 +147,21 @@
                     </tr>
                   </tbody>
                   <tfoot>
-                    <tr class="summary-row">
-                      <th ></th>
-                      <td colspan="8"></td>
-                      <td v-for="(approval, index) in maxprojectApprovalData" :key="'tfoot-approval-' + index" style="text-align: center;">
-                      </td>
-                      <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
-                      <td>{{ formatAccounting(callQuotation[0].Sum.budget_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation[0].Sum.adj_budget_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation[0].Sum.subcontract_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation[0].Sum.adj_subcontract_amount) }}</td>
-                      <td>{{ formatAccounting(callQuotation[0].Sum.total_saving) }}</td>
-                      <td>{{ formatAccounting(callQuotation[0].Sum.provisional_sum) }}</td>
-                      <td></td>
-                    </tr>
-                  </tfoot>
+  <tr class="summary-row">
+    <th></th>
+    <td colspan="8"></td>
+    <td v-for="(approval, index) in maxprojectApprovalData" :key="'tfoot-approval-' + index" style="text-align: center;"></td>
+    <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
+    <td>{{ formatAccounting(SumTotal.budget_amount || 0) }}</td>
+    <td>{{ formatAccounting(SumTotal.adj_budget_amount || 0) }}</td>
+    <td>{{ formatAccounting(SumTotal.subcontract_amount || 0) }}</td>
+    <td>{{ formatAccounting(SumTotal.adj_subcontract_amount || 0) }}</td>
+    <td>{{ formatAccounting(SumTotal.total_saving || 0) }}</td>
+    <td>{{ formatAccounting(SumTotal.provisional_sum || 0) }}</td>
+    <td></td>
+  </tr>
+</tfoot>
+
                 </table><br><br>
               </div>
             </div>
@@ -192,6 +192,7 @@ export default {
       errorMessage: "",
       callQuotation: [],
       projectApproval:[],
+      SumTotal:[],
       UpdateMessage: null,
       FailMessage: null,
       item: null,
@@ -331,46 +332,46 @@ export default {
       return '0.00';
     },
     downloadExcelTemplate() {
-  // Create a new workbook
-  const wb = XLSX.utils.book_new();
-  
-  // Select the table element
-  const table = document.querySelector('table');
-  
-  // Clone the table to avoid altering the original DOM
-  const clonedTable = table.cloneNode(true);
-  
-  // Remove the first column from each row (Actions column)
-  clonedTable.querySelectorAll('tr').forEach(row => {
-    if (row.cells.length > 0) {
-      row.deleteCell(0);
-    }
-  });
-  
-  // Update table cells based on conditions
-  clonedTable.querySelectorAll('td').forEach(cell => {
-    // Replace cell content with an empty string if it matches '0000-00-00'
-    if (cell.textContent.trim() === '0000-00-00') {
-      cell.textContent = '';
-    }
-  });
-  
-  // Convert the cloned table to a worksheet
-  const ws = XLSX.utils.table_to_sheet(clonedTable);
-  
-  // Append the worksheet to the workbook
-  XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
-  
-  // Write the workbook to a file
-  XLSX.writeFile(wb, 'summary.xlsx');
-}
-,
+      // Create a new workbook
+      const wb = XLSX.utils.book_new();
+      
+      // Select the table element
+      const table = document.querySelector('table');
+      
+      // Clone the table to avoid altering the original DOM
+      const clonedTable = table.cloneNode(true);
+      
+      // Remove the first column from each row (Actions column)
+      clonedTable.querySelectorAll('tr').forEach(row => {
+        if (row.cells.length > 0) {
+          row.deleteCell(0);
+        }
+      });
+      
+      // Update table cells based on conditions
+      clonedTable.querySelectorAll('td').forEach(cell => {
+        // Replace cell content with an empty string if it matches '0000-00-00'
+        if (cell.textContent.trim() === '0000-00-00') {
+          cell.textContent = '';
+        }
+      });
+      
+      // Convert the cloned table to a worksheet
+      const ws = XLSX.utils.table_to_sheet(clonedTable);
+      
+      // Append the worksheet to the workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
+      
+      // Write the workbook to a file
+      XLSX.writeFile(wb, 'summary.xlsx');
+    },
     async accessCQ() {
       try {
         this.isLoading = true;
         const processedData = await CallofQuotationController.accessCQ();
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
+          this.SumTotal = processedData[0].Sum;
           console.log('this CallQuotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
