@@ -147,21 +147,20 @@
                     </tr>
                   </tbody>
                   <tfoot>
-  <tr class="summary-row">
-    <th></th>
-    <td colspan="8"></td>
-    <td v-for="(approval, index) in maxprojectApprovalData" :key="'tfoot-approval-' + index" style="text-align: center;"></td>
-    <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
-    <td>{{ formatAccounting(SumTotal.budget_amount || 0) }}</td>
-    <td>{{ formatAccounting(SumTotal.adj_budget_amount || 0) }}</td>
-    <td>{{ formatAccounting(SumTotal.subcontract_amount || 0) }}</td>
-    <td>{{ formatAccounting(SumTotal.adj_subcontract_amount || 0) }}</td>
-    <td>{{ formatAccounting(SumTotal.total_saving || 0) }}</td>
-    <td>{{ formatAccounting(SumTotal.provisional_sum || 0) }}</td>
-    <td></td>
-  </tr>
-</tfoot>
-
+                    <tr class="summary-row">
+                      <th></th>
+                      <td colspan="8"></td>
+                      <td v-for="(approval, index) in maxprojectApprovalData" :key="'tfoot-approval-' + index" style="text-align: center;"></td>
+                      <td colspan="5" style="text-align: right; font-weight: bold;">Total:</td>
+                      <td>{{ formatAccounting(SumTotal.budget_amount || 0) }}</td>
+                      <td>{{ formatAccounting(SumTotal.adj_budget_amount || 0) }}</td>
+                      <td>{{ formatAccounting(SumTotal.subcontract_amount || 0) }}</td>
+                      <td>{{ formatAccounting(SumTotal.adj_subcontract_amount || 0) }}</td>
+                      <td>{{ formatAccounting(SumTotal.total_saving || 0) }}</td>
+                      <td>{{ formatAccounting(SumTotal.provisional_sum || 0) }}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
                 </table><br><br>
               </div>
             </div>

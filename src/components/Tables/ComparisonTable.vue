@@ -500,8 +500,7 @@ export default {
       }
     },
     async rejectAdminApproval(systemUserId,index) {
-      this.isLoading = true;
-      
+
       this.excelFile = this.generateExcelFile() || null;
       const documents = this.excelFile;
       const approvalDataToSubmit = [];
@@ -516,10 +515,8 @@ export default {
         });
       });
 
-      console.log('approvalDaraToSubmit',approvalDataToSubmit);
-
-
       try {
+          this.isLoading = true;
           window.scrollTo({
             top: 0,
             behavior: 'smooth' 
