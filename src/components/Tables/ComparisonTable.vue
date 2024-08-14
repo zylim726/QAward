@@ -483,8 +483,6 @@ export default {
             behavior: 'smooth' 
           });
 
-          console.log('approvalDatatiSubmit',approvalDataToSubmit);
-
           const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
@@ -502,7 +500,7 @@ export default {
       }
     },
     async rejectAdminApproval(systemUserId,index) {
-
+      this.isLoading = true;
       const approvalDataToSubmit = [];
       const remark = this.remarks[index];
 
@@ -516,11 +514,12 @@ export default {
       });
 
       try {
-          this.isLoading = true;
+        
           window.scrollTo({
             top: 0,
             behavior: 'smooth' 
           });
+
           const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
@@ -549,7 +548,7 @@ export default {
       this.rejectModal = false;
     },
     closeEditModal(){
-      this.delModal = false;xs
+      this.delModal = false;
     },
     deleteSubcon(id) {
       const matchedSubcons = [];
