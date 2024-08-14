@@ -7,10 +7,11 @@
       {{ FailMessage }} <md-icon>cancel</md-icon>
     </div>
     <div v-if="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">   
+      <span class="visually-hidden">
         <button class="transparentButton" style="margin-right: 10px;cursor: default;">
           <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
+        </button> Loading...
+      </span>
     </div>
     <div v-if="!loading" class="container" style="margin-top: 20px">
       <div class="search-container">
@@ -46,19 +47,19 @@
             <td>{{ project.area }}</td>
             <td>{{ project.regno }}</td> 
             <td style="text-align: center" v-if="hasAccess">
-              <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;" >
+              <button class="transparentButton" @click="editProj(project.id)" style="margin-left: -6px;">
                 <div class="tooltip">
                   <span class="tooltiptext">Set up unit type</span>
-                  <md-icon   :style="{ color: getUnitTypeColor(project.id) }" >edit</md-icon>
+                  <md-icon :style="{ color: getUnitTypeColor(project.id) }">edit</md-icon>
                   <md-icon v-if="getUnitTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
                 </div>
               </button>
             </td>
-            <td style="text-align: center" v-if="hasAdminAccess" >
+            <td style="text-align: center" v-if="hasAdminAccess">
               <button class="transparentButton" style="margin-left: -6px;" @click="goToProjectControl(project)">
                 <div class="tooltip">
                   <span class="tooltiptext">Set up admin approved</span>
-                  <md-icon :style="{ color: getManageTypeColor(project.id) }" >manage_accounts</md-icon>
+                  <md-icon :style="{ color: getManageTypeColor(project.id) }">manage_accounts</md-icon>
                   <md-icon v-if="getManageTypeColor(project.id) === 'red'" style="color: lightcoral;">warning</md-icon>
                 </div>
               </button>
@@ -66,10 +67,11 @@
           </tr>
         </tbody>
       </table>
-      <div v-else style="text-align: center;" >
+      <div v-else style="text-align: center;">
         <div v-if="!FailMessage">
-        No projects available</div>
+          No projects available
         </div>
+      </div>
       <br />
     </div>
     <EditProject
@@ -95,7 +97,6 @@ export default {
   data() {
     return {
       projects: [],
-      unitTypes: [],
       unitTypeColors: {},
       manageTypeColors: {},
       hasAccess: false,
@@ -110,84 +111,72 @@ export default {
     };
   },
   mounted() {
-    this.accessProject();
-    this.checkPermission();
+    this.loadData();
   },
   computed: {
     filterProject() {
-      return this.projects.filter((project) => {
-        return (
-          project &&
-          (
-            (project.code && project.code.toLowerCase().includes(this.searchText.toLowerCase())) ||
-            (project.name && project.name.toLowerCase().includes(this.searchText.toLowerCase()))
-          )
-        );
-      });
+      const searchTextLower = this.searchText.toLowerCase();
+      return this.projects.filter((project) =>
+        project &&
+        (
+          (project.code && project.code.toLowerCase().includes(searchTextLower)) ||
+          (project.name && project.name.toLowerCase().includes(searchTextLower))
+        )
+      );
     },
   },
   methods: {
+    async loadData() {
+      this.loading = true;
+      try {
+        await this.checkPermission();
+        
+        // Ensure `this.projects` is defined and has valid project objects
+        const projects = await ProjectController.accessProject();
+        const unitTypesResults = await Promise.all(
+          projects.map(project => ProjectController.getUnitTypes(project.id))
+        );
+        const manageTypesResults = await Promise.all(
+          projects.map(project => ProjectController.getProjectManage(project.id))
+        );
+
+        this.projects = projects;
+
+        this.unitTypeColors = this.projects.reduce((acc, project, index) => {
+          acc[project.id] = unitTypesResults[index].length > 0 ? 'grey' : 'red';
+          return acc;
+        }, {});
+
+        this.manageTypeColors = this.projects.reduce((acc, project, index) => {
+          acc[project.id] = manageTypesResults[index].length > 0 ? 'grey' : 'red';
+          return acc;
+        }, {});
+
+      } catch (error) {
+        this.FailMessage = `Error Message: ${error.message || 'Unknown Data.'}`;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async checkPermission() {
+      try {
+        const permission = await checkAccess();
+        const accessIds = ['Set Up Unit Type'];
+        const accessAdmin = ['Set Up Approved'];
+        this.hasAccess = accessIds.some(id => permission.includes(id));
+        this.hasAdminAccess = accessAdmin.some(id => permission.includes(id));
+      } catch (error) {
+        console.error('Permission check failed:', error);
+      }
+    },
     goToProjectControl(project) {
       this.$router.push({ 
         path: '/projectcontrol', 
         query: { name: project.name, id: project.id }
       });
     },
-    async checkPermission() {
-      try {
-        const permission = await checkAccess(); 
-        const accessIds = ['Set Up Unit Type'];
-        const accessAdmin = ['Set Up Approved'];
-        this.hasAccess = accessIds.some(id => permission.includes(id));
-        this.hasAdminAccess = accessAdmin.some(id => permission.includes(id));
-      } catch (error) {
-      }
-    },
-    async accessProject() {
-      try {
-        this.loading = true;
-        const processedData = await ProjectController.accessProject();
-         this.projects = processedData;
-        await this.updateUnitTypeColors();
-        await this.updateManageTypeColors();
-      } catch (error) {
-        this.loading = false;
-        this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
-      } finally {
-        this.loading = false;
-      }
-    },
-    async updateUnitTypeColors() {
-    this.loading = true;
-    try {
-        for (const project of this.projects) {
-          const unitType = await ProjectController.getUnitTypes(project.id);
-          this.$set(this.unitTypeColors, project.id, unitType.length > 0 ? 'grey' : 'red');
-        }
-      } catch (error) {
-        const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
-        this.$emit('fail-message', failMessage);
-      } finally {
-        this.loading = false;
-      }
-    },
     getUnitTypeColor(projectId) {
       return this.unitTypeColors[projectId] || 'red';
-    },
-    async updateManageTypeColors() {
-
-    this.loading = true;
-    try {
-        for (const project of this.projects) {
-          const manager = await ProjectController.getProjectManage(project.id);
-          this.$set(this.manageTypeColors, project.id, manager.length > 0 ? 'grey' : 'red');
-        }
-      } catch (error) {
-        const failMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
-        this.$emit('fail-message', failMessage);
-      } finally {
-        this.loading = false;
-      }
     },
     getManageTypeColor(projectId) {
       return this.manageTypeColors[projectId] || 'red';
@@ -207,7 +196,7 @@ export default {
     },
     ModalMessage(message) {
       this.UpdateMessage = message;
-      this.accessProject();
+      this.loadData();
     },
     ModalErrorMessage(message) {
       this.FailMessage = message;
