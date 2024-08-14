@@ -143,9 +143,9 @@
       </template>
       <div>
     </div>
-    <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
+    <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 ">
       <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
-        <p>It is the quotation is work order.</p> 
+        <p>It this a work order.</p> 
         <label >
           <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
           Yes
@@ -186,7 +186,7 @@
                     <p class="user-name">Name: {{ user.name }}</p>
                   </div>
                   <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                  <div v-if="(approvalData.system_user_id === Number(getUserIdLocal) || hasAccess) && index === 0 ">
+                  <div v-if="(approvalData.system_user_id === Number(getUserIdLocal)) && index === 0 ">
                     <select v-model="selectedQuotations[index]" class="quotation-select" >
                       <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
                         {{ quotationData.Subcon.name }}
@@ -213,7 +213,7 @@
         </template>
       </div>
     </template>
-    <template v-if="(project.status === 'Approved' ) && QuotationName.length > 0 && (hasAccess || cmAccesslevel)">
+    <template v-if="(project.status === 'Approved' ) && QuotationName.length > 0 ">
       <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
         <p>It is the quotation is work order.</p> 
         <label >
@@ -483,6 +483,8 @@ export default {
             behavior: 'smooth' 
           });
 
+          console.log('approvalDatatiSubmit',approvalDataToSubmit);
+
           const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
@@ -501,8 +503,6 @@ export default {
     },
     async rejectAdminApproval(systemUserId,index) {
 
-      this.excelFile = this.generateExcelFile() || null;
-      const documents = this.excelFile;
       const approvalDataToSubmit = [];
       const remark = this.remarks[index];
 
@@ -521,7 +521,7 @@ export default {
             top: 0,
             behavior: 'smooth' 
           });
-          const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit,documents);
+          const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
           this.UpdateMessage = Message;

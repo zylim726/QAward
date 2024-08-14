@@ -204,42 +204,13 @@ const QuotationController = {
         throw errorMessage;
     }
   },
-  async rejectCQApproval(approvalDataToSubmit,documents){
+  async rejectCQApproval(approvalDataToSubmit){
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
         let foundId = null;
         const messages = [];
-        
-
-        const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
-            call_for_quotation_id: approvalDataToSubmit[0].cqId,
-        }, { headers });
-
-        console.log('revisionRespeonse',revisionResponse);
-
-
-        const revisionId = revisionResponse.data.data.id;
-
-        const formData = new FormData();
-        formData.append('file', documents.file);
-        formData.append('data-table', 'revision');
-        formData.append('data-table-id', revisionId);
-        formData.append('description', approvalDataToSubmit[0].remark);
-        formData.append('name', 'revision.xlsx');
-
-        const Importresponse = await axios.post(
-            `${apiHost}/document/importExcel`, 
-            formData, 
-            { 
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`,
-                }
-            }
-        );
-
   
         for (const data of approvalDataToSubmit) {
             try {
@@ -253,7 +224,6 @@ const QuotationController = {
                     }
                 });
 
-                console.log('foundId',foundId);
 
                 if (foundId){
 
@@ -277,6 +247,7 @@ const QuotationController = {
                     const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
                         status: 'Pending',
                     }, { headers });
+
 
                     messages.push(response.data.message);
                 }
@@ -314,7 +285,7 @@ const QuotationController = {
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
 
-        console.log('cqId',cqId);
+        
     
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: cqId,

@@ -103,7 +103,7 @@
                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: lightgray !important;" >pending</md-icon>
                       </td>
                       <td v-else>
-                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: lightcoral !important;">error</md-icon>
+                       {{ callQuotation.trade }}<md-icon class="mdIcon" style="color: orange !important;">error</md-icon>
                       </td>
                       <td>{{ callQuotation.location }}</td>
                       <td>{{ callQuotation.numberOfQuotations }}</td>

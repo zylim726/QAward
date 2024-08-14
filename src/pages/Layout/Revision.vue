@@ -15,7 +15,7 @@
                     <th scope="col">Revision</th>
                     <th scope="col">Date</th>
                     <th>Create By</th>
-                    <th>Remark</th>
+                    <th>Remarks</th>
                     <th scope="col" style="text-align: right;"></th>
                   </tr>
                 </thead>
@@ -25,7 +25,7 @@
                     <td>Revision {{ rv.version }}</td>
                     <td>{{ formatDate(rv.createdAt) }}</td>
                     <td>{{ rv.created_by }}</td>
-                    <td>{{ rv.document_description  || 'No remarks available' }}</td>
+                    <td>{{ rv.remark?.approval_remarks || 'No remarks available' }}</td>
                     <td>
                       <button class="btn-save" @click="downloadDocument(rv.document_api)">
                         Download Revision

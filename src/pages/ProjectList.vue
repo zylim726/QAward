@@ -120,6 +120,12 @@ export default {
   width: 300px; 
 }
 
+.no-results {
+  margin-top: 70px;
+  font-size: 22px;
+  text-align: center;
+}
+
 
 @media (max-width: 768px) {
   .project-card {
