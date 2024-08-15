@@ -26,7 +26,7 @@
                     <td>Revision {{ rv.version }}</td>
                     <td>{{ formatDate(rv.createdAt) }}</td>
                     <td>{{ rv.created_by }}</td>
-                    <td>{{ rv.updated_by }}</td>
+                    <td>{{ rv.remark?.updated_by }}</td>
                     <td>{{ rv.remark?.approval_remarks || '' }}</td>
                     <td>
                       <button class="btn-save" @click="downloadDocument(rv.document_api)">
