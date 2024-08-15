@@ -173,7 +173,7 @@ const QuotationController = {
             
                 const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
                     approval_remarks: data.remark,
-                    approval_type: 'QS',
+                    approval_type: '',
                     approval_status: 'Approved',
                     call_for_quotation_id: data.cqId,
                     call_for_quotation_subcon_list_id: data.callForQuotationListId
@@ -182,18 +182,6 @@ const QuotationController = {
                 
                 messages.push(response.data.message);
                 
-            }else {
-
-                const response = await axios.post(`${apiHost}/cq_approval/add`, {
-                    approval_remarks: data.remark,
-                    approval_type: 'CM',
-                    approval_status: 'Approved',  
-                    call_for_quotation_id: data.cqId,
-                    call_for_quotation_subcon_list_id: data.callForQuotationListId
-                }, { headers });
-
-                messages.push(response.data.message);
-             
             }
         }
         
@@ -229,7 +217,7 @@ const QuotationController = {
 
                     const cqApprovalResponse = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
                         approval_remarks: data.remark,
-                        approval_type: 'QS',
+                        approval_type: '',
                         approval_status: 'Reject',
                         call_for_quotation_id: data.cqId,
                         call_for_quotation_subcon_list_id: data.callForQuotationListId
@@ -303,8 +291,7 @@ const QuotationController = {
         for (let pair of formData.entries()) {
                 console.log(`${pair[0]}: ${pair[1]}`);
             }
-        console.log('Sending request to:', `${apiHost}//document/importExcel`);
-        
+
         const response = await axios.post(
                     `${apiHost}/document/importExcel`, 
                     formData, 
@@ -318,6 +305,14 @@ const QuotationController = {
 
         const CQresponse = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
             status: 'Waiting Approval',
+        }, { headers });
+
+        const approvalResponse = await axios.post(`${apiHost}/cq_approval/add`, {
+            approval_remarks: '',
+            approval_type: '',
+            approval_status: 'Pending',  
+            call_for_quotation_id: cqId,
+            call_for_quotation_subcon_list_id: ''
         }, { headers });
 
         return CQresponse.data.message;
