@@ -223,7 +223,7 @@ export default {
     if (projectName) {
       this.projectName = projectName;
     } else {
-      this.FailMessage = "Project ID not found in localStorage";
+      this.FailMessage = "You haven't select the project in project list.";
     };
     this.accessCQ();
   },
