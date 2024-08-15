@@ -194,8 +194,8 @@
                     </select>
                     <p style="margin: 8px 0 10px;">Remarks:</p>
                     <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" required ></textarea>
-                    <button class="btn-save"  @click="rejectAdminApproval(approvalData.system_user_id, index)">Rejected</button><br>
-                    <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approved</button><br>
+                    <button class="btn-save"  @click="rejectAdminApproval(approvalData.system_user_id, index)">Reject</button><br>
+                    <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approve</button><br>
                   </div>
                   <div v-else>
                     <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
@@ -937,7 +937,12 @@ export default {
     },
     async approvalQuotation(){
       try {
-        this.isLoading = true;
+        this.isLoading = true; 
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth' 
+        });
+
         const wb = XLSX.utils.book_new();
         const originalTable = this.$refs.dataTable;
         const clonedTable = originalTable.cloneNode(true);
@@ -963,11 +968,9 @@ export default {
         const blob = new Blob([excelFileContent], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const getDataFile = new File([blob], 'quotation.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
+
         this.UpdateMessage = await QuotationController.approvalQuotation(this.cqId, getDataFile);
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth' 
-        });
+        
         setTimeout(() => {
           this.UpdateMessage = '';
           window.location.reload();

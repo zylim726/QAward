@@ -273,8 +273,6 @@ const QuotationController = {
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
 
-        
-    
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: cqId,
         }, { headers });
