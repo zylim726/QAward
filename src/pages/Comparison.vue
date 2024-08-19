@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
-      <div class="modal-content" style="max-height: 600px;">
+      <div class="modal-content" style="max-height: 550px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
         <table class="project-table">
               <thead>

@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': editSubcon }">
     <div class="modal-background" @click="closeeditSub"></div>
-    <div class="modal-content" style="width: 40%;max-height: 600px !important;">
+    <div class="modal-content" style="width: 40%;max-height: 550px !important;">
       <div class="box">
         <h1 class="titleHeader">{{ title }}</h1>
         <br />

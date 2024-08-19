@@ -291,27 +291,45 @@
 }
 
 
+.nav-item {
+  position: relative;
+}
+
+
 .sidebar {
-  width: 3.9% !important;
+  width: 4.5% !important;
   position: absolute !important;
   top: 0 !important;
   bottom: 0 !important;
   height: 100% !important;
   overflow: hidden !important;
   transition: width 0.2s linear !important;
-  z-index: 10; /* Set a default z-index */
+  z-index: 10 !important; /* Set a default z-index */
 }
 
-.nav-item {
-  position: relative;
-}
-
-
+/* Hover effect */
 .sidebar:hover {
-   width: 18.5% !important;
-   transition: all 0.5s ease !important;
-  z-index: 5; /* Increase the z-index on hover */
+  width: 18.5% !important;
+  transition: all 0.5s ease !important;
+  z-index: 15 !important; /* Increase the z-index on hover */
+}
 
+/* Larger screens (desktops) */
+@media screen and (min-width: 1024px) {
+  .sidebar {
+    width: 4% !important;
+  }
+}
+
+/* Medium screens (tablets) */
+@media screen and (max-width: 1023px) and (min-width: 768px) {
+  .sidebar {
+    width: 6% !important;
+  }
+
+  .sidebar:hover {
+    width: 25% !important; /* Adjust hover width for medium screens */
+  }
 }
 
 
