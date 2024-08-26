@@ -96,6 +96,7 @@
 import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { EditCQ,DeleteCQ }  from "@/components";
+import ProjectController from "@/services/controllers/ProjectController.js";
 
 export default {
   components: {
@@ -121,11 +122,16 @@ export default {
     };
   },
   mounted() {
+    const pId = this.$route.query.projectID;
+    localStorage.setItem('projectId', pId);
+    
     const projectName = localStorage.getItem('projectName');
     if (projectName) {
       this.projectName = projectName;
-    } else {
-    };
+    }else {
+      this.getProjectNameById(pId);
+    }
+    
     const Id = this.$route.query.cqID;
     this.cqId = Id;
     this.getDetailCQ(this.cqId);
@@ -133,6 +139,21 @@ export default {
     this.getUTypes(); 
   },
   methods: {
+    async getProjectNameById(pId) {
+      try {
+        const { data, message } = await ProjectController.projectList();
+
+        const project = data.find(proj => {
+            return proj.id === parseInt(pId, 10); 
+        });
+
+        if (project) {
+          localStorage.setItem('projectName', project.code);
+          this.projectName = project.code;
+        } 
+      } catch (error) {
+      }
+    },
     editCallQuotation(id) {
       this.editId = id;
       this.editModal = true;

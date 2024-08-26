@@ -172,22 +172,6 @@ const ProjectController = {
 
     }
   },
-  async getDetailProject(id) {
-    try {
-      const apiHost = config.getHost();
-      const headers = config.getHeadersWithToken(); 
-      const response = await axios.get(`${apiHost}/project/${id}`, {
-        headers,
-      });
-      return response.data.data;
-      
-    } catch (error) {
-      const errorMessage = handleApiError(error);
-    
-      throw { errorMessage };
-      
-    }
-  },
   async getUnitTypes(id) {
     try {
       const apiHost = config.getHost();
