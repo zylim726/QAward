@@ -89,7 +89,7 @@
                   <tbody>
                     <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
-                      <td><a :href="'/comparison?cqID=' + callQuotation.id"><button class="transparentButton" >
+                      <td><a :href="'/comparison?cqID=' + callQuotation.id + '&projectID=' + callQuotation.projectId"><button class="transparentButton" >
                         <div class="tooltip" >
                           <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
                         <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
