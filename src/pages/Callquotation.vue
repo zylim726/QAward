@@ -110,9 +110,14 @@
                       <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
                       <td>{{ formatDate(callQuotation.actuallDoneDate) !== '0000-00-00' ? formatDate(callQuotation.actuallDoneDate) : '' }}</td>
-                      <td v-for="(approval, i) in mergeApprovals(callQuotation)" :key="'approval-' + i">
-                        <span>{{ approval && approval.updatedAt ? (approval.updatedAt !== '0000-00-00' ? formatDate(approval.updatedAt) : '') : '' }}</span>
-                      </td>
+                      <template v-if="mergeApprovals(callQuotation).length === 0">
+                        <td></td>
+                      </template>
+                      <template v-else>
+                        <td v-for="(approval, i) in mergeApprovals(callQuotation)" :key="'approval-' + i">
+                          <span>{{ approval && approval.updatedAt ? (approval.updatedAt !== '0000-00-00' ? formatDate(approval.updatedAt) : '') : '' }}</span>
+                        </td>
+                      </template>
                       <td>{{ formatDate(callQuotation.awadingtargetdate) !== '0000-00-00' ? formatDate(callQuotation.awadingtargetdate) : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
                       <template v-if="callQuotation.is_work_order === true">
