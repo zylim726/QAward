@@ -61,7 +61,6 @@ const ProjectController = {
   
     } catch (error) {
       const errorMessage = handleApiError(error);
-      console.error(errorMessage);
       throw new Error(errorMessage); // Use Error object for throwing exceptions
     }
   },  

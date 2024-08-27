@@ -181,8 +181,10 @@ export default {
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;
-        this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId } }); // use actual route name and pass the query parameter
-
+        const storedProjectId = localStorage.getItem('projectId');
+        this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId,projectID: storedProjectId  } }); // use actual route name and pass the query parameter
+  
+        
       } catch (error) {
         this.FailMessage = "Failed to save data.";
       }

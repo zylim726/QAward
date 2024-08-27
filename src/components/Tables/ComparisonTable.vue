@@ -354,27 +354,22 @@ export default {
   methods: {
     async downloadDocument(url) {
       try {
-        console.log('Starting download...');
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const fullUrl = `${apiHost}${url}`;
-
-        console.log('Full URL:', fullUrl);
-        console.log('Headers:', headers);
 
         const response = await fetch(fullUrl, {
           headers,
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response status text:', response.statusText);
+     
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
         }
 
         const blob = await response.blob();
-        console.log('Blob created:', blob);
+   
 
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
@@ -384,7 +379,7 @@ export default {
         link.click();
         document.body.removeChild(link);
 
-        console.log('Download initiated.');
+      
       } catch (error) {
         this.errorMessage = "Error issue : download quotation document fail: " + error.message;
         console.error(this.errorMessage); // Log the error to the console
@@ -610,7 +605,6 @@ export default {
           processedData = [];
         }
         this.processedData = processedData;
-        console.log('this.proceesedData',this.processedData);
 
         if (processedData.length > 0) {
           const tableBody = document.querySelector('.nested-table tbody');

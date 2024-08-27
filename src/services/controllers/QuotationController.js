@@ -78,7 +78,7 @@ const QuotationController = {
 
            
             for (const quotation of QuotationData) {
-                console.log('quotation',quotation);
+         
                 try {
                     const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
                         quote_rate: quotation.rate,
@@ -222,9 +222,7 @@ const QuotationController = {
                         call_for_quotation_id: data.cqId,
                         call_for_quotation_subcon_list_id: data.callForQuotationListId
                     }, { headers });
-                    console.log('cqApprovalResponse',cqApprovalResponse);
-
-                    
+                   
                     const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
                         status: 'Pending',
                     }, { headers });
@@ -285,10 +283,6 @@ const QuotationController = {
         formData.append('data-table-id', revisionId);
         formData.append('description', 'Submit cost comparison');
         formData.append('name', 'revision.xlsx');
-        // Log FormData keys and values
-        for (let pair of formData.entries()) {
-                console.log(`${pair[0]}: ${pair[1]}`);
-            }
 
         const response = await axios.post(
                     `${apiHost}/document/importExcel`, 
@@ -326,14 +320,11 @@ const QuotationController = {
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
 
-        console.log('rev');
-
 
         const revisionResponse = await axios.post(`${apiHost}/revision/add`, {
             call_for_quotation_id: CQid,
         }, { headers });
 
-        console.log('revisionResponse',revisionResponse);
         const revisionId = revisionResponse.data.data.id;
         const getInformation = 'CM rejected :' + remarksData;
 

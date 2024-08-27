@@ -173,15 +173,11 @@ export default {
       }
     },
     confirmSelection() {
-      console.log('this.selectedUserId',this.selectedUserId);
-        console.log('this option',this.currentAdminIndex);
 
       if (this.selectedUserId !== null && this.currentAdminIndex !== null) {
         // Find the selected user object
         const selectedUser = this.users.find(user => user.id === this.selectedUserId);
       
-        console.log('this.getUserHaveDt',this.getUserHaveDT);
-
         // Update only the current admin's data with the selected user info
         this.getUserHaveDT[this.currentAdminIndex] = {
           ...this.getUserHaveDT[this.currentAdminIndex],
@@ -241,7 +237,7 @@ export default {
     },
     async projectcontrol(formData) {
       try {
-        console.log('formData',formData);
+     
         const successMessage = await ProjectController.projectcontrol(formData);
         const concatenatedMessage = successMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
