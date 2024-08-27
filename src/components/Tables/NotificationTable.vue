@@ -153,28 +153,6 @@ export default {
 
 
 <style scoped>
-.tableNotification {
-  display: flex; 
-  align-items: flex-start;
-}
 
-.read-icons {
-  margin-right: 15px; 
-  font-size: 29px; 
-}
-
-.tableNotifyContent {
-  display: flex;
-  flex-direction: column; 
-}
-
-.tableNotifyDiescription {
-  font-size: 15px;
-  margin: 0; 
-}
-
-.notification-row:hover {
-  background-color: #f5f5f5; 
-}
 </style>
 
