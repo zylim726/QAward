@@ -35,6 +35,26 @@ const NotificationController = {
       throw new Error(errorMessage);
     }
   },
+  async updateUnRead(NotificationUnread) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+      const messages = [];
+      for (const id of NotificationUnread.ids) {
+
+        const response = await axios.patch(`${apiHost}/notification/edit/${id}`, { 
+          is_read: 0, 
+        }, { headers });
+        messages.push(response.data.message);
+  
+      }
+      
+      return messages;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      throw new Error(errorMessage);
+    }
+  },
 };
 
 

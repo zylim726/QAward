@@ -29,30 +29,33 @@
               <th>No</th>
               <th>Description</th>
               <th>Date</th>
+              <th></th>
             </tr>
         </thead>
         <tbody>
-          <tr 
-              v-for="(notify, index) in notification" 
-              :key="notify.id" 
-              @click="handleNotificationClick(notify)" 
-              class="notification-row"
-              style="cursor: pointer;"
-          >
+          <tr  v-for="(notify, index) in notification" :key="notify.id">
               <td>{{ index + 1 }}</td>
-              <td>
+              <td class="notification-row" style="cursor: pointer;" @click="handleNotificationClick(notify)" >
                 <div class="tableNotification" >
                   <i class="material-icons read-icons" :style="{ color: getIconColor(notify.is_read) }">
                     {{ getNotificationIcon(notify.category) }}
                   </i>
                   <div class="tableNotifyContent">
-                    <p style="font-size: 11px !important;margin: 0px;"><b>{{ notify.title }}</b></p>
-                    <p class="tableNotifyDiescription">{{ notify.description }}</p>
-                    <p style="font-size: 11px !important;">created by : {{ notify.created_by }}</p>
+                    <p :style="[ { fontSize: '14px', margin: '0px' }]"><b>{{ notify.title }}</b></p>
+                    <p class="tableNotifyDiescription" >{{ notify.description }}</p>
                   </div>
                 </div>
               </td>
-              <td>{{ formatRelativeDate(notify.updatedAt) }}</td>
+              <td>{{ formatRelativeDate(notify.createdAt) }}</td>
+              <td v-if="notify.is_read">
+                <button class="transparentButton" @click="markUnread(notify.id)">
+                  <md-icon>bookmarks</md-icon>
+                </button>
+              </td>
+              <td v-else>
+                <md-icon style="color: orange;font-size: 16px !important;">circle</md-icon>
+              </td>
+
             </tr>
         </tbody>
       </table>
@@ -145,14 +148,21 @@ export default {
       } catch (error) {
         console.error('Error updating notifications:', error);
       }
-    }
+    },
+    async markUnread(notificationId) {
+      try {
+        const NotificationUnread = { ids: [notificationId] };
+        await NotificationController.updateUnRead(NotificationUnread);
+
+        this.notification = this.notification.map(notification => 
+          notification.id === notificationId ? { ...notification, is_read: false } : notification
+        );
+      } catch (error) {
+        this.FailMessage = `Error: ${error.message || 'Unknown error.'}`;
+      }
+    },
   },
 };
 </script>
 
-
-
-<style scoped>
-
-</style>
 
