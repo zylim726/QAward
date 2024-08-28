@@ -435,7 +435,7 @@ table {
 
 .header-title-2 th {
   position: sticky;
-  top: 70px; 
+  top: 67px; 
   z-index: 1; 
 }
 
