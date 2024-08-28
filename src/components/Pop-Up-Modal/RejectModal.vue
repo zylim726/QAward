@@ -63,7 +63,6 @@ export default {
         }
 
         const SuccessMessage = await QuotationController.CMrejectedQuotation(this.remarksData, CQid, getFile);
-        console.log('SuccessMessage:', SuccessMessage); 
         this.$emit('editMessage', SuccessMessage); 
         this.closerejectModal(); 
       } catch (error) {

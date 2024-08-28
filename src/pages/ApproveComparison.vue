@@ -179,7 +179,7 @@ export default {
           const processedData = await LaController.accessWO(queryParams.woCqId);
           if (Array.isArray(processedData) && processedData.length > 0) {
             this.lawoComparison = processedData[0];
-            console.log('this lawoComparison', this.lawoComparison);
+         
           } else {
             this.FailMessage = "No data.";
           }
@@ -187,7 +187,6 @@ export default {
           const processedData = await LaController.accessLa(queryParams.laCqId);
           if (Array.isArray(processedData) && processedData.length > 0) {
             this.lawoComparison = processedData[0];
-            console.log('this lawoComparison', this.lawoComparison);
           } else {
             this.FailMessage = "No data.";
           }

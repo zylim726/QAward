@@ -376,7 +376,6 @@ export default {
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
           this.SumTotal = processedData[0].Sum;
-          console.log('this CallQuotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
           this.errorMessage = "No data.";

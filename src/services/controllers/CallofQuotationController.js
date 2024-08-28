@@ -13,11 +13,7 @@ const CallofQuotationController = {
       const response = await axios.get(`${apiHost}/call_for_quotation`, {
         headers,
       })
-
-      console.log('error api header repsonse',response.data);
-
       const processedData = CallQuotationModels.processResponseData(response.data);
-      console.log('error api header processedData',processedData);
 
       return processedData;
 

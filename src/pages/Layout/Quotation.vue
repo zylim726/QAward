@@ -396,12 +396,15 @@ export default {
               const concatenatedMessage = SuccessMessage.join(', ');
               this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
               window.scrollTo(0, 0); 
-
+              const storedProjectId = localStorage.getItem('projectId');
+             
               this.$router.push({
                   name: 'Subcon Comparison',
-                  query: { cqID: this.$route.query.cqId }
+                  query: { cqID: this.$route.query.cqId, 
+                    projectID: storedProjectId }
               });
 
+             
             } else {
               this.FailMessage = "Error: Rate data is empty";
               setTimeout(() => {
