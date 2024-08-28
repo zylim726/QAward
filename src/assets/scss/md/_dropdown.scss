@@ -2,7 +2,7 @@
   min-height: 56px;
   padding: 10px;
   border-radius: 3px;
-  z-index: 0 !important;
+  z-index: 9999 !important;
 
   &.md-transparent{
     background-color: transparent !important;
@@ -224,7 +224,7 @@
     z-index: 3000;
     display: none;
     float: left;
-    min-width: 160px;
+    min-width: 350px;
     padding: 5px 0;
     margin: 2px 0 0;
     font-size: 14px;
@@ -234,7 +234,6 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid $gray-light;
-    border: 1px solid $gray-lighter;
     border-radius: 4px;
     -webkit-box-shadow: 0 6px 12px $gray-light;
     box-shadow: 0 6px 12px $gray-lighter;
@@ -900,3 +899,67 @@
 }
 }
 
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 21px;
+  border-bottom: 1px solid orange; 
+}
+
+.mark-as-read {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.mark-as-read md-icon {
+  margin-right: 5px;
+  font-size: 18px; 
+}
+
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.notification-item p {
+  margin: 0;
+}
+
+.notification-item:hover {
+  background-color: #fef4e4;
+}
+
+.notification-icon {
+  margin-right: 10px;
+  color: orange;
+  align-self: flex-start;
+  font-size: 20px; 
+}
+
+.notification-content {
+  flex: 1;
+  font-size: 14px;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: #9E9E9E;
+}
+
+.view-all {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.view-all md-button {
+  width: 100%; /* Make the button full-width */
+  text-align: center;
+}
