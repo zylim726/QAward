@@ -61,7 +61,7 @@
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Prepare :</h6>
-              <h3 class="titleHeader">{{ callQuotation.updated_by }}</h3>
+              <h3 class="titleHeader">{{ callQuotation.created_by }}</h3>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
               <h6>Awading Target Data :</h6>
@@ -213,6 +213,7 @@ export default {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
 
         this.callQuotation = processedData[0];
+        console.log('callQuotation',this.callQuotation);
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
             if (processedData[i]) {
