@@ -77,12 +77,12 @@
                       <th style="text-align: center">Status</th>
                     </tr>
                     <tr  class="header-title-2">
-                      <th ></th>
-                      <th colspan="8"></th>
-                      <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
+                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }"></th>
+                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }" colspan="8"></th>
+                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }" v-for="(approval, index) in maxprojectApprovalData" :key="index">
                         {{ approval.user.name || approval.user[0].name }}
                       </th>
-                      <th colspan="12"></th>
+                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }" colspan="12"></th>
                     </tr>
                   </thead>
                   
@@ -435,7 +435,7 @@ table {
 
 .header-title-2 th {
   position: sticky;
-  top: 67px; 
+
   z-index: 1; 
 }
 
