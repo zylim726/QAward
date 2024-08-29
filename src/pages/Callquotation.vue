@@ -76,13 +76,14 @@
                       <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
-                    <tr  class="header-title-2">
-                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }"></th>
-                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }" colspan="8"></th>
-                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }" v-for="(approval, index) in maxprojectApprovalData" :key="index">
+                    <tr :class="headerClass">
+                      <th :style="{ 'top': '0' }"></th>
+                      <th :style="{ 'top': '0' }" colspan="8"></th>
+                      <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
                         {{ approval.user.name || approval.user[0].name }}
                       </th>
-                      <th   :style="{ 'top': maxprojectApprovalData.length ? '70px' : '20px' }" colspan="12"></th>
+                      <th :style="{ 'top': '0' }" colspan="12"></th>
+
                     </tr>
                   </thead>
                   
@@ -202,6 +203,7 @@ export default {
       item: null,
       hasAccess: false,
       isLoading: false,
+      isMobile: false,
     };
   },
   computed: {
@@ -221,6 +223,9 @@ export default {
     },
     maxprojectApprovalData() {
       return this.maxprojectApproval();
+    },
+    headerClass() {
+      return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop';
     }
   },
   mounted() {
@@ -231,11 +236,19 @@ export default {
       this.FailMessage = "You haven't select the project in project list.";
     };
     this.accessCQ();
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkScreenSize);
   },
   async created() {
     await this.checkPermission();
   },
   methods: {
+    checkScreenSize() {
+      this.isMobile = window.innerWidth < 768; // Adjust breakpoint as needed
+    },
     getMaxCqApprovalsLength() {
       let maxLength = 0;
       this.callQuotation.forEach(quotation => {
@@ -433,12 +446,6 @@ table {
   color: #333;
 }
 
-.header-title-2 th {
-  position: sticky;
-
-  z-index: 1; 
-}
-
 
 .summary-row {
   background-color: #f9f9f9;
@@ -447,6 +454,33 @@ table {
 
 .summary-row td {
   border-top: 2px solid #ddd;
+}
+
+/* Default for desktop */
+.header-title-2 {
+  position: sticky;
+}
+
+.header-title-2.desktop {
+  top: 70px; /* For larger screens (desktops) */
+}
+
+.header-title-2.mobile {
+  top: 20px; /* For smaller screens (mobile) */
+}
+
+@media (max-width: 767px) {
+  /* Mobile view styles */
+  .header-title-2 {
+    top: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Desktop view styles */
+  .header-title-2 {
+    top: 70px;
+  }
 }
 
 

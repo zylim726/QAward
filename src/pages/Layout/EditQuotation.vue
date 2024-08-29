@@ -116,8 +116,8 @@ export default {
   },
   mounted() {
     const id = this.$route.query.cqId;
-    const subconId = this.$route.query.sbConId;
-    this.getNewDescription(id, subconId);
+    const subconListId = this.$route.query.sbConId;
+    this.getNewDescription(id, subconListId);
   },
   methods: {
     blockNegativeInput(event) {
@@ -129,7 +129,7 @@ export default {
       this.documents.file = event.target.files[0];
       
     },
-    async getNewDescription(id, subconId) {
+    async getNewDescription(id, subconListId) {
       try {
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
@@ -139,7 +139,7 @@ export default {
           this.Unittype = cqUnitType;
 
           const filteredQuotations = getQuotation.filter(quotationRate =>
-            String(quotationRate.Call_For_Quotation_Subcon_List.subcon_id) === String(subconId)
+            String(quotationRate.call_for_quotation_subcon_list_id) === String(subconListId)
           );
 
 
@@ -158,10 +158,10 @@ export default {
     },
     async saveAllData() {
       try {
-        const subconId = this.$route.query.sbConId;
+        const subListId = this.$route.query.sbConId;
         const dataToSave = this.Description.map(formData => {
         const filteredQuotation = formData.quotation.find(quotation => {
-          return String(quotation.Call_For_Quotation_Subcon_List.subcon_id) === String(subconId);
+          return String(quotation.call_for_quotation_subcon_list_id) === String(subListId);
         });
 
         if (!filteredQuotation) {
