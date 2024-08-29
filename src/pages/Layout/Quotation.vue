@@ -393,16 +393,17 @@ export default {
             }
             if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
-              const concatenatedMessage = SuccessMessage.join(', ');
-              this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
-              window.scrollTo(0, 0); 
-              const storedProjectId = localStorage.getItem('projectId');
+              console.log('successMessage',SuccessMessage);
+              // const concatenatedMessage = SuccessMessage.join(', ');
+              // this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
+              // window.scrollTo(0, 0); 
+              // const storedProjectId = localStorage.getItem('projectId');
              
-              this.$router.push({
-                  name: 'Subcon Comparison',
-                  query: { cqID: this.$route.query.cqId, 
-                    projectID: storedProjectId }
-              });
+              // this.$router.push({
+              //     name: 'Subcon Comparison',
+              //     query: { cqID: this.$route.query.cqId, 
+              //       projectID: storedProjectId }
+              // });
 
              
             } else {
