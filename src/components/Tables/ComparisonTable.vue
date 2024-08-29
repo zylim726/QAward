@@ -64,7 +64,7 @@
                   v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5" 
                 > priority_high</md-icon>
               </div>
-              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.Call_For_Quotation_Subcon_List.subcon_id"  v-if="isPending">
+              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.call_for_quotation_subcon_list_id"  v-if="isPending">
                 <button type="button" class="transparentButton"  >
                   <div class="tooltip" >
                     <span class="tooltiptext" style="margin-bottom: -111px !important;margin-right: -6px;" >
@@ -73,7 +73,7 @@
                   </div>
                 </button>
               </a>
-              <button style="margin-left: -9px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.Call_For_Quotation_Subcon_List.subcon_id)"  
+              <button style="margin-left: -9px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.call_for_quotation_subcon_list_id)"  
               v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5">
                 <div class="tooltip" >
                   <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
@@ -353,38 +353,50 @@ export default {
   },
   methods: {
     async downloadDocument(url) {
-      try {
-        const apiHost = config.getHost();
-        const headers = config.getHeadersWithToken();
-        const fullUrl = `${apiHost}${url}`;
+  try {
+    const apiHost = config.getHost();
+    const headers = config.getHeadersWithToken();
+    const fullUrl = `${apiHost}${url}`;
 
-        const response = await fetch(fullUrl, {
-          headers,
-        });
+    const response = await fetch(fullUrl, { headers });
 
-     
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+    }
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
-        }
+    const blob = await response.blob();
 
-        const blob = await response.blob();
-   
+    // Attempt to get the filename from the Content-Disposition header
+    const contentDisposition = response.headers.get('Content-Disposition');
+    let filename = 'downloaded-file'; // Default filename if none is provided
 
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "download-quotation.xlsx");
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-      
-      } catch (error) {
-        this.errorMessage = "Error issue : download quotation document fail: " + error.message;
-        console.error(this.errorMessage); // Log the error to the console
+    if (contentDisposition && contentDisposition.includes('attachment')) {
+      const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+      if (filenameMatch && filenameMatch[1]) {
+        filename = filenameMatch[1];
       }
-    },
+    } else {
+      // Extract filename from URL if Content-Disposition is not available
+      const urlParts = url.split('/');
+      filename = urlParts[urlParts.length - 1];
+    }
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename; // Set filename for download
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Release the object URL after the download
+    URL.revokeObjectURL(link.href);
+
+  } catch (error) {
+    this.errorMessage = "Error issue : download quotation document fail: " + error.message;
+    console.error(this.errorMessage); // Log the error to the console
+  }
+},
     async handleCheckboxChange() {
        if (event && event.target) {
         const isChecked = event.target.checked; 
@@ -546,26 +558,7 @@ export default {
       this.delModal = false;
     },
     deleteSubcon(id) {
-      const matchedSubcons = [];
-      for (const getQuote of this.processedData) {
-        const quotation = getQuote.quotation;
-        const filteredQuotationIds = [];
-        for (const quote of quotation) {
-        
-          if (quote.Call_For_Quotation_Subcon_List.subcon_id === id) {
-            filteredQuotationIds.push(quote.call_for_quotation_subcon_list_id);
-          }
-        }
-        if (filteredQuotationIds.length > 0) {
-          matchedSubcons.push(filteredQuotationIds);
-        }
-      }
-      if (matchedSubcons) {
-        this.deleteId = matchedSubcons;
-        this.delModal = true;
-      } else {
-        this.FailMessage = 'Error Message: No matching subcon_id found.';
-      }
+      this.deleteId = id;
       this.delModal = true;
     },
     closedelModal() {
@@ -681,7 +674,7 @@ export default {
           }
 
           this.QuotationName = maxQuotation.length > 0 ? maxQuotation[0] : [];
-
+          console.log('this Quotation Name',this.QuotationName);
           const UnitType = this.Unittype;
           const numberOfArrays = UnitType.length;
           const getRemeauserement = UnitType[0].is_remeasurement;
@@ -701,8 +694,10 @@ export default {
           let rateTDs = '';
           let remarks = '';
           for (const DatasubconAmount of this.QuotationName) {
-             const SubconId = DatasubconAmount.Call_For_Quotation_Subcon_List.Subcon.id;
+            console.log('databasubconAmount',DatasubconAmount);
+             const SubconId = DatasubconAmount.call_for_quotation_subcon_list_id;
              const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
+             console.log('totalQuotation',totalQuotation);
             if (totalQuotation[0].subcon_id > 1.5) {
               discountGivenTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].discount_given)}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].afterADJDiscount_give)}</td>`;
@@ -862,19 +857,26 @@ export default {
       const wb = XLSX.utils.book_new();
       const originalTable = this.$refs.dataTable;
       const clonedTable = originalTable.cloneNode(true);
+
+      // Remove the first row of <thead> if it exists
       const firstRow = clonedTable.querySelector('thead tr');
       if (firstRow) {
         firstRow.parentNode.removeChild(firstRow);
       }
 
+      // Ensure the first row of <tbody> is not removed
       const firstBodyRow = clonedTable.querySelector('tbody tr');
       if (firstBodyRow) {
         firstBodyRow.parentNode.removeChild(firstBodyRow);
       }
 
-      const firstFooterRow = clonedTable.querySelector('tfoot tr');
-      if (firstFooterRow) {
-        firstFooterRow.parentNode.removeChild(firstFooterRow);
+      // Preserve the <tfoot> section entirely
+      const tfoot = clonedTable.querySelector('tfoot');
+      if (tfoot) {
+        const allFootRows = Array.from(tfoot.querySelectorAll('tr'));
+        allFootRows.forEach(row => {
+          row.style.display = '';
+        });
       }
 
       const hiddenElements = clonedTable.querySelectorAll('[style*="display: none"]');
@@ -883,9 +885,8 @@ export default {
       });
 
       const ws = XLSX.utils.table_to_sheet(clonedTable);
-      
       XLSX.utils.book_append_sheet(wb, ws, 'Table Data');
-      
+
       XLSX.writeFile(wb, 'subconComparison.xlsx');
 
       hiddenElements.forEach(element => {
@@ -1008,11 +1009,10 @@ export default {
 }
 
 
-
 .header-row-2 th {
   position: sticky;
-  top: 38px; 
-  z-index: 1; 
+  top: 39px;
+  z-index: 9; 
 }
 
 </style>
