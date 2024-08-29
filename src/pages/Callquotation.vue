@@ -83,6 +83,7 @@
                         {{ approval.user.name || approval.user[0].name }}
                       </th>
                       <th :style="{ 'top': '0' }" colspan="12"></th>
+
                     </tr>
                   </thead>
                   
