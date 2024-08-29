@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     toggleDropDown() {
-      this.$emit("dropdown-clicked", this); // Emit event indicating dropdown clicked
+      this.$emit("dropdown-clicked", this); 
       this.isOpen = !this.isOpen;
     },
     closeDropDown() {
@@ -45,3 +45,4 @@ export default {
   },
 };
 </script>
+ 

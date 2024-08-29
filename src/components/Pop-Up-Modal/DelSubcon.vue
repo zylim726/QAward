@@ -51,8 +51,7 @@ export default {
     },
     async removeSubcon(id) {
       try {
-        const deleteId = Number(id[0]);
-       const SuccessMessage = await QuotationController.removeSubcon(deleteId);
+       const SuccessMessage = await QuotationController.removeSubcon(id);
         this.$emit('editSubconMessage', SuccessMessage); 
       } catch (error) {
         const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;

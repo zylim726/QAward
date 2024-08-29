@@ -76,13 +76,14 @@
                       <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
-                    <tr  class="header-title-2">
-                      <th ></th>
-                      <th colspan="8"></th>
+                    <tr :class="headerClass">
+                      <th :style="{ 'top': '0' }"></th>
+                      <th :style="{ 'top': '0' }" colspan="8"></th>
                       <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
                         {{ approval.user.name || approval.user[0].name }}
                       </th>
-                      <th colspan="12"></th>
+                      <th :style="{ 'top': '0' }" colspan="12"></th>
+
                     </tr>
                   </thead>
                   
@@ -110,9 +111,14 @@
                       <td>{{ formatDate(callQuotation.CallingQuotationDate) !== '0000-00-00' ? formatDate(callQuotation.CallingQuotationDate) : '' }}</td>
                       <td>{{ callQuotation.createdby }}</td>
                       <td>{{ formatDate(callQuotation.actuallDoneDate) !== '0000-00-00' ? formatDate(callQuotation.actuallDoneDate) : '' }}</td>
-                      <td v-for="(approval, i) in mergeApprovals(callQuotation)" :key="'approval-' + i">
-                        <span>{{ approval && approval.updatedAt ? (approval.updatedAt !== '0000-00-00' ? formatDate(approval.updatedAt) : '') : '' }}</span>
-                      </td>
+                      <template v-if="mergeApprovals(callQuotation).length === 0">
+                        <td></td>
+                      </template>
+                      <template v-else>
+                        <td v-for="(approval, i) in mergeApprovals(callQuotation)" :key="'approval-' + i">
+                          <span>{{ approval && approval.updatedAt ? (approval.updatedAt !== '0000-00-00' ? formatDate(approval.updatedAt) : '') : '' }}</span>
+                        </td>
+                      </template>
                       <td>{{ formatDate(callQuotation.awadingtargetdate) !== '0000-00-00' ? formatDate(callQuotation.awadingtargetdate) : '' }}</td>
                       <td>{{ callQuotation.remarks }}</td>
                       <template v-if="callQuotation.is_work_order === true">
@@ -197,6 +203,7 @@ export default {
       item: null,
       hasAccess: false,
       isLoading: false,
+      isMobile: false,
     };
   },
   computed: {
@@ -216,6 +223,9 @@ export default {
     },
     maxprojectApprovalData() {
       return this.maxprojectApproval();
+    },
+    headerClass() {
+      return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop';
     }
   },
   mounted() {
@@ -226,11 +236,19 @@ export default {
       this.FailMessage = "You haven't select the project in project list.";
     };
     this.accessCQ();
+    this.checkScreenSize();
+    window.addEventListener('resize', this.checkScreenSize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.checkScreenSize);
   },
   async created() {
     await this.checkPermission();
   },
   methods: {
+    checkScreenSize() {
+      this.isMobile = window.innerWidth < 768; // Adjust breakpoint as needed
+    },
     getMaxCqApprovalsLength() {
       let maxLength = 0;
       this.callQuotation.forEach(quotation => {
@@ -371,7 +389,6 @@ export default {
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
           this.SumTotal = processedData[0].Sum;
-          console.log('this CallQuotation',this.callQuotation);
           this.projectApproval = processedData[0].projectApproval;
         } else {
           this.errorMessage = "No data.";
@@ -429,12 +446,6 @@ table {
   color: #333;
 }
 
-.header-title-2 th {
-  position: sticky;
-  top: 70px; 
-  z-index: 1; 
-}
-
 
 .summary-row {
   background-color: #f9f9f9;
@@ -443,6 +454,33 @@ table {
 
 .summary-row td {
   border-top: 2px solid #ddd;
+}
+
+/* Default for desktop */
+.header-title-2 {
+  position: sticky;
+}
+
+.header-title-2.desktop {
+  top: 70px; /* For larger screens (desktops) */
+}
+
+.header-title-2.mobile {
+  top: 20px; /* For smaller screens (mobile) */
+}
+
+@media (max-width: 767px) {
+  /* Mobile view styles */
+  .header-title-2 {
+    top: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Desktop view styles */
+  .header-title-2 {
+    top: 70px;
+  }
 }
 
 

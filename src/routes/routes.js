@@ -20,6 +20,7 @@ import Quotation from "@/pages/Layout/Quotation.vue";
 import EditQuotation from "@/pages/Layout/EditQuotation.vue";
 import Description from "@/pages/Layout/Description.vue";
 import Remeasurement from "@/pages/Layout/Remeasurement.vue";
+import Notification from "@/pages/Layout/Notification.vue";
 
 
 const routes = [
@@ -85,6 +86,13 @@ const routes = [
         meta: { requiresAuth: true },
       },
 
+      {
+        path: "notification",
+        name: "Notification",
+        component: Notification,
+        meta: { requiresAuth: true },
+      },
+      
       {
         path: "userconfig",
         name: "User Access",

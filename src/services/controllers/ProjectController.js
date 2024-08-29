@@ -61,7 +61,6 @@ const ProjectController = {
   
     } catch (error) {
       const errorMessage = handleApiError(error);
-      console.error(errorMessage);
       throw new Error(errorMessage); // Use Error object for throwing exceptions
     }
   },  
@@ -170,22 +169,6 @@ const ProjectController = {
       const errorMessage = handleApiError(error);
       throw { errorMessage };
 
-    }
-  },
-  async getDetailProject(id) {
-    try {
-      const apiHost = config.getHost();
-      const headers = config.getHeadersWithToken(); 
-      const response = await axios.get(`${apiHost}/project/${id}`, {
-        headers,
-      });
-      return response.data.data;
-      
-    } catch (error) {
-      const errorMessage = handleApiError(error);
-    
-      throw { errorMessage };
-      
     }
   },
   async getUnitTypes(id) {

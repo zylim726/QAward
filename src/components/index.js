@@ -7,7 +7,7 @@ import PermissionTable from "./Tables/PermissionTable.vue";
 import GetcallquotationTable from "./Tables/GetcallquotationTable.vue";
 import SubconTable from "./Tables/SubconTable.vue";
 import ProjectTable from "./Tables/ProjectTable.vue";
-
+import NotificationTable from "./Tables/NotificationTable.vue";
 
 // MODAL
 import Modal from "./Pop-Up-Modal/Modal.vue";
@@ -42,6 +42,7 @@ export {
   GetcallquotationTable,
   SubconTable,
   ProjectTable,
+  NotificationTable,
   Createsubcon,
   DeleteSubcon,
   EditSubcon,

@@ -175,7 +175,7 @@ export default {
     async getDetailSubcon(id) {
       try {
         this.processedData = await SubconController.getDetailSubcon(id);
-        console.log('this processdata',this.processedData[0]);
+    
       } catch (error) {
         const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         this.$emit('fail-message', FailMessage);

@@ -149,7 +149,6 @@ export default {
         this.processElement();
 
         this.unitResult = await CallofQuotationController.getUnittype(id);
-        console.log('unitResult',this.unitResult);
 
       } catch (error) {
         const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
