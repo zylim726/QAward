@@ -352,51 +352,35 @@ export default {
     },
   },
   methods: {
-    async downloadDocument(url) {
-  try {
-    const apiHost = config.getHost();
-    const headers = config.getHeadersWithToken();
-    const fullUrl = `${apiHost}${url}`;
+   async downloadDocument(url) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+      const fullUrl = `${apiHost}${url}`;
 
-    const response = await fetch(fullUrl, { headers });
+      const response = await fetch(fullUrl, { headers });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
-    }
-
-    const blob = await response.blob();
-
-    // Attempt to get the filename from the Content-Disposition header
-    const contentDisposition = response.headers.get('Content-Disposition');
-    let filename = 'downloaded-file'; // Default filename if none is provided
-
-    if (contentDisposition && contentDisposition.includes('attachment')) {
-      const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-      if (filenameMatch && filenameMatch[1]) {
-        filename = filenameMatch[1];
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
       }
-    } else {
-      // Extract filename from URL if Content-Disposition is not available
-      const urlParts = url.split('/');
-      filename = urlParts[urlParts.length - 1];
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create a link element, set its href to the blob URL, and click it to trigger the download
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = ''; // This will use the default filename from the server
+      link.click();
+
+      // Clean up
+      URL.revokeObjectURL(blobUrl);
+
+    } catch (error) {
+      this.errorMessage = "Error issue: download document failed: " + error.message;
+      console.error(this.errorMessage);
     }
-
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename; // Set filename for download
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Release the object URL after the download
-    URL.revokeObjectURL(link.href);
-
-  } catch (error) {
-    this.errorMessage = "Error issue : download quotation document fail: " + error.message;
-    console.error(this.errorMessage); // Log the error to the console
-  }
-},
+  },
     async handleCheckboxChange() {
        if (event && event.target) {
         const isChecked = event.target.checked; 
