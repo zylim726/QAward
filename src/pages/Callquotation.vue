@@ -462,7 +462,7 @@ table {
 }
 
 .header-title-2.desktop {
-  top: 70px; /* For larger screens (desktops) */
+  top: 52px; /* For larger screens (desktops) */
 }
 
 .header-title-2.mobile {
