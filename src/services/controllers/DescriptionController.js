@@ -169,7 +169,7 @@ const DescriptionController = {
         formData.append('data-table', 'call_for_quotation_subcon_list');
         formData.append('data-table-id', dataToSave[0].subconListId);
         formData.append('description', 'edit quotation quantity');
-        formData.append('name', 'quotation.xlsx');
+        formData.append('name', Documents.file.name);
        
         const response = await axios.post(
             `${apiHost}/document/importExcel`, 
