@@ -199,7 +199,6 @@ export default {
           }
         });
 
-
         if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative.");
           hasErrors = true;
@@ -224,9 +223,7 @@ export default {
         }
 
         if (object["Unit"] !== "") {
-          console.log('checking unit');
           if (object["Budget Rate"] <= 0) {
-            console.log('for the budget');
             this.$emit('fail-message', "Budget Rate cannot be zero.");
             hasErrors = true;
             exit();
