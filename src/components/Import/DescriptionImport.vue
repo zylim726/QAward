@@ -199,7 +199,7 @@ export default {
           }
         });
 
-        if (object["Budget Rate"] <= 0) {
+        if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative rate and rate is 0.");
           hasErrors = true;
           exit();
