@@ -222,13 +222,7 @@ export default {
           }
         }
 
-        if (object["Unit"] !== "") {
-          if (object["Budget Rate"] <= 0) {
-            this.$emit('fail-message', "Budget Rate cannot be zero.");
-            hasErrors = true;
-            exit();
-          }
-        }
+   
 
         const hasMatches = Object.keys(matchedValues).length > 0;
 
