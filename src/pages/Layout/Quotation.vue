@@ -306,7 +306,7 @@ export default {
         const cqUnitType = formData.cqUnitType;
         const getQuotation = formData.quotation;
 
-        if (getQuotation.length <= 0 || getQuotation[0].total_quote_amount === 0) {
+        if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
           head1Counter++;
           prevHead1 = formData.description_item;
 
@@ -325,7 +325,7 @@ export default {
           prevHead2 = null;
         }
 
-        if (getQuotation.length > 0 && getQuotation[0].total_quote_amount !== 0) {
+        if (getQuotation.length > 0 && parseFloat(formData.adj_quantity) !== 0.00 ) {
           head2Counter++;
           prevHead2 = formData.description_item;
 
