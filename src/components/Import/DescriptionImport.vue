@@ -199,11 +199,12 @@ export default {
           }
         });
 
-        if (object["Budget Rate"] <= 0) {
-          this.$emit('fail-message', "Budget Rate cannot be negative rate and rate is 0.");
+
+        if (object["Budget Rate"] < 0) {
+          this.$emit('fail-message', "Budget Rate cannot be negative.");
           hasErrors = true;
           exit();
-        } 
+        }
 
         for (const key in matchedValues) {
           if (matchedValues[key] < 0) {
@@ -215,8 +216,18 @@ export default {
 
 
         if (object["Unit"] !== "") {
-          if (object["Budget Rate"] === "") {
-            this.$emit('fail-message', "Budget Rate cannot be empty data.");
+          if (object["Budget Rate"] === "" ) {
+            this.$emit('fail-message', "Budget Rate cannot be empty data .");
+            hasErrors = true;
+            exit();
+          }
+        }
+
+        if (object["Unit"] !== "") {
+          console.log('checking unit');
+          if (object["Budget Rate"] <= 0) {
+            console.log('for the budget');
+            this.$emit('fail-message', "Budget Rate cannot be zero.");
             hasErrors = true;
             exit();
           }
