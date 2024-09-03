@@ -40,13 +40,16 @@ export default {
         this.UpdateMessage = message;
         setTimeout(() => {
           this.UpdateMessage = '';
+          window.location.reload();
         }, 2000);
       }
     },
     ImportErrorMessage(message) {
       this.FailMessage = message; 
+      console.log('this fail message',message);
       setTimeout(() => {
         this.FailMessage = '';
+        window.location.reload();
       }, 2000);
     },
   }
