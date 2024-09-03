@@ -34,7 +34,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-' + formIndex">
-                    <template v-if="formData.quotation.length <= 0 || formData.quotation[0].total_quote_amount === 0">
+                    <template v-if="formData.quotation.length <= 0 || parseFloat(formData.quotation[0].adj_quantity) === 0.00 ">
                       <td><b>{{ formIndex + 1 }}</b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
