@@ -47,7 +47,7 @@
             <th scope="col">Trade</th>
             <th scope="col">Location 1</th>
             <th scope="col">Actual Calling Quotation Date (dd/mm/yyyy)</th>
-            <th scope="col">Awading Target Date (dd/mm/yyyy)</th>
+            <th scope="col">Awarding Target Date (dd/mm/yyyy)</th>
             <th scope="col">Remarks</th>
           </tr>
         </thead>
@@ -144,7 +144,7 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-      const csvHeader = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awading Target Date (dd/mm/yyyy),Remarks\n';
+      const csvHeader = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awarding Target Date (dd/mm/yyyy),Remarks\n';
 
       const csvRows = [
         ',PROJECT SIGNAGE,,,,',
@@ -237,7 +237,7 @@ export default {
         trade: unit["Trade"],
         location: unit["Location 1"],
         callingquotationDate: unit["Actual Calling Quotation Date (dd/mm/yyyy)"],
-        awadingtaget: unit["Awading Target Date (dd/mm/yyyy)"],
+        awadingtaget: unit["Awarding Target Date (dd/mm/yyyy)"],
         remarks: unit["Remarks"],
       }));
 

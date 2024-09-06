@@ -64,7 +64,7 @@
               <h3 class="titleHeader">{{ callQuotation.created_by }}</h3>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
-              <h6>Awading Target Data :</h6>
+              <h6>Awarding Target Data :</h6>
               <h3 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h3>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
