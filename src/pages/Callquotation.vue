@@ -12,12 +12,7 @@
         <md-card>
           <md-card-content style="font-size: 13px !important;line-height: 17px !important">
             <div>
-              <div v-if="isLoading" class="spinner-border" role="status">
-                <span class="visually-hidden">   
-                  <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-                    <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-                  </button> Loading...</span>
-              </div>
+              <loading-modal v-if="isLoading" /><br><br>
               <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
               <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
               <br>
@@ -136,7 +131,7 @@
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
                         <td>
                           <a v-if="callQuotation.La && callQuotation.La.length > 0" 
-                            :href="'/approveComparison?laCqId=' + callQuotation.id" 
+                           
                             class="notify-status">
                             {{ callQuotation.La[0].la_code }}
                           </a>
@@ -181,12 +176,12 @@
 const XLSX = require('xlsx');
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
-  
+    LoadingModal
   },
   data() {
     return {

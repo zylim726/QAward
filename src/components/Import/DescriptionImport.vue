@@ -1,11 +1,6 @@
 <template>
   <div>
-    <div v-if="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">   
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
-    </div>
+    <loading-modal v-if="isLoading" /><br><br>
     <label
       for="desciptionInput"
       style="margin-right: 10px; float: right"
@@ -71,8 +66,10 @@
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import DescriptionController from "@/services/controllers/DescriptionController.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
+  components:{LoadingModal},
   props: {
     cqId: {
       type: Number,
@@ -85,7 +82,7 @@ export default {
       Unittype: [],
       columnTitles: [],
       selectAll: true,
-      loading: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -181,7 +178,7 @@ export default {
       }
     },
     async saveData() {
-      this.loading = true;
+      this.isLoading = true;
       const cqId = this.cqId;
       const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
       const unittype = this.Unittype;
@@ -257,7 +254,7 @@ export default {
           const FailMessage = `Error Message: ${error.message || 'Unknown Error.'}`;
           this.$emit('fail-message', FailMessage);
         } finally {
-          this.loading = false;
+          this.isLoading = false;
         }
        }
     }

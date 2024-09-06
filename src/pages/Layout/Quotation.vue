@@ -29,12 +29,7 @@
       </div>
     </div>
 
-    <div v-if="isLoading" class="spinner-border" role="status">
-        <span class="visually-hidden">   
-          <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-            <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-          </button> Loading...</span>
-      </div>
+    <loading-modal v-if="isLoading" />
 
 
     <div class="md-layout">
@@ -138,8 +133,12 @@ import DescriptionController from "@/services/controllers/DescriptionController.
 import QuotationController from "@/services/controllers/QuotationController.js";
 import SubconController from "@/services/controllers/SubconController.js";
 import ExcelJS from "exceljs";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
+  components: {
+    LoadingModal,
+  },
   data() {
     return {
       cqId: 0,

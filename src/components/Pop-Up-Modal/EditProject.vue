@@ -8,14 +8,9 @@
         <hr style="margin-top: -10px" />
         <br />
 
-        <div v-if="loading" class="spinner-border" role="status">
-          <span class="visually-hidden">   
-            <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-              <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-            </button> Loading...</span>
-        </div>
+        <loading-modal v-if="isLoading" /><br><br>
 
-        <div v-if="!loading && unitTypes.length > 0">
+        <div v-if="!isLoading && unitTypes.length > 0">
           <div class="form-group" v-for="(unitType, index) in unitTypes" :key="index" style="margin-bottom: 50px;">
             <div class="input-pair">
               <div class="input-group">
@@ -65,7 +60,7 @@
             
           </div>
         </div>
-        <div v-if="!loading && unitTypes.length === 0" style="margin-bottom: 350px;">
+        <div v-if="!isLoading && unitTypes.length === 0" style="margin-bottom: 350px;">
           <p>No unit types found.</p><br><br>
         </div>
         
@@ -83,8 +78,9 @@
 
 <script>
 import ProjectController from "@/services/controllers/ProjectController.js";
-
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 export default {
+  components:{LoadingModal},
   props: {
     editProject: Boolean,
     title: String,
@@ -94,7 +90,7 @@ export default {
     return {
       processedData: null,
       unitTypes: [],
-      loading: false, // Add loading state
+      isLoading: false, // Add isLoading state
     };
   },
   watch: {
@@ -109,27 +105,27 @@ export default {
       this.$emit("close");
     },
     async saveAndCloseModal() {
-      this.loading = true; // Set loading state
+      this.isLoading = true; // Set isLoading state
       const updatedData = { unitTypes: this.unitTypes };
       try {
         await this.editProjs(this.id, updatedData);
       } finally {
-        this.loading = false; // Reset loading state
+        this.isLoading = false; // Reset isLoading state
       }
     },
     async getUnitTypes(id) {
-      this.loading = true; // Set loading state
+      this.isLoading = true; // Set isLoading state
       try {
         this.unitTypes = await ProjectController.getUnitTypes(id);
       } catch (error) {
         const FailMessage = "Error fetching unit types: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       } finally {
-        this.loading = false; 
+        this.isLoading = false; 
       }
     },
     async editProjs(id, updatedData) {
-      this.loading = true; 
+      this.isLoading = true; 
       try {
         const SuccessMessage = await ProjectController.editProjs(id, updatedData);
         this.$emit("close");
@@ -143,7 +139,7 @@ export default {
         const FailMessage = "Error updating project: " + error.errorMessage;
         this.$emit('fail-message', FailMessage);
       } finally {
-        this.loading = false; 
+        this.isLoading = false; 
       }
     },
     addUnitType() {
