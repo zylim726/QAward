@@ -344,7 +344,14 @@ export default {
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
-            <td style="text-align:center;">${columnKData[columnKDataIndex] !== undefined ? columnKData[columnKDataIndex] : ''}</td>
+            <td style="text-align:center;">
+            ${columnKData[columnKDataIndex] !== undefined && columnKData[columnKDataIndex] !== null && columnKData[columnKDataIndex] !== '' 
+              ? parseFloat(columnKData[columnKDataIndex]).toFixed(2) 
+              : ''}
+          </td>
+
+
+
           `;
           tableBody.appendChild(head2Row);
 
