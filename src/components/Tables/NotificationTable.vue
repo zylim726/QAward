@@ -2,12 +2,7 @@
   <div>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
-    <div v-if="loading" class="spinner-border" role="status">
-        <span class="visually-hidden">   
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
-      </div>
+    <loading-modal v-if="isLoading" /><br><br>
     <div class="container">
       <div class="search-container">
         <form class="Searchbar">
@@ -68,14 +63,15 @@
 import NotificationController from "@/services/controllers/NotificationController.js";
 import { formatDistanceToNow } from 'date-fns'; 
 import { enGB } from 'date-fns/locale'; 
-
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 export default {
+  components:{LoadingModal},
   data() {
     return {
       notification: [],
       FailMessage: null,
       UpdateMessage: null, 
-      loading: false,
+      isLoading: false,
     };
   },
   mounted() {
@@ -83,7 +79,7 @@ export default {
   },
   methods: {
     async loadData() {
-      this.loading = true;
+      this.isLoading = true;
       try {
         const { data } = await NotificationController.notificationAccess();
         this.notification = data; 
@@ -91,7 +87,7 @@ export default {
       } catch (error) {
         this.FailMessage = `Error Message: ${error.message || 'Unknown Data.'}`;
       } finally {
-        this.loading = false;
+        this.isLoading = false;
       }
     },
     getNotificationIcon(category) {

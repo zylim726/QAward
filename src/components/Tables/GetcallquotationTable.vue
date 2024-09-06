@@ -1,11 +1,6 @@
 <template>
   <div>
-    <div v-if="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">   
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
-    </div>
+    <loading-modal v-if="isLoading" /><br><br>
     <div class="md-layout">
       <!-- Unit Types Table -->
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25" style="padding: 0px 17px">
@@ -84,8 +79,10 @@
 
 <script>
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
+  components:{LoadingModal},
   props: {
     Unittype: {
       type: Array,

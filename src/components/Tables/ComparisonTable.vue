@@ -1,11 +1,6 @@
 <template>
   <div>
-    <div v-if="isLoading" class="spinner-border" role="status">
-      <span class="visually-hidden">   
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
-    </div>
+    <loading-modal v-if="isLoading" /><br><br>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="container" style="margin-top: 20px">
@@ -267,11 +262,13 @@ import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
 import {  config } from "@/services";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
   components: {
     DelSubcon,
-    RejectModal
+    RejectModal,
+    LoadingModal
   },
   props: {
     cqId: {
@@ -599,6 +596,7 @@ export default {
 
             if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
               head1Counter++;
+             
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
                 <td><b><u>${head1Counter}</u></b></td>
@@ -610,14 +608,18 @@ export default {
               tableBody.appendChild(head1Row);
 
               head2Counter = 0;
+
+              
             }
 
-            if (getQuotation.length > 0 && parseFloat(formData.adj_quantity) !== 0.00 ) {
+            if (getQuotation.length > 0 && parseFloat(formData.adj_quantity) !== 0.00) {
+         
               head2Counter++;
               if (getQuotation.length > maxLength) {
                   maxLength = getQuotation.length;
                   maxQuotation = [getQuotation]; 
               }
+
 
               let quotationTDs = '';
               for (const quotationRate of getQuotation) {

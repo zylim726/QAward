@@ -21,7 +21,7 @@ import EditSubcon from "./Pop-Up-Modal/EditSubcon.vue";
 import Createproject from "./Pop-Up-Modal/Createproject.vue";
 import EditProject from "./Pop-Up-Modal/EditProject.vue";
 import DelSubcon from "./Pop-Up-Modal/DelSubcon.vue";
-
+import LoadingModal from  "./Pop-Up-Modal/LoadingModal.vue";
 // IMPORT
 import CQImport from "./Import/CQImport.vue";
 import DescriptionImport from "./Import/DescriptionImport.vue";
@@ -48,5 +48,6 @@ export {
   EditSubcon,
   Createproject,
   EditProject,
-  DelSubcon
+  DelSubcon,
+  LoadingModal
 };

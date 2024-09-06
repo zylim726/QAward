@@ -1,12 +1,6 @@
 <template>
   <div class="content">
-    <div v-if="isLoading" class="spinner-border" role="status">
-      <span class="visually-hidden">
-        <button class="transparentButton" style="margin-right: 10px; cursor: default;">
-          <md-icon style="color: red; margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...
-      </span>
-    </div>
+    <loading-modal v-if="isLoading" /><br><br>
     <div v-if="UpdateMessage" class="notification success">
       {{ UpdateMessage }} 
       <md-icon style="color:green">check_circle_outline</md-icon>
@@ -140,10 +134,11 @@
 const XLSX = require('xlsx');
 import { ref } from "vue";
 import LaController from "@/services/controllers/LaController.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
   components: {
-  
+    LoadingModal
   },
   data() {
     return {

@@ -6,14 +6,8 @@
     <div v-if="FailMessage" class="notification fail">
       {{ FailMessage }} <md-icon>cancel</md-icon>
     </div>
-    <div v-if="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...
-      </span>
-    </div>
-    <div v-if="!loading" class="container" style="margin-top: 20px">
+    <loading-modal v-if="isLoading" /><br><br>
+    <div v-if="!isLoading" class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
           <input
@@ -24,7 +18,7 @@
         </form>
       </div>
     </div>
-    <div v-if="!loading" class="table-container" style="max-height: 700px; overflow-y: auto">
+    <div v-if="!isLoading" class="table-container" style="max-height: 700px; overflow-y: auto">
       <table class="nested-table" v-if="projects.length">
         <thead>
           <tr>
@@ -89,10 +83,12 @@
 import ProjectController from "@/services/controllers/ProjectController.js";
 import EditProject from "@/components/Pop-Up-Modal/EditProject.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
   components: {
     EditProject,
+    LoadingModal
   },
   data() {
     return {
@@ -107,7 +103,7 @@ export default {
       showModal: false,
       showEditModal: false,
       editId: null,
-      loading: false,
+      isLoading: false,
     };
   },
   mounted() {
@@ -127,7 +123,7 @@ export default {
   },
   methods: {
     async loadData() {
-      this.loading = true;
+      this.isLoading = true;
       try {
         await this.checkPermission();
         
@@ -155,7 +151,7 @@ export default {
       } catch (error) {
         this.FailMessage = `Error Message: ${error.message || 'Unknown Data.'}`;
       } finally {
-        this.loading = false;
+        this.isLoading = false;
       }
     },
     async checkPermission() {
