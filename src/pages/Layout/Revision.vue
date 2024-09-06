@@ -12,7 +12,7 @@
                   </tr>
                   <tr>
                     <th scope="col">No</th>
-                    <th scope="col">Revision</th>
+                    <th scope="col">Version</th>
                     <th scope="col">Date</th>
                     <th>Create By</th>
                     <th>Reject By</th>
@@ -23,7 +23,7 @@
                 <tbody>
                   <tr v-for="(rv, index) in revision" :key="index">
                     <td>{{ index + 1 }}</td>
-                    <td>Revision {{ rv.version }}</td>
+                    <td>Version {{ rv.version }}</td>
                     <td>{{ formatDate(rv.createdAt) }}</td>
                     <td>{{ rv.created_by }}</td>
                     <td>{{ rv.remark?.updated_by }}</td>
