@@ -148,7 +148,6 @@ const QuotationController = {
             
                 const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
                     approval_remarks: data.remark,
-                    approval_type: '',
                     approval_status: 'Approved',
                     call_for_quotation_id: data.cqId,
                     call_for_quotation_subcon_list_id: data.callForQuotationListId
