@@ -454,7 +454,7 @@ export default {
       this.SubconListId.forEach((getSubconList) => {
         const subconName = getSubconList.Subcon;
         if (subconName.name === selectedSubconListName) {
-          if (selectedSubconListName && remark) {
+          if (selectedSubconListName) {
             approvalDataToSubmit.push({
               cqId: this.cqId,
               userId: systemUserId,
@@ -470,6 +470,7 @@ export default {
             top: 0,
             behavior: 'smooth' 
           });
+          
 
           const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
