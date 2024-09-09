@@ -11,11 +11,8 @@
       />
     </div>
 
-    <!-- Loading Indicator -->
-    <div v-if="loading" class="spinner-container">
-      <md-icon class="spinner-icon" style="color: red;">autorenew</md-icon>
-      Loading...
-    </div>
+    <!-- isLoading Indicator -->
+    <div v-if="isLoading"><loading-modal /><br><br></div>
 
     <!-- Error Message -->
     <div v-if="error" class="notification fail">{{ error }}<md-icon>cancel</md-icon></div>
@@ -41,14 +38,19 @@
 
 <script>
 import ProjectController from "@/services/controllers/ProjectController.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
+  components: {
+      LoadingModal
+    },
   data() {
+
     return {
       projectData: [],
       filteredProjects: [],
       error: null,
-      loading: false,
+      isLoading: false,
       searchQuery: '',
     };
   },
@@ -59,7 +61,7 @@ export default {
   methods: {
     async projectList() {
       try {
-        this.loading = true;
+        this.isLoading = true;
         const { data, message } = await ProjectController.projectList();
         if (data) {
           this.projectData = data;
@@ -70,7 +72,7 @@ export default {
       } catch (error) {
         this.error = `Error Message: ${error.message || 'Unknown error'}`;
       } finally {
-        this.loading = false;
+        this.isLoading = false;
       }
     },
     filterProjects() {

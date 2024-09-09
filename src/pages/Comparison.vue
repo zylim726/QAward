@@ -30,11 +30,11 @@
     </div>
 
     <div class="md-layout">
-      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -65px;">
         <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
         <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
         <br>
-        <md-card style="height: 70%">
+        <md-card style="height: 65%">
           <div class="status">
             <i class="material-icons">notifications_active</i>
             <h7>Status : <b class="titleHeader">{{ callQuotation.status }}</b></h7>
@@ -42,30 +42,30 @@
           <div class="comparison-title">
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Project :</h6>
-              <h3 class="titleHeader">{{ projectName }}</h3>
+              <h5 class="titleHeader">{{ projectName }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Category :</h6>
-              <h3 class="titleHeader">{{ callQuotation.trade_category ? callQuotation.trade_category : '-' }}</h3>
+              <h5 class="titleHeader">{{ callQuotation.trade_category ? callQuotation.trade_category : '-' }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Trade :</h6>
-              <h3 class="titleHeader">{{ callQuotation.trade ? callQuotation.trade : '-' }}</h3>
+              <h5 class="titleHeader">{{ callQuotation.trade ? callQuotation.trade : '-' }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Location 1 :</h6>
-              <h3 class="titleHeader">{{ callQuotation.trade_location1 ? callQuotation.trade_location1 : '-' }}</h3>
+              <h5 class="titleHeader">{{ callQuotation.trade_location1 ? callQuotation.trade_location1 : '-' }}</h5>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h6>Prepare :</h6>
-              <h3 class="titleHeader">{{ callQuotation.created_by }}</h3>
+              <h5 class="titleHeader">{{ callQuotation.created_by }}</h5>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
               <h6>Awarding Target Data :</h6>
-              <h3 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h3>
+              <h5 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h5>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
                 <div class="tooltip">
@@ -79,7 +79,7 @@
           </div>
         </md-card>
       </div>
-      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -40px;">
         <md-card style="min-height: 97%">
           <md-card-content style="line-height: 16px !important;">
             <comparison-table :cqId="cqId" ></comparison-table>
@@ -272,23 +272,12 @@ export default {
 
 
 <style>
-.comparison-title {
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  display: flex;
-  padding: 16px;
-}
 
 .md-layout-item {
   padding: 0 8px; 
 }
 
-.titleHeader {
-  margin: 0;
-  font-size: 18px;
-  font-weight: bold;
-}
+
 
 .row {
   display: flex;
@@ -299,36 +288,13 @@ export default {
   margin-right: 10px; 
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
 
 .modal-content {
   text-align: center;
   width: 500px;
 }
 
-.status {
-  display: flex;
-  background-color: antiquewhite;
-  padding: 17px;
-  justify-content: center
-}
 
-.status .material-icons {
-  font-size: 20px;
-  margin-right: 10px;
-  color: orange;
-}
 
 
 

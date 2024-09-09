@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <loading-modal v-if="isLoading" /><br><br>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
     <div v-if="UpdateMessage" class="notification success">
       {{ UpdateMessage }} 
       <md-icon style="color:green">check_circle_outline</md-icon>
