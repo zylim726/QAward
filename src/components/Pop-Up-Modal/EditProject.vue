@@ -8,7 +8,7 @@
         <hr style="margin-top: -10px" />
         <br />
 
-        <loading-modal v-if="isLoading" /><br><br>
+        <div v-if="isLoading"><loading-modal /><br><br></div>
 
         <div v-if="!isLoading && unitTypes.length > 0">
           <div class="form-group" v-for="(unitType, index) in unitTypes" :key="index" style="margin-bottom: 50px;">

@@ -12,7 +12,7 @@
         <md-card>
           <md-card-content style="font-size: 13px !important;line-height: 17px !important">
             <div>
-              <loading-modal v-if="isLoading" /><br><br>
+              <div v-if="isLoading"><loading-modal /><br><br></div>
               <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
               <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
               <br>

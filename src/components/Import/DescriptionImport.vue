@@ -1,6 +1,6 @@
 <template>
   <div>
-    <loading-modal v-if="isLoading" /><br><br>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
     <label
       for="desciptionInput"
       style="margin-right: 10px; float: right"

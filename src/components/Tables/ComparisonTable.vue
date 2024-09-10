@@ -1,6 +1,6 @@
 <template>
   <div>
-    <loading-modal v-if="isLoading" /><br><br>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="container" style="margin-top: 20px">
@@ -28,10 +28,10 @@
         </button>
       </div>
     </div>
-    <div class="table-container" style="min-height: 350px;max-height: 600px;">
+    <div class="table-container" style="min-height: 400px;max-height: 800px;">
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
-          <tr>
+          <tr class="header-row-1">
             <th colspan="6"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
@@ -87,7 +87,7 @@
 
             </th>
           </tr>
-          <tr  class="header-row-1">
+          <tr  class="header-row-2">
             <th scope="col">Item</th>
             <th scope="col">Element</th>
             <th scope="col">Sub Element</th>
@@ -111,7 +111,7 @@
             </th>
 
           </tr>
-          <tr  class="header-row-2">
+          <tr   :class="{ 'header-row-3': Unittype.length > 0 }">
             <th colspan="6"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
@@ -556,7 +556,7 @@ export default {
     handleInputChange: _.debounce(function(event) {
       this.searchQuery = event.target.value;
       this.getDescription(this.cqId, this.isHide);
-    }, 200), 
+    }, 900), 
     async getDescription(id, isHide) {
       try {
         this.isLoading = true;
@@ -998,8 +998,14 @@ export default {
 
 .header-row-2 th {
   position: sticky;
-  top: 39px;
-  z-index: 9; 
+  top: 57px;
+  z-index: 11; 
+}
+
+.header-row-3 th {
+  position: sticky;
+  top: 109px;
+  z-index: 14; 
 }
 
 </style>

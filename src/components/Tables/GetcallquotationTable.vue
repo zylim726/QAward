@@ -1,6 +1,6 @@
 <template>
   <div>
-    <loading-modal v-if="isLoading" /><br><br>
+    <loading-modal v-if="isLoading" />
     <div class="md-layout">
       <!-- Unit Types Table -->
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-25" style="padding: 0px 17px">

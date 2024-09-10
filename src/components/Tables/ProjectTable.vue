@@ -6,7 +6,7 @@
     <div v-if="FailMessage" class="notification fail">
       {{ FailMessage }} <md-icon>cancel</md-icon>
     </div>
-    <loading-modal v-if="isLoading" /><br><br>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
     <div v-if="!isLoading" class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
