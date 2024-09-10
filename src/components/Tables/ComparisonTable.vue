@@ -999,6 +999,7 @@ export default {
 .header-row-2 th {
   position: sticky;
   top: 57px;
+  height: 48px;
   z-index: 11; 
 }
 
