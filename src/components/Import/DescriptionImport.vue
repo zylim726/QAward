@@ -1,20 +1,22 @@
 <template>
   <div>
-    <div v-if="isLoading"><loading-modal /><br><br></div>
+    <div v-if="isLoading">
+      <loading-modal /><br><br>
+    </div>
     <label
       for="desciptionInput"
       style="margin-right: 10px; float: right"
       class="file-label"
     >
-      <div class="tooltip" >
-        <span class="tooltiptext" >Upload your BQ Description.</span>
+      <div class="tooltip">
+        <span class="tooltiptext">Upload your BQ Description.</span>
         <md-icon class="mdIcon">upload_file</md-icon>
       </div>
       <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
     </label>
     <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px; float: right">
-      <div class="tooltip" >
-        <span class="tooltiptext" >Download BQ Template and field in data.</span>
+      <div class="tooltip">
+        <span class="tooltiptext">Download BQ Template and field in data.</span>
         <md-icon class="mdIcon">download_for_offline</md-icon>
       </div>
     </button>
@@ -34,17 +36,20 @@
             <th scope="col">Element</th>
             <th scope="col">Sub Element</th>
             <th scope="col">Sub Sub Element</th>
-            <th scope="col">Description </th>
-            <th scope="col">Unit </th>
-            <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" >{{ unitdata.type }} ({{unitdata.quantity}})</th>
-            <th scope="col">Budget Rate </th>
+            <th scope="col">Description</th>
+            <th scope="col">Unit</th>
+            <th scope="col" v-for="(unitdata, index) in Unittype" :key="index">
+              {{ unitdata.type }} ({{ unitdata.quantity }})
+            </th>
+            <th scope="col">Budget Rate</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="(row, index) in importedData"
             :key="index"
-            :class="{ 'selected-row': row.selected }">
+            :class="{ 'selected-row': row.selected }"
+          >
             <td v-if="shouldDisplayCheckbox(row)">
               <label class="control control--checkbox">
                 <input type="checkbox" v-model="row.selected" />
@@ -58,9 +63,10 @@
         </tbody>
       </table>
     </div>
-    <button type="submit" class="btn-save" @click="saveData" >Save</button><br /><br />
+    <button type="submit" class="btn-save" @click="saveData">Save</button><br /><br />
   </div>
 </template>
+
 
 <script>
 import Import from "papaparse";
@@ -69,7 +75,7 @@ import DescriptionController from "@/services/controllers/DescriptionController.
 import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
-  components:{LoadingModal},
+  components: { LoadingModal },
   props: {
     cqId: {
       type: Number,
@@ -101,7 +107,7 @@ export default {
         const processedData = await CallofQuotationController.getUnittype(id);
         this.Unittype = processedData;
       } catch (error) {
-        const FailMessage = 'Error fetching Unittype:'+ error;
+        const FailMessage = 'Error fetching Unittype: ' + error;
         this.$emit('fail-message', FailMessage);
       }
     },
@@ -123,6 +129,13 @@ export default {
       });
 
       filteredData.forEach(row => {
+        // Convert string numbers to actual numbers
+        for (const key in row) {
+          const value = parseFloat(row[key]);
+          if (!isNaN(value)) {
+            row[key] = value; 
+          }
+        }
         row.selected = true; 
       });
 
@@ -140,11 +153,12 @@ export default {
       }
     },
     shouldDisplayCheckbox(row) {
-     return true;
+      return true;
     },
     displayValue(value, key) {
-      if (typeof value === "boolean") {
-        return ""; 
+      if (typeof value === "number") {
+        // Format number to 2 decimal places
+        return value.toFixed(2);
       }
       return value; 
     },
@@ -173,7 +187,7 @@ export default {
         link.click();
         link.remove();
       } catch (error) {
-        const FailMessage = "Error download template:"+ error;
+        const FailMessage = "Error downloading template: " + error;
         this.$emit('fail-message', FailMessage);
       }
     },
@@ -184,7 +198,7 @@ export default {
       const unittype = this.Unittype;
 
       const validData = [];
-      const hasErrors = false;
+      let hasErrors = false;
 
       selectImportData.forEach(object => {
         const matchedValues = {};
@@ -199,28 +213,23 @@ export default {
         if (object["Budget Rate"] < 0) {
           this.$emit('fail-message', "Budget Rate cannot be negative.");
           hasErrors = true;
-          exit();
+          return;
         }
 
         for (const key in matchedValues) {
           if (matchedValues[key] < 0) {
             this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
             hasErrors = true;
-            exit();
+            return;
           }
         }
-
-
         if (object["Unit"] !== "") {
           if (object["Budget Rate"] === "" ) {
-            this.$emit('fail-message', "Budget Rate cannot be empty data .");
-            hasErrors = true;
+          this.$emit('fail-message', "Budget Rate cannot be empty data.");
+          hasErrors = true;
             exit();
           }
         }
-
-   
-
         const hasMatches = Object.keys(matchedValues).length > 0;
 
         if (hasMatches) {
@@ -236,7 +245,7 @@ export default {
         }
       });
 
-       if (!hasErrors) {
+      if (!hasErrors) {
         try {
           const SuccessMessage = await DescriptionController.addDescription(cqId, validData);
           const concatenatedMessage = SuccessMessage.join(', ');
@@ -256,9 +265,8 @@ export default {
         } finally {
           this.isLoading = false;
         }
-       }
+      }
     }
   }
 };
 </script>
-
