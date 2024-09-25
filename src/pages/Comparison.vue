@@ -41,30 +41,30 @@
           </div>
           <div class="comparison-title">
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
-              <h6>Project :</h6>
+              <h7>Project :</h7>
               <h5 class="titleHeader">{{ projectName }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
-              <h6>Category :</h6>
+              <h7>Category :</h7>
               <h5 class="titleHeader">{{ callQuotation.trade_category ? callQuotation.trade_category : '-' }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
-              <h6>Trade :</h6>
+              <h7>Trade :</h7>
               <h5 class="titleHeader">{{ callQuotation.trade ? callQuotation.trade : '-' }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
-              <h6>Location 1 :</h6>
+              <h7>Location 1 :</h7>
               <h5 class="titleHeader">{{ callQuotation.trade_location1 ? callQuotation.trade_location1 : '-' }}</h5>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
-              <h6>Prepare :</h6>
+              <h7>Prepare :</h7>
               <h5 class="titleHeader">{{ callQuotation.created_by }}</h5>
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
-              <h6>Awarding Target Data :</h6>
+              <h7>Awarding Target Data :</h7>
               <h5 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h5>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
