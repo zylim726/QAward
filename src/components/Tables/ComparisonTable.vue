@@ -40,14 +40,14 @@
             <th>
               <div class="tooltip" >
                 <span class="tooltiptext" style="margin-bottom: -118px !important;margin-left: -142px;width: 210px !important;">
-                  ADJ Quantity formula = (Unit Type ADJ Quantity x Description Quantity) x ADJ Factor</span>
+                  By default, BQ QTY x ADJ factor</span>
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
             <th v-if="hasRemeasurement">
               <div class="tooltip" >
-                <span class="tooltiptext" style="margin-bottom: -116px !important;margin-left: -107px;width: 229px !important;">
-                  Remeasurement Quantity formula = (Unit Type Remeasurement Quantity x Description Quantity) x ADJ Factor</span>
+                <span class="tooltiptext" style="margin-bottom: -116px !important;margin-left: -107px;width: 200px !important;">
+                  For reference purpose only</span>
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
