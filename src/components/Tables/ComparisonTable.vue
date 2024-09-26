@@ -28,7 +28,7 @@
         </button>
       </div>
     </div>
-    <div class="table-container" style="min-height: 400px;max-height: 800px;">
+    <div class="table-container" style="min-height: 400px;max-height: 925px;">
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr class="header-row-1">
