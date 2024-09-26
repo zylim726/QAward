@@ -15,7 +15,7 @@
         <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 2">Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
-          <div class="tooltip" >
+          <div class="tooltip" style="width: 178px !important;">
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
             <md-icon class="mdIcon">{{ isHide ? 'visibility_off' : 'visibility' }}</md-icon>
           </div>
@@ -32,68 +32,70 @@
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr class="header-row-1">
-            <th colspan="6"></th>
+            <th colspan="6"  class="sticky-col"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
             </template>
             <th></th>
             <th>
               <div class="tooltip" >
-                <span class="tooltiptext" style="margin-bottom: -127px !important;margin-left: -167px;width: 178px !important;">
+                <span class="tooltiptext" style="margin-bottom: -118px !important;margin-left: -142px;width: 210px !important;">
                   ADJ Quantity formula = (Unit Type ADJ Quantity x Description Quantity) x ADJ Factor</span>
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
             <th v-if="hasRemeasurement">
               <div class="tooltip" >
-                <span class="tooltiptext" style="margin-bottom: -127px !important;margin-left: -167px;width: 178px !important;">
+                <span class="tooltiptext" style="margin-bottom: -116px !important;margin-left: -107px;width: 229px !important;">
                   Remeasurement Quantity formula = (Unit Type Remeasurement Quantity x Description Quantity) x ADJ Factor</span>
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
-            <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center;border:1px solid #ddd !important">
-              <div class="tooltip" >
-                <span class="tooltiptext" style="margin-bottom: -107px !important;margin-left: -167px;width: 178px !important;">
-                Formula Quotation rate = ADJ Quantity x Quotation Rate</span>
-                <md-icon style="color: red;margin-top: 10px;margin-right: -10px;"  
-                  v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5" 
-                > priority_high</md-icon>
+            <th scope="col" colspan="2" v-for="(quotationData, index) in QuotationName" :key="index" style="text-align: center; border: 1px solid #ddd;">
+              <div class="tooltip" style="display: inline-block; margin-right: 10px;">
+                <span class="tooltiptext" style="margin-bottom: -107px; margin-left: -167px; width: 178px;">
+                  Formula Quotation Rate = ADJ Quantity x Quotation Rate
+                </span>
+                <md-icon v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5" style="color: red;">priority_high</md-icon>
               </div>
-              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.call_for_quotation_subcon_list_id"  v-if="isPending">
-                <button type="button" class="transparentButton"  >
-                  <div class="tooltip" >
-                    <span class="tooltiptext" style="margin-bottom: -111px !important;margin-right: -6px;" >
-                    Edit Quotation Rate</span>
-                    <md-icon style="color:orange;margin-left: 26px;margin-top: 10px;">edit_note</md-icon>
+
+              <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.call_for_quotation_subcon_list_id" v-if="isPending" style="display: inline-block;">
+                <button type="button" class="transparentButton" style="padding: 0; margin-right: 5px;">
+                  <div class="tooltip" style="display: inline-block;">
+                    <span class="tooltiptext" style="margin-bottom: -111px; margin-right: -6px;width: 180px;">
+                      Edit Quotation
+                    </span>
+                    <md-icon style="color: orange;">edit_note</md-icon>
                   </div>
                 </button>
               </a>
-              <button style="margin-left: -9px !important;" type="button" class="transparentButton" @click="deleteSubcon(quotationData.call_for_quotation_subcon_list_id)"  
-              v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5">
-                <div class="tooltip" >
-                  <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
-                  Delete Quotation</span>
-                  <md-icon style="color:orange;margin-top: 10px;">delete</md-icon>
-                </div>
-              </button>
-              <button v-if="quotationData.document_api" style="margin-left: -9px !important;" type="button" class="transparentButton" @click="downloadDocument(quotationData.document_api)">
-                <div class="tooltip">
-                  <span class="tooltiptext" style="margin-bottom: -95px !important;margin-left: -76px;">
-                    Download Quotation
+
+              <button v-if="isPending && quotationData.Call_For_Quotation_Subcon_List.subcon_id > 1.5" @click="deleteSubcon(quotationData.call_for_quotation_subcon_list_id)" class="transparentButton" style="padding: 0; margin-right: 5px;">
+                <div class="tooltip" style="display: inline-block;">
+                  <span class="tooltiptext" style="margin-bottom: -95px; margin-left: -76px;">
+                    Delete Quotation
                   </span>
-                  <md-icon style="color:orange;margin-top: 10px;">file_present</md-icon>
+                  <md-icon style="color: orange;">delete</md-icon>
                 </div>
               </button>
 
+              <button v-if="quotationData.document_api" @click="downloadDocument(quotationData.document_api)" class="transparentButton" style="padding: 0;">
+                <div class="tooltip" style="display: inline-block;">
+                  <span class="tooltiptext" style="margin-bottom: -95px; margin-left: -76px;">
+                    Download Quotation
+                  </span>
+                  <md-icon style="color: orange;">file_present</md-icon>
+                </div>
+              </button>
             </th>
           </tr>
           <tr  class="header-row-2">
-            <th scope="col">Item</th>
-            <th scope="col">Element</th>
-            <th scope="col">Sub Element</th>
-            <th scope="col">Sub Sub Element</th>
-            <th scope="col">Description</th>
-            <th scope="col">Unit</th>
+            <th scope="col"   class="sticky-col">Item</th>
+            <th scope="col"   class="sticky-col">Element</th>
+            <th scope="col"   class="sticky-col">Sub Element</th>
+            <th scope="col"   class="sticky-col">Sub Sub Element</th>
+            <th scope="col"   class="sticky-col">Description</th>
+            <th scope="col"   class="sticky-col">Unit</th>
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
             </template>
@@ -105,14 +107,17 @@
               colspan="2" 
               v-for="(quotationData, index) in QuotationName" 
               :key="index" 
-              style="text-align: center; border: 1px solid #ddd !important">
-              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id,quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
-              <br>
-            </th>
+              style="text-align: center; border: 1px solid #ddd !important; width: 200px; word-break: break-word; overflow-wrap: break-word;">
+              
+              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
 
+            </th>
           </tr>
-          <tr   :class="{ 'header-row-3': Unittype.length > 0 }">
-            <th colspan="6"></th>
+          <tr :class="{
+            'header-row-4': Unittype.length > 0 && QuotationName.length === 2, 
+            'header-row-3': Unittype.length > 0 && QuotationName.length > 2
+          }">
+            <th colspan="6"   class="sticky-col"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
             </template>
@@ -136,113 +141,62 @@
           <button class="btn-save" @click="approvalQuotation">Submit</button>
         </div>
       </template>
-      <div>
-    </div>
-    <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 ">
-      <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
-        <p>It this a work order.</p> 
-        <label >
-          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
-          Yes
-        </label>
-      </div>
-      <div class="cqapprovalBox-container">
-        <template><br>
-          <div class="container" style="width: 100%;">
-            <div class="row"  v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
-              <div class="cqbox">
-                <div class="left-container">
-                  <div class="md-card-avatar" style="margin-bottom: 315px;">
-                    <img class="img" src="@/assets/img/admin.png" />
+      <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 ">
+        <div class="confirmation-message" >
+          <p>It this a work order.</p> 
+          <label >
+            <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
+            Yes
+          </label>
+        </div>
+        <div class="cqapprovalBox-container">   
+          <template><br>
+            <div class="container" style="width: 100%;">
+              <ApprovalTable :cmCQapproval="cmCQapproval" />
+              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
+                <div class="cqbox">
+                  <div class="left-container">
+                    <div class="md-card-avatar" style="margin-bottom: 160px;">
+                      <img class="img" src="@/assets/img/admin.png" />
+                    </div>
                   </div>
-                </div>
-                <div class="right-container">
-                  <div class="user-info">
-                    <p class="user-name">Name: {{  cmapproval.user[0].name }}</p>
-                  </div>
-                  <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}</p>
-                  <p style="margin: 8px 0 10px;">Date:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ formatDate(cmapproval.updatedAt) }}</p>
-                  <p style="margin: 8px 0 10px;">Remarks:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;height: 180px;" disabled>{{ cmapproval.approval_remarks }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
-              <div class="cqbox">
-                <div class="left-container">
-                  <div class="md-card-avatar" style="margin-bottom: 160px;">
-                    <img class="img" src="@/assets/img/admin.png" />
-                  </div>
-                </div>
-                <div class="right-container">
-                  <div v-for="(user, userIndex) in approvalData.systemuser" :key="userIndex" class="user-info">
-                    <p class="user-name">Name: {{ user.name }}</p>
-                  </div>
-                  <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                  <div v-if="(approvalData.system_user_id === Number(getUserIdLocal)) && index === 0 ">
-                    <select v-model="selectedQuotations[index]" class="quotation-select" >
-                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
-                        {{ quotationData.Subcon.name }}
-                      </option>
-                    </select>
-                    <p style="margin: 8px 0 10px;">Remarks:</p>
-                    <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" required ></textarea>
-                    <button class="btn-save"  @click="rejectAdminApproval(approvalData.system_user_id, index)">Reject</button><br>
-                    <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approve</button><br>
-                  </div>
-                  <div v-else>
-                    <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
-                      <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
-                        {{ quotationData.Subcon.name }} 
-                      </option>
-                    </select>
-                    <p style="margin: 8px 0 10px;">Remarks:</p>
-                    <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
+                  <div class="right-container">
+                    <div v-for="(user, userIndex) in approvalData.systemuser" :key="userIndex" class="user-info">
+                      <p class="user-name">Name: {{ user.name }}</p>
+                    </div>
+                    <p style="margin: 8px 0 10px;">Recommend Award To:</p>
+                    <div v-if="(approvalData.system_user_id === Number(getUserIdLocal)) && index === 0 ">
+                      <select v-model="selectedQuotations[index]" class="quotation-select" >
+                        <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
+                          {{ quotationData.Subcon.name }}
+                        </option>
+                      </select>
+                      <p style="margin: 8px 0 10px;">Remarks:</p>
+                      <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" required ></textarea>
+                      <button class="btn-save"  @click="rejectAdminApproval(approvalData.system_user_id, index)">Reject</button><br>
+                      <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approve</button><br>
+                    </div>
+                    <div v-else>
+                      <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
+                        <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
+                          {{ quotationData.Subcon.name }} 
+                        </option>
+                      </select>
+                      <p style="margin: 8px 0 10px;">Remarks:</p>
+                      <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </template>
-      </div>
-    </template>
-    <template v-if="(project.status === 'Approved' ) && QuotationName.length > 0 ">
-      <div class="confirmation-message" v-if="project.status === 'Waiting Approval'">
-        <p>It is the quotation is work order.</p> 
-        <label >
-          <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
-          Yes
-        </label>
-      </div>
-      <div class="cqapprovalBox-container">
-        <template><br>
-          <div class="container" style="width: 100%;">
-            <div class="row"  v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
-              <div class="cqbox">
-                <div class="left-container">
-                  <div class="md-card-avatar" style="margin-bottom: 315px;">
-                    <img class="img" src="@/assets/img/admin.png" />
-                  </div>
-                </div>
-                <div class="right-container">
-                  <div class="user-info">
-                    <p class="user-name">Name: {{  cmapproval.user[0].name }}</p>
-                  </div>
-                  <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}</p>
-                  <p style="margin: 8px 0 10px;">Date:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ formatDate(cmapproval.updatedAt) }}</p>
-                  <p style="margin: 8px 0 10px;">Remarks:</p>
-                  <p  class="quotation-select" style="background-color: #EFEFEF4D;height: 180px;" disabled>{{ cmapproval.approval_remarks }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-      </div>
-    </template>
+          </template>
+        </div>
+      </template>
+      <template v-if="(project.status === 'Approved' ) && QuotationName.length > 0 "> 
+        <div class="cqapprovalBox-container">
+          <ApprovalTable :cmCQapproval="cmCQapproval" />
+        </div>
+      </template>
   </div> 
     <RejectModal :reject-modal="rejectModal"   @editMessage="EditMessage" @fail-message="EditErrorMessage" @close="closerejectModal" 
     title="Reject Approval" :ApprovalData="ApprovalDataArray"  :excelFile="excelFile"></RejectModal>
@@ -258,17 +212,21 @@ import DescriptionController from '@/services/controllers/DescriptionController.
 import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
 import RejectModal from '@/components/Pop-Up-Modal/RejectModal.vue';
+import ApprovalTable from '@/components/Tables/ApprovalTable.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
 import {  config } from "@/services";
 import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
+import tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css'; 
 
 export default {
   components: {
     DelSubcon,
     RejectModal,
-    LoadingModal
+    LoadingModal,
+    ApprovalTable
   },
   props: {
     cqId: {
@@ -350,34 +308,34 @@ export default {
   },
   methods: {
    async downloadDocument(url) {
-    try {
-      const apiHost = config.getHost();
-      const headers = config.getHeadersWithToken();
-      const fullUrl = `${apiHost}${url}`;
+      try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const fullUrl = `${apiHost}${url}`;
 
-      const response = await fetch(fullUrl, { headers });
+        const response = await fetch(fullUrl, { headers });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Create a link element, set its href to the blob URL, and click it to trigger the download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = ''; // This will use the default filename from the server
+        link.click();
+
+        // Clean up
+        URL.revokeObjectURL(blobUrl);
+
+      } catch (error) {
+        this.errorMessage = "Error issue: download document failed: " + error.message;
+        console.error(this.errorMessage);
       }
-
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      // Create a link element, set its href to the blob URL, and click it to trigger the download
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = ''; // This will use the default filename from the server
-      link.click();
-
-      // Clean up
-      URL.revokeObjectURL(blobUrl);
-
-    } catch (error) {
-      this.errorMessage = "Error issue: download document failed: " + error.message;
-      console.error(this.errorMessage);
-    }
-  },
+    },
     async handleCheckboxChange() {
        if (event && event.target) {
         const isChecked = event.target.checked; 
@@ -600,11 +558,11 @@ export default {
              
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                <td><b><u>${head1Counter}</u></b></td>
-                <td><b><u>${formData.element || ''}</u></b></td>
-                <td><b><u>${formData.sub_element || ''}</u></b></td>
-                <td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>
-                <td style="padding-left:10px !important" class="td-max-width"><b><u>${formData.description_item}</u></b></td>
+                <td  class="sticky-col"><b><u>${head1Counter}</u></b></td>
+                <td  class="sticky-col"><b><u>${formData.element || ''}</u></b></td>
+                <td  class="sticky-col"><b><u>${formData.sub_element || ''}</u></b></td>
+                <td  class="sticky-col"><b><u>${formData.description_sub_sub_element || ''}</u></b></td>
+                <td style="padding-left:10px !important" class="sticky-col td-max-width"><b><u>${formData.description_item}</u></b></td>
               `;
               tableBody.appendChild(head1Row);
 
@@ -644,11 +602,11 @@ export default {
 
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
-                <td>${head1Counter}.${head2Counter}</td>
-                <td>${formData.element || ''}</td>
-                <td>${formData.sub_element || ''}</td>
-                <td>${formData.description_sub_sub_element || ''}</td>
-                <td style="padding-left:10px !important;" class="td-max-width">${formData.description_item}</td>
+                <td class="sticky-col" >${head1Counter}.${head2Counter}</td>
+                <td class="sticky-col">${formData.element || ''}</td>
+                <td class="sticky-col">${formData.sub_element || ''}</td>
+                <td class="sticky-col">${formData.description_sub_sub_element || ''}</td>
+                <td style="padding-left:10px !important;" class="sticky-col td-max-width">${formData.description_item}</td>
                 <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
@@ -661,7 +619,6 @@ export default {
           }
 
           this.QuotationName = maxQuotation.length > 0 ? maxQuotation[0] : [];
-          console.log('this Quotation Name',this.QuotationName);
           const UnitType = this.Unittype;
           const numberOfArrays = UnitType.length;
           const getRemeauserement = UnitType[0].is_remeasurement;
@@ -681,10 +638,8 @@ export default {
           let rateTDs = '';
           let remarks = '';
           for (const DatasubconAmount of this.QuotationName) {
-            console.log('databasubconAmount',DatasubconAmount);
              const SubconId = DatasubconAmount.call_for_quotation_subcon_list_id;
              const totalQuotation = await DescriptionController.getTotalQuotation(id, SubconId);
-             console.log('totalQuotation',totalQuotation);
             if (totalQuotation[0].subcon_id > 1.5) {
               discountGivenTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].discount_given)}</td>`;
               afterADJDiscountTDs += `<td colspan="2">${this.formatAccounting(totalQuotation[0].afterADJDiscount_give)}</td>`;
@@ -726,32 +681,31 @@ export default {
           const tableFoot = document.querySelector('.nested-table tfoot');
           tableFoot.innerHTML = `
             <tr>
-              <td colspan="${colspan}"><b>BQ Total Amount (RM)</b></td>
+              <td colspan="${colspan}" title="BQ Qty x  Rate "><b>BQ Total Amount (RM)</b></td>
               ${bqTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>ADJ Total Amount (RM)</b></td>
+              <td colspan="${colspan}" title="ADJ Qty x Rate "><b>ADJ Total Amount (RM)</b></td>
               ${adjTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Remeasurement Total Amount (RM)</b></td>
+              <td colspan="${colspan}" title="Remeasurement Qty x Rate"><b>Remeasurement Total Amount (RM)</b></td>
               ${remasurementTotalAmountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Discount Given (RM)</b></td>
+              <td colspan="${colspan}" ><b>Discount Given (RM)</b></td>
               ${discountGivenTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>After Discount Given (RM)</b></td>
+              <td colspan="${colspan}" title="ADJ Total Amount - Discount"><b>After Discount Given (RM)</b></td>
               ${afterADJDiscountTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Total Saving / Overrun (RM)
-                </b></td>
+              <td colspan="${colspan}" title="Budget  ADJ Total Amount - After Discount Given"><b>Total Saving / Overrun (RM)</b></td>
               ${overrumTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Total Saving / Overrun (%)</b></td>
+              <td colspan="${colspan}" title="Total Saving  / Budget ADJ Total Amount * 100%"><b>Total Saving / Overrun (%)</b></td>
               ${rateTDs}
             </tr>
             <tr>
@@ -759,7 +713,7 @@ export default {
               ${winnerTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}"><b>Provisional Sum (RM)</b></td>
+              <td colspan="${colspan}" title="BQ Total Amount - After Discount Given"><b>Provisional Sum (RM)</b></td>
               ${previsionalSumTDs}
             </tr>
             <tr>
@@ -767,6 +721,17 @@ export default {
               ${remarks}
             </tr>
           `;
+
+ 
+          this.$nextTick(() => {
+            tippy('.nested-table [title]', {
+              content: (reference) => reference.getAttribute('title'),
+              placement: 'right',
+              theme: 'custom',
+            });
+          });
+
+
         } else {
           const tableBody = document.querySelector('.nested-table tbody');
           tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No data available.</td></tr>';
@@ -788,12 +753,8 @@ export default {
       }
 
       const parsedValue = parseFloat(value);
-
-      // Format positive numbers
       return parsedValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     },
-
-    // Helper function to check if the value is formatted as a negative number
     isNegativeFormatted(value) {
       return typeof value === 'string' && value.startsWith('(') && value.endsWith(')');
     },
@@ -998,15 +959,33 @@ export default {
 
 .header-row-2 th {
   position: sticky;
-  top: 57px;
+  top: 55px;
   height: 48px;
-  z-index: 11; 
 }
 
 .header-row-3 th {
   position: sticky;
   top: 109px;
-  z-index: 14; 
+  z-index: 11; 
+}
+
+.header-row-4 th {
+  position: sticky;
+  top: 88px;
+  z-index: 11; 
+}
+
+.tippy-box[data-theme~='custom'] {
+  background-color: #FFE5B4; /* Change background color */
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: black;
+}
+
+/* Optional: Arrow styling */
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+  color: #FFE5B4; 
 }
 
 </style>

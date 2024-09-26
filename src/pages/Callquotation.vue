@@ -451,30 +451,31 @@ table {
   border-top: 2px solid #ddd;
 }
 
-/* Default for desktop */
 .header-title-2 {
   position: sticky;
 }
 
 .header-title-2.desktop {
-  top: 52px; /* For larger screens (desktops) */
+  top: 60px; 
+  z-index: 11;
 }
 
 .header-title-2.mobile {
-  top: 20px; /* For smaller screens (mobile) */
+  top: 20px;
+  z-index: 11;
 }
 
 @media (max-width: 767px) {
-  /* Mobile view styles */
   .header-title-2 {
     top: 20px;
+    z-index: 11;
   }
 }
 
 @media (min-width: 768px) {
-  /* Desktop view styles */
   .header-title-2 {
     top: 70px;
+    z-index: 11;
   }
 }
 
