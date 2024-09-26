@@ -29,7 +29,7 @@
                 <div class="filter-container" style="margin-right: -15px">
                   <a href="createcq" v-if="hasAccess">
                     <div class="tooltip">
-                      <span class="tooltiptext">Created Comparison Summary</span>
+                      <span class="tooltiptext" style="bottom: 114% !important;">Created Comparison Summary</span>
                     <md-icon class="mdIcon" style="margin-right: 15px"
                       >add</md-icon></div>
                     </a
@@ -37,7 +37,7 @@
                 </div>
                 <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
                     <div class="tooltip">
-                    <span class="tooltiptext">Export Comparison Summary</span>
+                    <span class="tooltiptext" style="bottom: 114% !important;">Export Comparison Summary</span>
                     <md-icon class="mdIcon">system_update_alt</md-icon>
                     </div>
                 </button>
@@ -87,7 +87,7 @@
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td><a :href="'/comparison?cqID=' + callQuotation.id + '&projectID=' + callQuotation.projectId"><button class="transparentButton" >
                         <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
+                          <span class="tooltiptext" style="margin-left: 20px !important;width: 164px; bottom: -43% !important;">Go to see subcon comparison detail.</span>
                         <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
                       </a></td>
                       <td>{{ index + 1 }}</td>
