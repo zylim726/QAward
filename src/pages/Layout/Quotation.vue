@@ -305,7 +305,7 @@ export default {
         const cqUnitType = formData.cqUnitType;
         const getQuotation = formData.quotation;
 
-        if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
+        if (getQuotation.length <= 0 ||  (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit =="") ) {
           head1Counter++;
           prevHead1 = formData.description_item;
 

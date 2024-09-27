@@ -553,7 +553,7 @@ export default {
             
             this.Unittype = formData.cqUnitType;
 
-            if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
+            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit =="") ) {
               head1Counter++;
              
               const head1Row = document.createElement('tr');

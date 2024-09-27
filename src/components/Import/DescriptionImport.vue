@@ -192,81 +192,107 @@ export default {
       }
     },
     async saveData() {
-      this.isLoading = true;
-      const cqId = this.cqId;
-      const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
-      const unittype = this.Unittype;
+  this.isLoading = true;
+  const cqId = this.cqId;
+  const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
+  const unittype = this.Unittype;
 
-      const validData = [];
-      let hasErrors = false;
+  const validData = [];
+  let hasErrors = false;
 
-      selectImportData.forEach(object => {
-        const matchedValues = {};
-        unittype.forEach(unit => {
-          const combineObjects = `${unit.type} (${unit.quantity})`;
+  // Loop through the selected imported data
+  selectImportData.forEach(object => {
+    const matchedValues = {};
 
-          if (object.hasOwnProperty(combineObjects)) {
-            matchedValues[unit.id] = `${object[combineObjects]}`;
-          }
-        });
+    // Loop through unit types and match them with the selected import data
+    unittype.forEach(unit => {
+      const combineObjects = `${unit.type} (${unit.quantity})`;
 
-        if (object["Budget Rate"] < 0) {
-          this.$emit('fail-message', "Budget Rate cannot be negative.");
-          hasErrors = true;
-          return;
+      // If the unit type exists in the import data
+      if (object.hasOwnProperty(combineObjects)) {
+        let unitValue = object[combineObjects];
+
+        // Handle empty Unit Quantity by setting it to 0
+        if (unitValue === "" || unitValue === undefined) {
+          unitValue = 0;
         }
 
-        for (const key in matchedValues) {
-          if (matchedValues[key] < 0) {
-            this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
-            hasErrors = true;
-            return;
-          }
-        }
-        if (object["Unit"] !== "") {
-          if (object["Budget Rate"] === "" ) {
-          this.$emit('fail-message', "Budget Rate cannot be empty data.");
-          hasErrors = true;
-            exit();
-          }
-        }
-        const hasMatches = Object.keys(matchedValues).length > 0;
+        matchedValues[unit.id] = `${unitValue}`;
+      }
+    });
 
-        if (hasMatches) {
-          validData.push({
-            matchedValues,
-            element: object["Element"],
-            sub_element: object["Sub Element"],
-            description_sub_sub_element: object["Sub Sub Element"],
-            description_unit: object["Unit"],
-            description: object["Description"],
-            budget: object["Budget Rate"],
-          });
-        }
-      });
+    // Check if Budget Rate is negative
+    if (object["Budget Rate"] < 0) {
+      this.$emit('fail-message', "Budget Rate cannot be negative.");
+      hasErrors = true;
+      return;
+    }
 
-      if (!hasErrors) {
-        try {
-          const SuccessMessage = await DescriptionController.addDescription(cqId, validData);
-          const concatenatedMessage = SuccessMessage.join(', ');
-          const Message = concatenatedMessage.split(',')[0].trim();
-          this.$emit('message', Message);
-          const storedProjectId = localStorage.getItem('projectId');
-          await this.$router.push({ 
-            path: '/comparison', 
-            query: { 
-              cqID: cqId, 
-              projectID: storedProjectId 
-            } 
-          });
-        } catch (error) {
-          const FailMessage = `Error Message: ${error.message || 'Unknown Error.'}`;
-          this.$emit('fail-message', FailMessage);
-        } finally {
-          this.isLoading = false;
-        }
+    // Check if any of the matched unit quantities are negative
+    for (const key in matchedValues) {
+      if (matchedValues[key] < 0) {
+        this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
+        hasErrors = true;
+        return;
       }
     }
+
+    if (object["Unit"] !== "") {
+
+      console.log('aaaa');
+      if (object["Budget Rate"] === "" || object["Budget Rate"] === undefined) {
+        object["Budget Rate"] = 0; 
+      }
+
+      unittype.forEach(unit => {
+        const combineObjects = `${unit.type} (${unit.quantity})`;
+        if (object.hasOwnProperty(combineObjects) && (object[combineObjects] === "" || object[combineObjects] === undefined)) {
+          object[combineObjects] = 0; 
+        }
+      });
+    }
+
+    // If no matches, skip to the next object
+    const hasMatches = Object.keys(matchedValues).length > 0;
+    if (!hasMatches) return;
+
+    // Add valid data to the array
+    validData.push({
+      matchedValues,
+      element: object["Element"],
+      sub_element: object["Sub Element"],
+      description_sub_sub_element: object["Sub Sub Element"],
+      description_unit: object["Unit"],
+      description: object["Description"],
+      budget: object["Budget Rate"],
+    });
+  });
+
+  // If no errors, proceed with saving the data
+  if (!hasErrors) {
+    try {
+
+      console.log('validData',validData);
+      const successMessage = await DescriptionController.addDescription(cqId, validData);
+      const message = successMessage[0].split(',')[0].trim(); // Use the first success message
+      this.$emit('message', message);
+
+      const storedProjectId = localStorage.getItem('projectId');
+      await this.$router.push({
+        path: '/comparison',
+        query: { cqID: cqId, projectID: storedProjectId }
+      });
+    } catch (error) {
+      this.$emit('fail-message', `Error Message: ${error.message || 'Unknown Error.'}`);
+    } finally {
+      this.isLoading = false;
+    }
+  } else {
+    this.isLoading = false;
+  }
+}
+
+
   }
 };
 </script>
