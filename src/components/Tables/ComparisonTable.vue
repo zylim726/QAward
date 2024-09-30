@@ -152,7 +152,7 @@
         <div class="cqapprovalBox-container">   
           <template><br>
             <div class="container" style="width: 100%;">
-              <ApprovalTable :cmCQapproval="cmCQapproval" />
+              <ApprovalTable v-if="cmCQapproval.length > 0" :cmCQapproval="cmCQapproval" />
               <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
                 <div class="cqbox">
                   <div class="left-container">

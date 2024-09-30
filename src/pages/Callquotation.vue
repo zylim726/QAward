@@ -71,7 +71,7 @@
                       <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
-                    <tr :class="headerClass">
+                    <tr :class="maxprojectApprovalData.length > 0 ? headerClass : ''">
                       <th :style="{ 'top': '0' }"></th>
                       <th :style="{ 'top': '0' }" colspan="8"></th>
                       <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
@@ -87,7 +87,7 @@
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td><a :href="'/comparison?cqID=' + callQuotation.id + '&projectID=' + callQuotation.projectId"><button class="transparentButton" >
                         <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
+                          <span class="tooltiptext" style="margin-left: 20px !important;width: 155px;margin-bottom: -41px !important;">Go to see subcon comparison detail.</span>
                         <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
                       </a></td>
                       <td>{{ index + 1 }}</td>
