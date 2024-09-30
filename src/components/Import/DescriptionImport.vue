@@ -274,7 +274,7 @@ export default {
       sub_element: object["Sub Element"],
       description_sub_sub_element: object["Sub Sub Element"],
       description_unit: object["Unit"],
-      description:  encodeURIComponent(object["Description"] || ""),
+      description:  object["Description"],
       budget: object["Budget Rate"],
     });
     
