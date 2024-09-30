@@ -4,12 +4,7 @@
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
         <md-card>
           <md-card-content>
-            <div v-if="isLoading" class="spinner-border" role="status">
-              <span class="visually-hidden">   
-                <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-                  <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-                </button> Loading...</span>
-            </div>
+            <div v-if="isLoading"><loading-modal /><br><br></div>
             <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
             <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
             <br>
@@ -34,14 +29,12 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-' + formIndex">
-                    <template v-if="formData.quotation.length <= 0 || parseFloat(formData.quotation[0].adj_quantity) === 0.00 ">
+                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit === '')  ">
                       <td><b>{{ formIndex + 1 }}</b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
                       <td><b>{{ formData.description_sub_sub_element || '' }}</b></td>
                       <td class="td-max-width"><b>{{ formData.description_item }}</b></td>
-                      <td><b>{{ formData.description_unit || '' }}</b></td>
-
                     </template>
                     <template v-else>
                       <td>{{ formIndex + 1 }}</td>
@@ -94,8 +87,11 @@
 
 <script>
 import DescriptionController from "@/services/controllers/DescriptionController.js";
-
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 export default {
+  components: {
+    LoadingModal,
+  },
   data() {
     return {
       cqId: 0,
@@ -126,6 +122,7 @@ export default {
         this.isLoading = true;
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
+        console.log('this description',this.Description);
         if (processedData.length > 0) {
           this.Unittype = processedData[0].cqUnitType;
         }

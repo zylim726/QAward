@@ -83,7 +83,7 @@
                   </thead>
                   
                   <tbody>
-                    <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
+                    <tr v-if="errorMessage" style="height: 50px;" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td><a :href="'/comparison?cqID=' + callQuotation.id + '&projectID=' + callQuotation.projectId"><button class="transparentButton" >
                         <div class="tooltip" >
@@ -147,7 +147,7 @@
                       <td>{{ callQuotation.status }}</td>
                     </tr>
                   </tbody>
-                  <tfoot>
+                  <tfoot v-if="!errorMessage">
                     <tr class="summary-row">
                       <th></th>
                       <td colspan="8"></td>
