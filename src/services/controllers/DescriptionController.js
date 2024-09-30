@@ -8,46 +8,26 @@ const DescriptionController = {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const messageArray = [];
-        const checkingSubconList = await axios.get(`${apiHost}/call_for_quotation_subcon_list`, {
-            headers,
-        });
-        
-        const GetSubconId = checkingSubconList.data.data;
+  
         const SubconId = "1";
         let SubconListId = "";
-        let subconIdToRetrieve = null;
-        for (const subcon of GetSubconId) {
 
-            if (subcon.subcon_id === Number(SubconId) && subcon.call_for_quotation_id === Number(cqId)) {
-                subconIdToRetrieve = subcon.id;
-                break; 
-            }
-        }
         
-
-        if (subconIdToRetrieve === null) {
-
-            try {
-                const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
-                    discount: 0.00,
-                    call_for_quotation_id: cqId,
-                    subcon_id: SubconId 
-                }, { headers });
-        
-                SubconListId = cqSubconResponse.data.data.id;
-            } catch (error) {
-              const errorMessage = handleApiError(error);
-              throw { errorMessage };
-            }
-        } else {
-          
-            SubconListId = subconIdToRetrieve;
+        try {
+            const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
+                discount: 0.00,
+                call_for_quotation_id: cqId,
+                subcon_id: SubconId 
+            }, { headers });
+    
+            SubconListId = cqSubconResponse.data.data.id;
+        } catch (error) {
+          const errorMessage = handleApiError(error);
+          throw { errorMessage };
         }
-
+       
 
         for (const data of matchedData) {
-
-
           const descriptionResponse = await axios.post(`${apiHost}/description/add`, {
               element: data.element,
               sub_element: data.sub_element,
@@ -82,6 +62,7 @@ const DescriptionController = {
         return messageArray;
 
     } catch (error) {
+     
         const errorMessage = handleApiError(error);
         throw { errorMessage };
     }
