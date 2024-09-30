@@ -540,6 +540,7 @@ export default {
         this.processedData = processedData;
 
         if (processedData.length > 0) {
+          console.log('processedData',processedData);
           const tableBody = document.querySelector('.nested-table tbody');
           tableBody.innerHTML = '';
 
@@ -553,7 +554,7 @@ export default {
             
             this.Unittype = formData.cqUnitType;
 
-            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit =="") ) {
+            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === "" ) ) {
               head1Counter++;
              
               const head1Row = document.createElement('tr');
@@ -569,9 +570,7 @@ export default {
               head2Counter = 0;
 
               
-            }
-
-            if (getQuotation.length > 0 && parseFloat(formData.adj_quantity) !== 0.00) {
+            }else {
          
               head2Counter++;
               if (getQuotation.length > maxLength) {

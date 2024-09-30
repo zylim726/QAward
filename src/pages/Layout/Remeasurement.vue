@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-' + formIndex">
-                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit === '')  ">
+                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === '')  ">
                       <td><b>{{ formIndex + 1 }}</b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
