@@ -177,15 +177,13 @@ export default {
 
     // Format the numeric part to 2 decimal places
     const formattedNumericPart = parseFloat(numericPart).toFixed(2);
-
-    // Combine the formatted numeric part with the suffix
-    return formattedNumericPart + suffix;
+    const formattedValue = formattedNumericPart + suffix;
+    return formattedValue;
   }
 
   // If the value does not match the pattern, return it as is
   return value;
 }
-
 ,
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
@@ -219,30 +217,23 @@ export default {
     async saveData() {
   this.isLoading = true;
   const cqId = this.cqId;
+
   const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
   const unittype = this.Unittype;
 
   const validData = [];
   let hasErrors = false;
 
-  // Loop through the selected imported data
   selectImportData.forEach(object => {
     const matchedValues = {};
 
-    // Loop through unit types and match them with the selected import data
     unittype.forEach(unit => {
+      //variable for unit type (unit quqantity) 
       const combineObjects = `${unit.type} (${unit.quantity})`;
 
-      // If the unit type exists in the import data
+      // If the unit type exists in the import data 
       if (object.hasOwnProperty(combineObjects)) {
-        let unitValue = object[combineObjects];
-
-        // Handle empty Unit Quantity by setting it to 0
-        if (unitValue === "" || unitValue === undefined) {
-          unitValue = 0;
-        }
-
-        matchedValues[unit.id] = `${unitValue}`;
+        matchedValues[unit.id] = `${object[combineObjects]}`;
       }
     });
 
@@ -276,27 +267,26 @@ export default {
       });
     }
 
-    // If no matches, skip to the next object
     const hasMatches = Object.keys(matchedValues).length > 0;
     if (!hasMatches) return;
 
-    // Add valid data to the array
     validData.push({
       matchedValues,
       element: object["Element"],
       sub_element: object["Sub Element"],
       description_sub_sub_element: object["Sub Sub Element"],
       description_unit: object["Unit"],
-      description: object["Description"],
+      description:  object["Description"],
       budget: object["Budget Rate"],
     });
+    
   });
 
   if (!hasErrors) {
     try {
 
       const successMessage = await DescriptionController.addDescription(cqId, validData);
-      const message = successMessage[0].split(',')[0].trim(); // Use the first success message
+      const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
 
       const storedProjectId = localStorage.getItem('projectId');
@@ -305,7 +295,7 @@ export default {
         query: { cqID: cqId, projectID: storedProjectId }
       });
     } catch (error) {
-      this.$emit('fail-message', `Error Message: ${error.message || 'Unknown Error.'}`);
+      this.$emit('fail-message', `Error Message: Failed to Import BQ Description.Template is wrongly`);
     } finally {
       this.isLoading = false;
     }
