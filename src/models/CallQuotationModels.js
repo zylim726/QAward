@@ -2,18 +2,6 @@
 const CallQuotationModels = {
   processResponseData(response) {
     const dataArray = response.data;
-    //const projectId = localStorage.getItem('projectId');
-
-
-    // const filteredData = dataArray.filter(item => {
-      
-    //   if (String(item.project_id) === projectId) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // });
-
     if (dataArray.length > 0) {
       const processedData = dataArray.map(config => ({
         id: config.id,
