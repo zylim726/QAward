@@ -95,7 +95,6 @@ export default {
     try {
       const { data } = await NotificationController.notificationAccess();
       this.todayNotifications = data.filter(notification => !notification.is_read);
-      console.log('this notification',this.todayNotifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }

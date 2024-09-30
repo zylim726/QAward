@@ -264,7 +264,6 @@ export default {
 
     if (object["Unit"] !== "") {
 
-      console.log('aaaa');
       if (object["Budget Rate"] === "" || object["Budget Rate"] === undefined) {
         object["Budget Rate"] = 0; 
       }
@@ -293,11 +292,9 @@ export default {
     });
   });
 
-  // If no errors, proceed with saving the data
   if (!hasErrors) {
     try {
 
-      console.log('validData',validData);
       const successMessage = await DescriptionController.addDescription(cqId, validData);
       const message = successMessage[0].split(',')[0].trim(); // Use the first success message
       this.$emit('message', message);

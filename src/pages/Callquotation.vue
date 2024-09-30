@@ -463,7 +463,7 @@ table {
 }
 
 .header-title-2.desktop {
-  top: 60px; 
+  top: 45px; 
   z-index: 11;
 }
 
