@@ -2,6 +2,7 @@
 const CallQuotationModels = {
   processResponseData(response) {
     const dataArray = response.data;
+
     if (dataArray.length > 0) {
       const processedData = dataArray.map(config => ({
         id: config.id,
