@@ -222,7 +222,9 @@ export default {
     headerClass() {
   if (this.maxprojectApprovalData.length > 0 && this.maxprojectApprovalData.length < 2) {
     return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop';
-  } else if (this.maxprojectApprovalData.length >= 2 && this.maxprojectApprovalData.length < 6) {
+  } else if (this.maxprojectApprovalData.length >= 2 && this.maxprojectApprovalData.length <= 4) {
+    return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop3';
+  } else if (this.maxprojectApprovalData.length >= 2 && this.maxprojectApprovalData.length < 4) {
     return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop2';
   } else {
     return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 default'; e
@@ -477,6 +479,10 @@ table {
   z-index: 11;
 }
 
+.header-title-2.desktop3 {
+  top: 54px; 
+  z-index: 11;
+}
 
 
 .header-title-2.mobile {
