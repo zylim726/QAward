@@ -228,8 +228,10 @@ export default {
     const matchedValues = {};
 
     unittype.forEach(unit => {
+      //variable for unit type (unit quqantity) 
       const combineObjects = `${unit.type} (${unit.quantity})`;
 
+      // If the unit type exists in the import data 
       if (object.hasOwnProperty(combineObjects)) {
         matchedValues[unit.id] = `${object[combineObjects]}`;
       }
