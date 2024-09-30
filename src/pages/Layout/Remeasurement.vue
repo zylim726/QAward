@@ -122,7 +122,6 @@ export default {
         this.isLoading = true;
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
-        console.log('this description',this.Description);
         if (processedData.length > 0) {
           this.Unittype = processedData[0].cqUnitType;
         }

@@ -213,7 +213,6 @@ export default {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
 
         this.callQuotation = processedData[0];
-        console.log('callQuotation',this.callQuotation);
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
             if (processedData[i]) {
