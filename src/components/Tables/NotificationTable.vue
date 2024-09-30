@@ -83,7 +83,6 @@ export default {
       try {
         const { data } = await NotificationController.notificationAccess();
         this.notification = data; 
-        console.log('data',data);
       } catch (error) {
         this.FailMessage = `Error Message: ${error.message || 'Unknown Data.'}`;
       } finally {

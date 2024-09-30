@@ -46,7 +46,6 @@ export default {
     },
     ImportErrorMessage(message) {
       this.FailMessage = message; 
-      console.log('this fail message',message);
       setTimeout(() => {
         this.FailMessage = '';
         window.location.reload();

@@ -282,6 +282,7 @@ export default {
 
   if (!hasErrors) {
     try {
+
       const successMessage = await DescriptionController.addDescription(cqId, validData);
       const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
