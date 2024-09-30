@@ -124,27 +124,33 @@ export default {
       }
     },
     importData(data) {
-      const filteredData = data.filter(row => {
-        return Object.values(row).some(value => value !== '');
-      });
+    const filteredData = data.filter(row => {
+      // Filter out rows where all values are empty
+      return Object.values(row).some(value => value !== '');
+    });
 
-      filteredData.forEach(row => {
-        // Convert string numbers to actual numbers
-        for (const key in row) {
-          const value = parseFloat(row[key]);
-          if (!isNaN(value)) {
-            row[key] = value; 
-          }
+    filteredData.forEach(row => {
+      // Process each row
+      for (const key in row) {
+        const value = row[key];
+
+        // Check if the value can be parsed as a number
+        if (!isNaN(parseFloat(value)) && isFinite(value)) {
+          row[key] = parseFloat(value); // Convert to number
+        } else {
+          row[key] = value; // Keep the original value if not numeric
         }
-        row.selected = true; 
-      });
-
-      this.importedData = [...this.importedData, ...filteredData];
-
-      if (this.importedData.length > 0) {
-        this.columnTitles = Object.keys(this.importedData[0]);
       }
-    },
+
+      row.selected = true; 
+    });
+
+    this.importedData = [...this.importedData, ...filteredData];
+
+    if (this.importedData.length > 0) {
+      this.columnTitles = Object.keys(this.importedData[0]);
+    }
+  },
     selectAllRows() {
       if (this.importedData.length > 0) {
         this.importedData.forEach((row) => {
@@ -156,12 +162,31 @@ export default {
       return true;
     },
     displayValue(value, key) {
-      if (typeof value === "number") {
-        // Format number to 2 decimal places
-        return value.toFixed(2);
-      }
-      return value; 
-    },
+  // Ensure value is a string
+  if (typeof value !== 'string') {
+    value = String(value);
+  }
+
+  // Check if the value starts with a number followed by non-numeric characters
+  const match = value.match(/^(\d+(\.\d+)?)([^0-9]*)$/);
+
+  if (match) {
+    // Extract the numeric part and the suffix
+    const numericPart = match[1];
+    const suffix = match[3] || '';
+
+    // Format the numeric part to 2 decimal places
+    const formattedNumericPart = parseFloat(numericPart).toFixed(2);
+
+    // Combine the formatted numeric part with the suffix
+    return formattedNumericPart + suffix;
+  }
+
+  // If the value does not match the pattern, return it as is
+  return value;
+}
+
+,
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
