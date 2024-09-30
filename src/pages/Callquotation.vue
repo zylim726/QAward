@@ -88,7 +88,6 @@
                       <td><a :href="'/comparison?cqID=' + callQuotation.id + '&projectID=' + callQuotation.projectId"><button class="transparentButton" >
                         <div class="tooltip" >
                           <span class="tooltiptext" style="margin-left: 20px !important;width: 155px;margin-bottom: -41px !important;">Go to see subcon comparison detail.</span>
-
                         <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
                       </a></td>
                       <td>{{ index + 1 }}</td>
