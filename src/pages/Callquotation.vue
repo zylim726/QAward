@@ -480,7 +480,7 @@ table {
 }
 
 .header-title-2.desktop3 {
-  top: 54px; 
+  top: 36px; 
   z-index: 11;
 }
 
