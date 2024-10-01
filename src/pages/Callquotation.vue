@@ -490,6 +490,11 @@ table {
   z-index: 11;
 }
 
+  
+.header-title-2.desktop4 {
+  top: 70px; 
+  z-index: 11;
+}
 @media (max-width: 767px) {
   .header-title-2 {
     top: 20px;
