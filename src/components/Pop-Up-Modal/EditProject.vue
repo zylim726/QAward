@@ -24,7 +24,7 @@
                 />
               </div>
               <div class="input-group">
-                <label style="text-align: left;" for="adjFactorInput">Adj Factor :</label>
+                <label style="text-align: left;" for="adjFactorInput">Adj Factor : </label>
                 <input
                   type="number"
                   id="adjFactorInput"
@@ -35,7 +35,7 @@
                   step="0.01"
                   @input="validateAdjFactor(index)"
                 />
-              </div>
+             </div>
             </div>
             <div class="input-pair">
               <div class="input-group">
@@ -105,12 +105,31 @@ export default {
       this.$emit("close");
     },
     async saveAndCloseModal() {
-      this.isLoading = true; // Set isLoading state
-      const updatedData = { unitTypes: this.unitTypes };
-      try {
-        await this.editProjs(this.id, updatedData);
-      } finally {
-        this.isLoading = false; // Reset isLoading state
+      let isValid = true;
+      
+      this.unitTypes.forEach((unitType) => {
+        if (unitType.adj_factor == 0 || unitType.adj_factor === '') {
+          isValid = false;
+        }
+      });
+
+      // If any adj_factor is 0 or empty, show error message and prevent submission
+      if (!isValid) {
+        const FailMessage = "Error: Adj Factor cannot be 0 or empty. Please correct the values.";
+        this.$emit('editfail-message', FailMessage);
+        this.$emit("close");
+        setTimeout(() => {
+          window.location.reload(); 
+        }, 1000); 
+      }else {
+        const updatedData = { unitTypes: this.unitTypes };
+  
+        this.isLoading = true;
+        try {
+          await this.editProjs(this.id, updatedData);
+        } finally {
+          this.isLoading = false; // Reset loading state
+        }
       }
     },
     async getUnitTypes(id) {
@@ -119,7 +138,7 @@ export default {
         this.unitTypes = await ProjectController.getUnitTypes(id);
       } catch (error) {
         const FailMessage = "Error fetching unit types: " + error.errorMessage;
-        this.$emit('fail-message', FailMessage);
+        this.$emit('editfail-message', FailMessage);
       } finally {
         this.isLoading = false; 
       }
@@ -137,7 +156,7 @@ export default {
         }, 1000); 
       } catch (error) {
         const FailMessage = "Error updating project: " + error.errorMessage;
-        this.$emit('fail-message', FailMessage);
+        this.$emit('editfail-message', FailMessage);
       } finally {
         this.isLoading = false; 
       }
@@ -155,7 +174,7 @@ export default {
           await ProjectController.removeProject(id);
         } catch (error) {
           const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
-          this.$emit('fail-message', FailMessage);
+          this.$emit('editfail-message', FailMessage);
         }
       }
       this.unitTypes.splice(index, 1);
@@ -168,10 +187,10 @@ export default {
     },
     validateAdjFactor(index) {
       let adj_factor = parseFloat(this.unitTypes[index].adj_factor);
-      if (isNaN(adj_factor) || adj_factor < 0) {
-        this.unitTypes[index].adj_factor = 0; 
+      if (isNaN(adj_factor) || adj_factor === '' || adj_factor < 0) {
+        this.unitTypes[index].adj_factor = 1.00; 
       }
-    },
+    }
   },
 };
 </script>
