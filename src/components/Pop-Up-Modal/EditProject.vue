@@ -8,6 +8,10 @@
         <hr style="margin-top: -10px" />
         <br />
 
+        <div v-if="FailMessage" class="error-message" style="color: red; font-size: 15px; margin-bottom: 10px;">
+          {{ FailMessage }}
+        </div>
+
         <div v-if="isLoading"><loading-modal /><br><br></div>
 
         <div v-if="!isLoading && unitTypes.length > 0">
@@ -21,10 +25,11 @@
                   v-model="unitType.unit_type"
                   placeholder="Enter Unit Type"
                   class="typeInput"
+                  required
                 />
               </div>
               <div class="input-group">
-                <label style="text-align: left;" for="adjFactorInput">Adj Factor :</label>
+                <label style="text-align: left;" for="adjFactorInput">Adj Factor : </label>
                 <input
                   type="number"
                   id="adjFactorInput"
@@ -35,7 +40,7 @@
                   step="0.01"
                   @input="validateAdjFactor(index)"
                 />
-              </div>
+             </div>
             </div>
             <div class="input-pair">
               <div class="input-group">
@@ -90,7 +95,8 @@ export default {
     return {
       processedData: null,
       unitTypes: [],
-      isLoading: false, // Add isLoading state
+      isLoading: false, 
+      FailMessage: '',
     };
   },
   watch: {
@@ -105,21 +111,49 @@ export default {
       this.$emit("close");
     },
     async saveAndCloseModal() {
-      this.isLoading = true; // Set isLoading state
-      const updatedData = { unitTypes: this.unitTypes };
-      try {
-        await this.editProjs(this.id, updatedData);
-      } finally {
-        this.isLoading = false; // Reset isLoading state
+      let isValid = true;
+      
+      this.unitTypes.forEach((unitType) => {
+        if (!unitType.unit_type || unitType.unit_type.trim() === '') {
+          isValid = false;
+        }
+        if (unitType.adj_factor == 0 || unitType.adj_factor === '') {
+          isValid = false;
+        }
+      });
+
+      if (!isValid) {
+
+        this.FailMessage = "Error: Unit Type is required, and Adj Factor cannot be 0 or empty. Please correct the values.";
+
+        Vue.nextTick(() => {
+          const modalContent = document.querySelector('.modal-content');
+          modalContent.scrollTop = 0; 
+        });
+
+        setTimeout(() => {
+          this.FailMessage = null;
+        }, 3000); 
+        return; 
+
+      }else {
+        const updatedData = { unitTypes: this.unitTypes };
+
+        this.isLoading = true;
+        try {
+          await this.editProjs(this.id, updatedData);
+        } finally {
+          this.isLoading = false; // Reset loading state
+        }
       }
     },
     async getUnitTypes(id) {
-      this.isLoading = true; // Set isLoading state
+      this.isLoading = true; 
       try {
         this.unitTypes = await ProjectController.getUnitTypes(id);
       } catch (error) {
         const FailMessage = "Error fetching unit types: " + error.errorMessage;
-        this.$emit('fail-message', FailMessage);
+        this.$emit('editfail-message', FailMessage);
       } finally {
         this.isLoading = false; 
       }
@@ -137,7 +171,7 @@ export default {
         }, 1000); 
       } catch (error) {
         const FailMessage = "Error updating project: " + error.errorMessage;
-        this.$emit('fail-message', FailMessage);
+        this.$emit('editfail-message', FailMessage);
       } finally {
         this.isLoading = false; 
       }
@@ -145,7 +179,7 @@ export default {
     addUnitType() {
       this.unitTypes.push({
         unit_type: '',
-        adj_factor: '',
+        adj_factor: '1',
         quantity: ''
       });
     },
@@ -155,7 +189,7 @@ export default {
           await ProjectController.removeProject(id);
         } catch (error) {
           const FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
-          this.$emit('fail-message', FailMessage);
+          this.$emit('editfail-message', FailMessage);
         }
       }
       this.unitTypes.splice(index, 1);
@@ -168,10 +202,10 @@ export default {
     },
     validateAdjFactor(index) {
       let adj_factor = parseFloat(this.unitTypes[index].adj_factor);
-      if (isNaN(adj_factor) || adj_factor < 0) {
-        this.unitTypes[index].adj_factor = 0; 
+      if (isNaN(adj_factor) || adj_factor === '' || adj_factor < 0) {
+        this.unitTypes[index].adj_factor = 1.00; 
       }
-    },
+    }
   },
 };
 </script>
