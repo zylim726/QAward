@@ -178,9 +178,6 @@
                     </div>
                     <div v-else>
                       <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
-                        <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
-                          {{ quotationData.Subcon.name }} 
-                        </option>
                       </select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
                       <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
