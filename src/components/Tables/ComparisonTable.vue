@@ -62,7 +62,7 @@
               <a :href="'editquotation?cqId=' + cqId + '&sbConId=' + quotationData.call_for_quotation_subcon_list_id" v-if="isPending" style="display: inline-block;">
                 <button type="button" class="transparentButton" style="padding: 0; margin-right: 5px;">
                   <div class="tooltip" style="display: inline-block;">
-                    <span class="tooltiptext" style="margin-bottom: -111px; margin-right: -6px;width: 180px;">
+                    <span class="tooltiptext" style="margin-bottom: -74px; margin-right: -6px;width: 180px;">
                       Edit Quotation
                     </span>
                     <md-icon style="color: orange;">edit_note</md-icon>
@@ -961,7 +961,7 @@ export default {
 
 .header-row-3 th {
   position: sticky;
-  top: 109px;
+  top: 104px;
   z-index: 11; 
 }
 
