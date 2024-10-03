@@ -228,14 +228,25 @@ export default {
     const matchedValues = {};
 
     unittype.forEach(unit => {
-      //variable for unit type (unit quqantity) 
-      const combineObjects = `${unit.type} (${unit.quantity})`;
+  // Variable for unit type (unit quantity)
+  const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+  console.log('combineObjects:', combineObjects);
 
-      // If the unit type exists in the import data 
-      if (object.hasOwnProperty(combineObjects)) {
-        matchedValues[unit.id] = `${object[combineObjects]}`;
-      }
-    });
+  // Clean the object keys by removing extra spaces
+  const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+    acc[key.replace(/\s+/g, ' ').trim()] = object[key];
+    return acc;
+  }, {});
+
+  // If the unit type exists in the sanitized import data 
+  if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
+    matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
+
+    // console.log('Value of sanitizedObjectKeys[combineObjects]:', sanitizedObjectKeys[combineObjects]);
+    // console.log('matchedValue for ownpropert:', matchedValues[unit.id]);
+  }
+});
+
 
     // Check if Budget Rate is negative
     if (object["Budget Rate"] < 0) {
@@ -267,8 +278,14 @@ export default {
       });
     }
 
-    const hasMatches = Object.keys(matchedValues).length > 0;
-    if (!hasMatches) return;
+    const hasMatches = Object.keys(matchedValues).length === unittype.length;
+
+    if (!hasMatches) {
+      this.$emit('fail-message', "Error Message: Failed to Import BQ Description.Template is wrongly.");
+      hasErrors = true;
+      return;
+      
+    }
 
     validData.push({
       matchedValues,
@@ -276,15 +293,16 @@ export default {
       sub_element: object["Sub Element"],
       description_sub_sub_element: object["Sub Sub Element"],
       description_unit: object["Unit"],
-      description:  object["Description"],
+      description: object["Description"],
       budget: object["Budget Rate"],
     });
+
     
   });
 
   if (!hasErrors) {
     try {
-
+      
       const successMessage = await DescriptionController.addDescription(cqId, validData);
       const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
