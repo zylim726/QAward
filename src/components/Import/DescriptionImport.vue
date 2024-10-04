@@ -281,7 +281,7 @@ export default {
     const hasMatches = Object.keys(matchedValues).length === unittype.length;
 
     if (!hasMatches) {
-      this.$emit('fail-message', "Error Message: Failed to Import BQ Description.Template is wrongly.");
+      this.$emit('fail-message', "Error Message: The template is outdated. Please download it again.");
       hasErrors = true;
       return;
       
@@ -313,7 +313,7 @@ export default {
         query: { cqID: cqId, projectID: storedProjectId }
       });
     } catch (error) {
-      this.$emit('fail-message', `Error Message: Failed to Import BQ Description.Template is wrongly`);
+      this.$emit('fail-message', `Error Message: The template is outdated. Please download it again`);
     } finally {
       this.isLoading = false;
     }
