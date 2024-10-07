@@ -42,7 +42,7 @@
           <div class="comparison-title">
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
               <h7>Project :</h7>
-              <h5 class="titleHeader">{{ projectName }}</h5>
+              <h5 class="titleHeader">{{ callQuotation.project_code }}</h5>
             </div>
 
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-17">
@@ -96,7 +96,6 @@
 import { ComparisonTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { EditCQ,DeleteCQ }  from "@/components";
-import ProjectController from "@/services/controllers/ProjectController.js";
 
 export default {
   components: {
@@ -125,13 +124,6 @@ export default {
     const pId = this.$route.query.projectID;
     localStorage.setItem('projectId', pId);
     
-    const projectName = localStorage.getItem('projectName');
-    if (projectName) {
-      this.projectName = projectName;
-    }else {
-      this.getProjectNameById(pId);
-    }
-    
     const Id = this.$route.query.cqID;
     this.cqId = Id;
     this.getDetailCQ(this.cqId);
@@ -139,21 +131,6 @@ export default {
     this.getUTypes(); 
   },
   methods: {
-    async getProjectNameById(pId) {
-      try {
-        const { data, message } = await ProjectController.projectList();
-
-        const project = data.find(proj => {
-            return proj.id === parseInt(pId, 10); 
-        });
-
-        if (project) {
-          localStorage.setItem('projectName', project.code);
-          this.projectName = project.code;
-        } 
-      } catch (error) {
-      }
-    },
     editCallQuotation(id) {
       this.editId = id;
       this.editModal = true;
@@ -213,10 +190,13 @@ export default {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
 
         this.callQuotation = processedData[0];
+        const projectName = this.callQuotation.project_code;
+        localStorage.setItem('projectName', projectName);
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
             if (processedData[i]) {
               this.callQuotation = processedData[i];
+              
               await this.getProject(this.callQuotation.project_id);
               break;
             }
