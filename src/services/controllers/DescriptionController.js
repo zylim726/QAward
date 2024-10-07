@@ -9,7 +9,7 @@ const DescriptionController = {
         const headers = config.getHeadersWithToken();
         const messageArray = [];
   
-        const SubconId = "1";
+      
         let SubconListId = "";
 
         
@@ -17,10 +17,11 @@ const DescriptionController = {
             const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
                 discount: 0.00,
                 call_for_quotation_id: cqId,
-                subcon_id: SubconId 
+                subcon_id: 1 //id 1 is budget
             }, { headers });
     
             SubconListId = cqSubconResponse.data.data.id;
+          
         } catch (error) {
           const errorMessage = handleApiError(error);
           throw { errorMessage };
