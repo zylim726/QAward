@@ -239,12 +239,17 @@ export default {
 
   },
   mounted() {
-    const projectName = localStorage.getItem('projectName');
-    if (projectName) {
-      this.projectName = projectName;
+    if (!this.callQuotation[0]?.project_code) {
+      const projectName = localStorage.getItem('projectName');
+      if (projectName) {
+        this.projectName = projectName;
+      } else {
+        this.FailMessage = "You haven't selected a project in the project list.";
+      }
     } else {
-      this.FailMessage = "You haven't select the project in project list.";
-    };
+      this.projectName = this.callQuotation[0].project_code;
+      localStorage.setItem('projectName', this.projectName);
+    }
     this.accessCQ();
     this.checkScreenSize();
     window.addEventListener('resize', this.checkScreenSize);
@@ -398,6 +403,9 @@ export default {
         const processedData = await CallofQuotationController.accessCQ();
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
+         
+          this.projectName = this.callQuotation[0].project_code;
+          
           this.SumTotal = processedData[0].Sum;
           this.projectApproval = processedData[0].projectApproval;
         } else {
