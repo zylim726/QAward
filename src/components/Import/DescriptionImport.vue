@@ -57,7 +57,11 @@
             </td>
             <td v-else></td>
             <td v-for="column in filteredColumns" :key="column" class="td-max-width">
-              {{ displayValue(row[column], column) }}
+              {{ 
+                (rowIndex > 4 && !isNaN(row[column])) 
+                  ? parseFloat(row[column]).toFixed(2) 
+                  : row[column] 
+              }}
             </td>
           </tr>
         </tbody>
@@ -130,20 +134,28 @@ export default {
     });
 
     filteredData.forEach(row => {
-      // Process each row
-      for (const key in row) {
-        const value = row[key];
+        let count = 0; // Initialize a counter to track the position
 
-        // Check if the value can be parsed as a number
-        if (!isNaN(parseFloat(value)) && isFinite(value)) {
-          row[key] = parseFloat(value); // Convert to number
-        } else {
-          row[key] = value; // Keep the original value if not numeric
+        for (const key in row) {
+          const value = row[key];
+          // For the first five values, leave them as is
+          if (count < 5) {
+            row[key] = value; // No conversion for first 5 items
+          } else {
+            // For values after the fifth, check if they can be converted to a number
+            if (!isNaN(parseFloat(value)) && isFinite(value)) {
+              row[key] = parseFloat(value).toFixed(2); // Convert to number
+            } else {
+              row[key] = value; // Keep the original value if not numeric
+            }
+          }
+          
+          count++; // Increment the counter after processing each value
         }
-      }
 
-      row.selected = true; 
-    });
+        row.selected = true; // Mark the row as selected
+      });
+
 
     this.importedData = [...this.importedData, ...filteredData];
 
@@ -161,30 +173,6 @@ export default {
     shouldDisplayCheckbox(row) {
       return true;
     },
-    displayValue(value, key) {
-  // Ensure value is a string
-  if (typeof value !== 'string') {
-    value = String(value);
-  }
-
-  // Check if the value starts with a number followed by non-numeric characters
-  const match = value.match(/^(\d+(\.\d+)?)([^0-9]*)$/);
-
-  if (match) {
-    // Extract the numeric part and the suffix
-    const numericPart = match[1];
-    const suffix = match[3] || '';
-
-    // Format the numeric part to 2 decimal places
-    const formattedNumericPart = parseFloat(numericPart).toFixed(2);
-    const formattedValue = formattedNumericPart + suffix;
-    return formattedValue;
-  }
-
-  // If the value does not match the pattern, return it as is
-  return value;
-}
-,
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
@@ -313,7 +301,13 @@ export default {
         query: { cqID: cqId, projectID: storedProjectId }
       });
     } catch (error) {
-      this.$emit('fail-message', `Error Message: The template is outdated. Please download it again`);
+
+      if(error){
+        this.$emit('fail-message', `Error Message:`+ error);
+      }else {
+        this.$emit('fail-message', `Error Message: The template is outdated. Please download it again`);
+      }
+      
     } finally {
       this.isLoading = false;
     }
