@@ -167,23 +167,18 @@ export default {
     value = String(value);
   }
 
-  // Check if the value starts with a number followed by non-numeric characters
-  const match = value.match(/^(\d+(\.\d+)?)([^0-9]*)$/);
+  // Check if the value contains only numbers (with optional decimals)
+  const isNumericOnly = /^[\d.]+$/.test(value);
 
-  if (match) {
-    // Extract the numeric part and the suffix
-    const numericPart = match[1];
-    const suffix = match[3] || '';
-
-    // Format the numeric part to 2 decimal places
-    const formattedNumericPart = parseFloat(numericPart).toFixed(2);
-    const formattedValue = formattedNumericPart + suffix;
-    return formattedValue;
+  if (isNumericOnly) {
+    // Format the numeric value to 2 decimal places
+    return parseFloat(value).toFixed(2);
   }
 
-  // If the value does not match the pattern, return it as is
+  // If the value contains any alphabetic characters, return it as is
   return value;
 }
+
 ,
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
