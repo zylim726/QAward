@@ -27,6 +27,7 @@ const CallQuotationModels = {
         la_id: config.la_id,
         status: config.status,
         projectId: config.project_id,
+        project_code: config.project_code,
         message: response.message,
         cqSubconList: config.Call_For_Quotation_Subcon_Lists,
         projectApproval: config.projectApproval,
