@@ -51,13 +51,6 @@ const routes = [
       },
 
       {
-        path: "approveComparison",
-        name: "Approve Comparison",
-        component: ApproveComparison,
-        meta: { requiresAuth: true },
-      },
-
-      {
         path: "callquotation",
         name: "Comparison Summary",
         component: Callquotation,

@@ -36,7 +36,7 @@
 export default {
   data() {
     return {
-      targetDate: new Date('2024-10-10T00:00:00'), // Set your target date here
+      targetDate: new Date('2024-10-09T00:00:00'), // Set your target date here
       days: 0,
       hours: 0,
       minutes: 0,

@@ -22,15 +22,29 @@ const router = new VueRouter({
   linkExactActiveClass: "nav-item active",
 });
 
+
+
+const isMaintenanceMode = true; 
+
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const isAuthenticated = store.state.token !== null;
-  if (requiresAuth && !isAuthenticated) {
-    next("/login");
+  if (isMaintenanceMode) {
+    // Redirect all users to the maintenance page
+    if (to.path !== '/maintenance') {
+      next('/maintenance');
+    } else {
+      next(); // Allow access to the maintenance page
+    }
   } else {
-    next();
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+    const isAuthenticated = store.state.token !== null;
+    if (requiresAuth && !isAuthenticated) {
+      next('/login');
+    } else {
+      next();
+    }
   }
 });
+
 
 Vue.prototype.$Chartist = Chartist;
 
