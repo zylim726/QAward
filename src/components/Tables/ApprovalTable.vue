@@ -1,6 +1,6 @@
 <template>
   <div class="container" style="width: 100%;">
-    <div class="row" v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 20px;">
+    <div class="row" v-for="(cmapproval, index) in cmCQapproval" :key="index" style="margin-top: 15px; margin-right: 20px;">
       <div class="cqbox">
         <div class="left-container">
           <div class="md-card-avatar" style="margin-bottom: 315px;">
