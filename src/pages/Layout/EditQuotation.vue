@@ -66,22 +66,34 @@
                 </tbody>
               </table>
             </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 15px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
                 <input type="number" id="discount" v-model.number="discount" style="width: 94%;" @keydown="blockNegativeInput" />
               </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 22px;">
               <div style="display: flex; align-items: center;">
                 <label for="remark" style="margin-right: 5px;">Remarks:</label>
-                <input type="text" id="remarks" v-model.number="remarks" style="width: 94%;" />
+                <textarea 
+                      id="remarks" 
+                      v-model="remarks" 
+                      style=" min-height: 70px; " >
+                  </textarea>
+
               </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: -13px;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 6px;">
               <div>
-                <label for="documents" style="margin-right: 5px;">Documents:</label>
-                <input type="file" @change="handleFileChange">
+                <label for="documents" style="margin-right: 5px;">Documents:
+                  <button v-if="QuotationName.length === 1 && QuotationName[0].document_api" 
+            @click="downloadDocument(QuotationName[0].document_api)" 
+            class="transparentButton" >
+        <md-icon style="color: orange;margin-top: -5px;">file_present</md-icon>
+    </button>
+                </label>
+                <input type="file" style="margin-top: 10px;" @change="handleFileChange">
+                
               </div>
             </div>
             <br>
@@ -98,7 +110,7 @@
 
 <script>
 import DescriptionController from "@/services/controllers/DescriptionController.js";
-
+import {  config } from "@/services";
 export default {
   data() {
     return {
@@ -120,6 +132,35 @@ export default {
     this.getNewDescription(id, subconListId);
   },
   methods: {
+    async downloadDocument(url) {
+      try {
+        const apiHost = config.getHost();
+        const headers = config.getHeadersWithToken();
+        const fullUrl = `${apiHost}${url}`;
+
+        const response = await fetch(fullUrl, { headers });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Create a link element, set its href to the blob URL, and click it to trigger the download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = ''; // This will use the default filename from the server
+        link.click();
+
+        // Clean up
+        URL.revokeObjectURL(blobUrl);
+
+      } catch (error) {
+        this.errorMessage = "Error issue: download document failed: " + error.message;
+        console.error(this.errorMessage);
+      }
+    },
     blockNegativeInput(event) {
       if (event.key === '-' || event.key === 'Minus') {
         event.preventDefault();
@@ -146,8 +187,16 @@ export default {
           if (filteredQuotations.length > 0) {
             this.QuotationName = filteredQuotations;
 
+            console.log('Document Api',this.QuotationName[0].document_api);
+
+            const QuotationRemark = this.QuotationName[0].Call_For_Quotation_Subcon_List;
+           
+            this.$set(this, 'remarks', QuotationRemark.remark || '');
+            this.$set(this, 'discount', QuotationRemark.discount || '');
+           
             filteredQuotations.forEach(quotation => {
-              this.$set(this.RateInput, formData.id, quotation.quote_rate || '');
+              this.$set(this.RateInput, formData.id, quotation.quote_rate || '')
+           
             });
           }
         });
@@ -182,8 +231,7 @@ export default {
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;
         const storedProjectId = localStorage.getItem('projectId');
-        this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId,projectID: storedProjectId  } }); // use actual route name and pass the query parameter
-  
+        this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId,projectID: storedProjectId  } }); 
         
       } catch (error) {
         this.FailMessage = "Failed to save data.";
