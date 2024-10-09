@@ -153,7 +153,7 @@
           <template><br>
             <div class="container" style="width: 100%;">
               <ApprovalTable v-if="cmCQapproval.length > 0" :cmCQapproval="cmCQapproval" />
-              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style=" margin-top: 15px; margin-right: 20px;">
+              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 60%; margin-top: 15px; margin-right: 20px;align-items: start;">
                 <div class="cqbox">
                   <div class="left-container">
                     <div class="md-card-avatar" style="margin-bottom: 160px;">
