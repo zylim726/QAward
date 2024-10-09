@@ -50,7 +50,7 @@ const CallofQuotationController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
 
-      const getCQResponse = await axios.delete(`${apiHost}/cq_unit_type/removeByCallForQuotation/${id}`, {
+      const getCQResponse = await axios.delete(`${apiHost}/call_for_quotation/removeByCallForQuotation/${id}`, {
         headers,
       });
 
