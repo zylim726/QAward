@@ -2,12 +2,7 @@
   <div>
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
-    <div v-if="loading" class="spinner-border" role="status">
-        <span class="visually-hidden">   
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
-      </div>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
     <div class="container" style="margin-top: 20px">
       <div class="search-container">
         <form class="Searchbar">
@@ -70,12 +65,14 @@ import Createsubcon from "@/components/Pop-Up-Modal/Createsubcon.vue";
 import EditSubcon from "@/components/Pop-Up-Modal/EditSubcon.vue";
 import DeleteSubcon from "@/components/Pop-Up-Modal/DeleteSubcon.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
   components: {
     Createsubcon,
     EditSubcon,
-    DeleteSubcon 
+    DeleteSubcon,
+    LoadingModal 
   },
   data() {
     return {
@@ -89,7 +86,7 @@ export default {
       showDeleteModal: false,
       editId: null,
       deleteId: null,
-      loading: false,
+      isLoading: false,
     };
   },
   async created() {
@@ -108,14 +105,14 @@ export default {
   methods: {
     async accessSubcon() {
       try {
-        this.loading = true;
+        this.isLoading = true;
         const processedData = await SubconController.accessSubcon();
         this.subcons = processedData;
       } catch (error) {
-        this.loading = false;
+        this.isLoading = false;
         this.FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       } finally {
-        this.loading = false;
+        this.isLoading = false;
       }
     },
     editSub(subconId) {

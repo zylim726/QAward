@@ -1,4 +1,4 @@
-body, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4 {
+body, h1, h2, h3, h4, h5, h6,h7, .h1, .h2, .h3, .h4 {
   font-family: $font-family-sans-serif;
   font-weight: 300;
   line-height: 1.5em;
@@ -9,7 +9,7 @@ h1,h2,h3,.h1,.h2,.h3{
     margin-bottom: 10px;
 }
 
-h4,h5,h6,.h4,.h5,.h6{
+h4,h5,h6,h7,.h4,.h5,.h6,.h7{
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -39,6 +39,10 @@ h6, .h6{
     font-size: $font-size-h6;
     text-transform: uppercase;
     font-weight: $font-weight-bold;
+}
+
+h7, .h7{
+  font-size: $font-size-h7;
 }
 
 p{
@@ -83,7 +87,7 @@ h2.title{
   @include transition (0.33s, cubic-bezier(0.685, 0.0473, 0.346, 1));
 
   > .content{
-      padding: 15px 10px;
+      padding: 15px 7px;
       min-height: calc(100vh - 123px);
   }
 
@@ -100,7 +104,7 @@ h2.title{
 .titleHeader {
 
   margin: 10px;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: bold;
   color: $orange;
 

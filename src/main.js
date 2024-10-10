@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import App from "./App";
 import store from "@/services/axios/store";
 import config from "@/services/axios/config.js";
+import MaintenanceController from "@/services/controllers/MaintenanceController.js";
 
 // router setup
 import routes from "./routes/routes";
@@ -22,15 +23,41 @@ const router = new VueRouter({
   linkExactActiveClass: "nav-item active",
 });
 
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const isAuthenticated = store.state.token !== null;
-  if (requiresAuth && !isAuthenticated) {
+router.beforeEach(async (to, from, next) => {
+  try {
+
+    if (to.path === "/maintenance") {
+      next(); // Already on maintenance page, no need to check
+      return;
+    }
+
+    const maintenanceMessage = await MaintenanceController.checkMaintenance();
+      console.log('end',maintenanceMessage.end);
+      console.log('status',maintenanceMessage.isMaintenance);
+
+    if (maintenanceMessage.isMaintenance === 1) {
+      next({
+        path: "/maintenance",
+        query: { end: maintenanceMessage.end },
+      });
+      return;
+    }
+
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+    const isAuthenticated = store.state.token !== null;
+    if (requiresAuth && !isAuthenticated) {
+      next("/login");
+    } else {
+      next();
+    }
+    
+
+  } catch (error) {
     next("/login");
-  } else {
-    next();
   }
 });
+
+
 
 Vue.prototype.$Chartist = Chartist;
 

@@ -37,12 +37,12 @@
       </div>
 
       <div class="form-group">
-        <label><b>Actuall Calling Quotation Date:</b></label>
+        <label><b>Actual Calling Quotation Date:</b></label>
         <input  v-model="module.callingquotationDate" type="date" class="form-control" required />
       </div>
 
       <div class="form-group">
-        <label><b>Awading Target Date:</b></label>
+        <label><b>Awarding Target Date:</b></label>
         <input type="date" v-model="module.awadingtaget" class="form-control" required />
       </div>
 

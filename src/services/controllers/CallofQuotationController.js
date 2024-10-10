@@ -9,12 +9,12 @@ const CallofQuotationController = {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
-
-      const response = await axios.get(`${apiHost}/call_for_quotation`, {
+      const projectId = localStorage.getItem('projectId');
+      const response = await axios.get(`${apiHost}/call_for_quotation/showByProject/${projectId}`, {
         headers,
       })
       const processedData = CallQuotationModels.processResponseData(response.data);
-
+     
       return processedData;
 
       
@@ -29,7 +29,8 @@ const CallofQuotationController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
 
-      const response = await axios.get(`${apiHost}/call_for_quotation`, {
+      const projectId = localStorage.getItem('projectId');
+      const response = await axios.get(`${apiHost}/call_for_quotation/showByProject/${projectId}`, {
         headers,
       })
 
@@ -49,7 +50,7 @@ const CallofQuotationController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken();
 
-      const getCQResponse = await axios.delete(`${apiHost}/cq_unit_type/removeByCallForQuotation/${id}`, {
+      const getCQResponse = await axios.delete(`${apiHost}/call_for_quotation/removeByCallForQuotation/${id}`, {
         headers,
       });
 

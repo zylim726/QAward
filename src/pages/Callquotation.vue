@@ -12,12 +12,7 @@
         <md-card>
           <md-card-content style="font-size: 13px !important;line-height: 17px !important">
             <div>
-              <div v-if="isLoading" class="spinner-border" role="status">
-                <span class="visually-hidden">   
-                  <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-                    <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-                  </button> Loading...</span>
-              </div>
+              <div v-if="isLoading"><loading-modal /><br><br></div>
               <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
               <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
               <br>
@@ -34,7 +29,7 @@
                 <div class="filter-container" style="margin-right: -15px">
                   <a href="createcq" v-if="hasAccess">
                     <div class="tooltip">
-                      <span class="tooltiptext">Created Comparison Summary</span>
+                      <span class="tooltiptext" style="bottom: 114% !important;">Created Comparison Summary</span>
                     <md-icon class="mdIcon" style="margin-right: 15px"
                       >add</md-icon></div>
                     </a
@@ -42,7 +37,7 @@
                 </div>
                 <button type="button" class="transparentButton" style="margin-left: 15px;margin-top: -40px;" @click="downloadExcelTemplate">
                     <div class="tooltip">
-                    <span class="tooltiptext">Export Comparison Summary</span>
+                    <span class="tooltiptext" style="bottom: 114% !important;">Export Comparison Summary</span>
                     <md-icon class="mdIcon">system_update_alt</md-icon>
                     </div>
                 </button>
@@ -76,7 +71,7 @@
                       <th>Provisional Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
-                    <tr :class="headerClass">
+                    <tr :class="maxprojectApprovalData.length > 0 ? headerClass : ''">
                       <th :style="{ 'top': '0' }"></th>
                       <th :style="{ 'top': '0' }" colspan="8"></th>
                       <th v-for="(approval, index) in maxprojectApprovalData" :key="index">
@@ -88,11 +83,11 @@
                   </thead>
                   
                   <tbody>
-                    <tr v-if="errorMessage" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
+                    <tr v-if="errorMessage" style="height: 50px;" ><td colspan="23" class="message">{{ errorMessage }}</td></tr>
                     <tr v-for="(callQuotation, index) in SearchcallQuotation" :key="index">
                       <td><a :href="'/comparison?cqID=' + callQuotation.id + '&projectID=' + callQuotation.projectId"><button class="transparentButton" >
                         <div class="tooltip" >
-                          <span class="tooltiptext" style="margin-left: 5px !important;">Go to see subcon comparison detail.</span>
+                          <span class="tooltiptext" style="margin-left: 20px !important;width: 155px;margin-bottom: -41px !important;">Go to see subcon comparison detail.</span>
                         <md-icon style="color: orange;">arrow_outward</md-icon></div></button>
                       </a></td>
                       <td>{{ index + 1 }}</td>
@@ -136,7 +131,7 @@
                         <td>{{ callQuotation.La && callQuotation.La.length > 0 ? callQuotation.La[0].Subcon.name : '' }}</td>
                         <td>
                           <a v-if="callQuotation.La && callQuotation.La.length > 0" 
-                            :href="'/approveComparison?laCqId=' + callQuotation.id" 
+                           
                             class="notify-status">
                             {{ callQuotation.La[0].la_code }}
                           </a>
@@ -152,7 +147,7 @@
                       <td>{{ callQuotation.status }}</td>
                     </tr>
                   </tbody>
-                  <tfoot>
+                  <tfoot v-if="!errorMessage">
                     <tr class="summary-row">
                       <th></th>
                       <td colspan="8"></td>
@@ -181,12 +176,12 @@
 const XLSX = require('xlsx');
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
-
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
-  
+    LoadingModal
   },
   data() {
     return {
@@ -225,16 +220,36 @@ export default {
       return this.maxprojectApproval();
     },
     headerClass() {
-      return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop';
-    }
+    const length = this.maxprojectApprovalData.length;
+      
+      if (length > 0 && length < 2) {
+        return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop';
+      } else if (length >= 2 && length <= 4) {
+        if (this.callQuotation.length > 8) {
+          return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop4';
+        } else if (this.callQuotation.length <= 6) {
+          return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop3';
+        } else {
+          return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 desktop2';
+        }
+      } else {
+        return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 default';
+      }
+}
+
   },
   mounted() {
-    const projectName = localStorage.getItem('projectName');
-    if (projectName) {
-      this.projectName = projectName;
+    if (!this.callQuotation[0]?.project_code) {
+      const projectName = localStorage.getItem('projectName');
+      if (projectName) {
+        this.projectName = projectName;
+      } else {
+        this.FailMessage = "You haven't selected a project in the project list.";
+      }
     } else {
-      this.FailMessage = "You haven't select the project in project list.";
-    };
+      this.projectName = this.callQuotation[0].project_code;
+      localStorage.setItem('projectName', this.projectName);
+    }
     this.accessCQ();
     this.checkScreenSize();
     window.addEventListener('resize', this.checkScreenSize);
@@ -388,6 +403,9 @@ export default {
         const processedData = await CallofQuotationController.accessCQ();
         if (Array.isArray(processedData) && processedData.length > 0) {
           this.callQuotation = processedData;
+         
+          this.projectName = this.callQuotation[0].project_code;
+          
           this.SumTotal = processedData[0].Sum;
           this.projectApproval = processedData[0].projectApproval;
         } else {
@@ -456,30 +474,52 @@ table {
   border-top: 2px solid #ddd;
 }
 
-/* Default for desktop */
 .header-title-2 {
   position: sticky;
 }
 
 .header-title-2.desktop {
-  top: 52px; /* For larger screens (desktops) */
+  top: 45px; 
+  z-index: 11;
 }
+
+.header-title-2.desktop2 {
+  top: 35px; 
+  z-index: 11;
+}
+
+.header-title-2.default {
+  top: 60px; 
+  z-index: 11;
+}
+
+.header-title-2.desktop3 {
+  top: 36px; 
+  z-index: 11;
+}
+
 
 .header-title-2.mobile {
-  top: 20px; /* For smaller screens (mobile) */
+  top: 20px;
+  z-index: 11;
 }
 
+  
+.header-title-2.desktop4 {
+  top: 70px; 
+  z-index: 11;
+}
 @media (max-width: 767px) {
-  /* Mobile view styles */
   .header-title-2 {
     top: 20px;
+    z-index: 11;
   }
 }
 
 @media (min-width: 768px) {
-  /* Desktop view styles */
   .header-title-2 {
     top: 70px;
+    z-index: 11;
   }
 }
 

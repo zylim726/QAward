@@ -2,20 +2,9 @@
 const CallQuotationModels = {
   processResponseData(response) {
     const dataArray = response.data;
-    const projectId = localStorage.getItem('projectId');
 
-
-    const filteredData = dataArray.filter(item => {
-      
-      if (String(item.project_id) === projectId) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-
-    if (filteredData.length > 0) {
-      const processedData = filteredData.map(config => ({
+    if (dataArray.length > 0) {
+      const processedData = dataArray.map(config => ({
         id: config.id,
         tradeCategory: config.trade_category,
         trade: config.trade,
@@ -38,6 +27,7 @@ const CallQuotationModels = {
         la_id: config.la_id,
         status: config.status,
         projectId: config.project_id,
+        project_code: config.project_code,
         message: response.message,
         cqSubconList: config.Call_For_Quotation_Subcon_Lists,
         projectApproval: config.projectApproval,

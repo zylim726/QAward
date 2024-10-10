@@ -29,29 +29,32 @@ const QuotationController = {
                 subcon_id: SubconId 
             }, { headers });
 
-
             SubconListId = cqSubconResponse.data.data.id;
 
-            const formData = new FormData();
-            formData.append('file', Documents.file);
-            formData.append('data-table', 'call_for_quotation_subcon_list');
-            formData.append('data-table-id', SubconListId);
-            formData.append('description', 'update quotation');
-            formData.append('name', Documents.file.name);
 
-            // Perform the axios request
-            const response = await axios.post(
-                `${apiHost}/document/importExcel`, 
-                formData, 
-                { 
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        Authorization: `Bearer ${token}`,
+            if (Documents && Documents.file) {
+                const formData = new FormData();
+                formData.append('file', Documents.file);
+                formData.append('data-table', 'call_for_quotation_subcon_list');
+                formData.append('data-table-id', SubconListId);
+                formData.append('description', 'update quotation');
+                formData.append('name', Documents.file.name);
+            
+                // Perform the axios request
+                const response = await axios.post(
+                    `${apiHost}/document/importExcel`, 
+                    formData, 
+                    { 
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${token}`,
+                        }
                     }
-                }
-            );
-
+                );
+            }
+            
             for (const quotation of QuotationData) {
+
                 try {
                     const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
                         quote_rate: quotation.rate,
@@ -145,7 +148,6 @@ const QuotationController = {
             
                 const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
                     approval_remarks: data.remark,
-                    approval_type: '',
                     approval_status: 'Approved',
                     call_for_quotation_id: data.cqId,
                     call_for_quotation_subcon_list_id: data.callForQuotationListId

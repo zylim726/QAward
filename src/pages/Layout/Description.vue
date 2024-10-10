@@ -40,6 +40,7 @@ export default {
         this.UpdateMessage = message;
         setTimeout(() => {
           this.UpdateMessage = '';
+          window.location.reload();
         }, 2000);
       }
     },
@@ -47,6 +48,7 @@ export default {
       this.FailMessage = message; 
       setTimeout(() => {
         this.FailMessage = '';
+        window.location.reload();
       }, 2000);
     },
   }

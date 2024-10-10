@@ -46,13 +46,13 @@
     <label class="titleHeader">Project Control Approval:</label>
     <br />
     <form @submit.prevent="submitForm">
-      <div class="form-group">
+      <div class="form-group" style="padding:12px">
         <label><b>Project Site:</b></label>
         <h5 v-if="!projectData">Please select the project name on the right side.</h5>
         <h3 class="titleHeader" v-else>{{ projectData.name }}</h3>
       </div>
 
-      <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;">
+      <div v-for="(item, index) in getUserHaveDT" :key="item.id" style="margin-bottom: 15px;padding: 12px;">
         <label><b>Approval {{ index + 1 }}</b></label>
         <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="display: flex;">
           <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-5">
@@ -253,18 +253,7 @@ export default {
 
 
 <style>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+
 
 .modal-content {
   text-align: center;

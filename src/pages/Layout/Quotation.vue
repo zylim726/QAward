@@ -29,12 +29,7 @@
       </div>
     </div>
 
-    <div v-if="isLoading" class="spinner-border" role="status">
-        <span class="visually-hidden">   
-          <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-            <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-          </button> Loading...</span>
-      </div>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
 
 
     <div class="md-layout">
@@ -138,8 +133,12 @@ import DescriptionController from "@/services/controllers/DescriptionController.
 import QuotationController from "@/services/controllers/QuotationController.js";
 import SubconController from "@/services/controllers/SubconController.js";
 import ExcelJS from "exceljs";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
+  components: {
+    LoadingModal,
+  },
   data() {
     return {
       cqId: 0,
@@ -306,7 +305,8 @@ export default {
         const cqUnitType = formData.cqUnitType;
         const getQuotation = formData.quotation;
 
-        if (getQuotation.length <= 0 || getQuotation[0].total_quote_amount === 0) {
+        
+        if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === "" ) ) {
           head1Counter++;
           prevHead1 = formData.description_item;
 
@@ -323,9 +323,7 @@ export default {
 
           head2Counter = 0;
           prevHead2 = null;
-        }
-
-        if (getQuotation.length > 0 && getQuotation[0].total_quote_amount !== 0) {
+        }else {
           head2Counter++;
           prevHead2 = formData.description_item;
 
@@ -344,7 +342,14 @@ export default {
             <td>${formData.description_unit || ''}</td> 
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
-            <td style="text-align:center;">${columnKData[columnKDataIndex] !== undefined ? columnKData[columnKDataIndex] : ''}</td>
+            <td style="text-align:center;">
+            ${columnKData[columnKDataIndex] !== undefined && columnKData[columnKDataIndex] !== null && columnKData[columnKDataIndex] !== '' 
+              ? parseFloat(columnKData[columnKDataIndex]).toFixed(2) 
+              : ''}
+          </td>
+
+
+
           `;
           tableBody.appendChild(head2Row);
 
@@ -475,18 +480,7 @@ export default {
 
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+
 
 .modal-content {
   text-align: center;

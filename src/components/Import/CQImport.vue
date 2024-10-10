@@ -1,11 +1,6 @@
 <template>
   <div>
-    <div v-if="loading" class="spinner-border" role="status">
-      <span class="visually-hidden">   
-        <button class="transparentButton" style="margin-right: 10px;cursor: default;">
-          <md-icon style="color: red;margin-bottom:10px;">autorenew</md-icon>
-        </button> Loading...</span>
-    </div>
+    <div v-if="isLoading"><loading-modal /><br><br></div>
     <label
       for="fileInput"
       style="margin-right: 10px; float: right"
@@ -47,7 +42,7 @@
             <th scope="col">Trade</th>
             <th scope="col">Location 1</th>
             <th scope="col">Actual Calling Quotation Date (dd/mm/yyyy)</th>
-            <th scope="col">Awading Target Date (dd/mm/yyyy)</th>
+            <th scope="col">Awarding Target Date (dd/mm/yyyy)</th>
             <th scope="col">Remarks</th>
           </tr>
         </thead>
@@ -75,8 +70,10 @@
 <script>
 import Import from "papaparse";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
 
 export default {
+  components:{LoadingModal},
   props: {
     formDataList: {
       type: Array,
@@ -88,7 +85,7 @@ export default {
       importedData: [],
       columnTitles: [],
       selectAll: true,
-      loading: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -144,7 +141,7 @@ export default {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
     downloadExcelTemplate() {
-      const csvHeader = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awading Target Date (dd/mm/yyyy),Remarks\n';
+      const csvHeader = 'Category,Trade,Location 1,Actual Calling Quotation Date (dd/mm/yyyy),Awarding Target Date (dd/mm/yyyy),Remarks\n';
 
       const csvRows = [
         ',PROJECT SIGNAGE,,,,',
@@ -228,7 +225,7 @@ export default {
       hiddenElement.click();
     },
     async saveData() {
-      this.loading = true;
+      this.isLoading = true;
       const selectedFormData = this.formDataList.filter(formData => formData.selected);
       const selectedImportedData = this.importedData.filter(importedRow => importedRow.selected);
 
@@ -237,7 +234,7 @@ export default {
         trade: unit["Trade"],
         location: unit["Location 1"],
         callingquotationDate: unit["Actual Calling Quotation Date (dd/mm/yyyy)"],
-        awadingtaget: unit["Awading Target Date (dd/mm/yyyy)"],
+        awadingtaget: unit["Awarding Target Date (dd/mm/yyyy)"],
         remarks: unit["Remarks"],
       }));
 
@@ -265,12 +262,12 @@ export default {
         
 
       } catch (error) {
-        this.loading = false;
+        this.isLoading = false;
         const FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
         window.scrollTo(0, 0); 
         this.$emit('fail-message', FailMessage);
       } finally {
-        this.loading = false; 
+        this.isLoading = false; 
       }
     }
   },

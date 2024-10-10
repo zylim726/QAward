@@ -1,6 +1,7 @@
 // Import your pages
 import Login from "@/pages/Login.vue";
 import Logout from "@/pages/Logout.vue";
+import Maintenance from "@/pages/Maintenance.vue";
 import ProjectList from "@/pages/ProjectList.vue";
 import Callquotation from "@/pages/Callquotation.vue";
 import ApproveComparison from "@/pages/ApproveComparison.vue";
@@ -152,6 +153,7 @@ const routes = [
   },
   { path: "/login", name: "Login", component: Login },
   { path: "/logout", name: "Logout", component: Logout },
+  { path: "/maintenance", name: "Maintenance", component: Maintenance },
 ];
 
 export default routes;
