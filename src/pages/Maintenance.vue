@@ -8,8 +8,8 @@
     </div>
     <div class="maintenance-message">
       <h1>We'll be back soon!</h1>
-      <p>We're currently undergoing maintenance. Thank you for your patience!</p>
-      <p>If you have any questions, feel free to <a href="mailto:support@example.com">contact us</a>.</p>
+      <p>IT is performing maintenance on QAward.</p>
+      <p>If you have any urgent matters, feel free to <a href='mailto:liwin@metrio.com.my'>contact us</a></p>
       <div class="countdown-timer">
         <div class="countdown-item">
           <span class="countdown-number">{{ days }}</span>
@@ -33,34 +33,57 @@
 </template>
 
 <script>
+import MaintenanceController from "@/services/controllers/MaintenanceController.js";
+
 export default {
+  components(){
+    MaintenanceController
+  },
   data() {
     return {
-      targetDate: new Date('2024-10-10T00:00:00'), // Set your target date here
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
+      maintenanceEnd: this.$route.query.end || "unknown", // Get end time from query parameter
     };
   },
   methods: {
-    calculateTimeRemaining() {
+    async calculateTimeRemaining() {
       const now = new Date();
-      const timeRemaining = this.targetDate - now;
+      const end = new Date(this.maintenanceEnd);
+      const timeRemaining = end - now;
 
-      this.days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-      this.hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      this.minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-      this.seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+      // Check if the maintenance end date and time is in the future
+      if (end > now) {
+        // Calculate the remaining time
+        this.days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        this.hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        this.minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        this.seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+      } else {
+
+        try {
+          const maintenanceMessage = await MaintenanceController.checkMaintenance();
+
+          if (maintenanceMessage.isMaintenance === 0){
+            window.location.href = '/login';
+          }else {
+            this.maintenanceEnd = maintenanceMessage.end;
+          }
+        }catch (error) {
+          console.error('Error updating maintenance:', error);
+        }
+        
+      }
     },
   },
   mounted() {
-    this.calculateTimeRemaining();
-    setInterval(this.calculateTimeRemaining, 1000);
+    this.calculateTimeRemaining(); // Initial calculation
+    setInterval(this.calculateTimeRemaining, 1000); // Update every second
   },
 };
 </script>
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Ubuntu:400,400i');
 
