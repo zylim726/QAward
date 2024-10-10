@@ -25,22 +25,20 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   try {
+
     if (to.path === "/maintenance") {
       next(); // Already on maintenance page, no need to check
       return;
     }
 
-    if (store.state.isMaintenance === null) {
-      const maintenanceMessage = await MaintenanceController.checkMaintenance();
-      
-      store.dispatch("setMaintenanceStatus", maintenanceMessage.isMaintenance);
-      store.dispatch("setMaintenanceEnd", maintenanceMessage.end); // Add end time
-    }
+    const maintenanceMessage = await MaintenanceController.checkMaintenance();
+      console.log('end',maintenanceMessage.end);
+      console.log('status',maintenanceMessage.isMaintenance);
 
-    if (store.state.isMaintenance === 1) {
+    if (maintenanceMessage.isMaintenance === 1) {
       next({
         path: "/maintenance",
-        query: { end: store.state.maintenanceEnd },
+        query: { end: maintenanceMessage.end },
       });
       return;
     }

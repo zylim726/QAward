@@ -33,7 +33,12 @@
 </template>
 
 <script>
+import MaintenanceController from "@/services/controllers/MaintenanceController.js";
+
 export default {
+  components(){
+    MaintenanceController
+  },
   data() {
     return {
       days: 0,
@@ -44,20 +49,32 @@ export default {
     };
   },
   methods: {
-    calculateTimeRemaining() {
+    async calculateTimeRemaining() {
       const now = new Date();
-      const previouse = new Date(this.maintenanceEnd);
-      const timeRemaining = previouse - now;
+      const end = new Date(this.maintenanceEnd);
+      const timeRemaining = end - now;
 
       // Check if the maintenance end date and time is in the future
-      if (previouse > now) {
+      if (end > now) {
         // Calculate the remaining time
         this.days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
         this.hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         this.minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
         this.seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
       } else {
-         window.location.href = '/login';
+
+        try {
+          const maintenanceMessage = await MaintenanceController.checkMaintenance();
+
+          if (maintenanceMessage.isMaintenance === 0){
+            window.location.href = '/login';
+          }else {
+            this.maintenanceEnd = maintenanceMessage.end;
+          }
+        }catch (error) {
+          console.error('Error updating maintenance:', error);
+        }
+        
       }
     },
   },
