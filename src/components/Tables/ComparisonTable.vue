@@ -972,7 +972,7 @@ export default {
 }
 
 .tippy-box[data-theme~='custom'] {
-  background-color: #FFE5B4; /* Change background color */
+  background-color: #FFE5B4; 
   padding: 10px;
   border-radius: 5px;
   font-size: 14px;

@@ -1,9 +1,9 @@
 <template>
   <div class="container" style="width: 100%;">
-    <div class="row" v-for="(cmapproval, index) in cmCQapproval" :key="index" style="margin-top: 15px; margin-right: 20px;">
-      <div class="cqbox">
+    <div class="row" v-for="(cmapproval, index) in cmCQapproval" :key="index" style="width: 100%; margin-top: 15px; margin-right: 10px;align-items: start;">
+      <div class="cqbox" style="align-items: start;">
         <div class="left-container">
-          <div class="md-card-avatar" style="margin-bottom: 315px;">
+          <div class="md-card-avatar">
             <img class="img" src="@/assets/img/admin.png" />
           </div>
         </div>
@@ -11,12 +11,18 @@
           <div class="user-info">
             <p class="user-name">Name: {{ cmapproval.user[0].name }}</p>
           </div>
-          <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-          <p class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}</p>
-          <p style="margin: 8px 0 10px;">Date:</p>
-          <p class="quotation-select" style="background-color: #EFEFEF4D;" disabled>{{ formatDate(cmapproval.updatedAt) }}</p>
-          <p style="margin: 8px 0 10px;">Remarks:</p>
-          <p class="quotation-select" style="background-color: #EFEFEF4D; height: 180px;" disabled>{{ cmapproval.approval_remarks }}</p>
+          <h6 style="margin: 8px 0 10px;">Recommend Award To:</h6>
+          <h6 class="approvalSelection">
+            {{ cmapproval.Call_For_Quotation_Subcon_List.Subcon.name }}
+          </h6>
+          <h6 style="margin: 8px 0 10px;">Date:</h6>
+          <h6 class="approvalSelection">
+            {{ formatDate(cmapproval.updatedAt) }}
+          </h6>
+          <h6 style="margin: 8px 0 10px;">Remarks:</h6>
+          <h6 class="approvalRemarks">
+            {{ cmapproval.approval_remarks }}
+          </h6>
         </div>
       </div>
     </div>
@@ -34,7 +40,7 @@ export default {
 
       const date = new Date(dateTimeString);
       if (isNaN(date.getTime())) {
-        return ''; 
+        return '';
       }
       const day = String(date.getDate()).padStart(2, '0');
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -48,5 +54,6 @@ export default {
 </script>
 
 <style scoped>
-/* Add your styles here */
+
+
 </style>
