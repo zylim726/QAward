@@ -8,8 +8,8 @@
     </div>
     <div class="maintenance-message">
       <h1>We'll be back soon!</h1>
-      <p>We're currently undergoing maintenance. Thank you for your patience!</p>
-      <p>If you have any questions, feel free to <a href="mailto:support@example.com">contact us</a>.</p>
+      <p>IT is performing maintenance on QAward.</p>
+      <p>If you have any urgent matters, feel free to <a href='mailto:liwin@metrio.com.my'>contact us</a></p>
       <div class="countdown-timer">
         <div class="countdown-item">
           <span class="countdown-number">{{ days }}</span>
