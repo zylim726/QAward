@@ -36,31 +36,37 @@
 export default {
   data() {
     return {
-      targetDate: new Date('2024-10-10T00:00:00'), // Set your target date here
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
+      maintenanceEnd: this.$route.query.end || "unknown", // Get end time from query parameter
     };
   },
   methods: {
     calculateTimeRemaining() {
       const now = new Date();
-      const timeRemaining = this.targetDate - now;
+      const previouse = new Date(this.maintenanceEnd);
+      const timeRemaining = previouse - now;
 
-      this.days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-      this.hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      this.minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-      this.seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+      // Check if the maintenance end date and time is in the future
+      if (previouse > now) {
+        // Calculate the remaining time
+        this.days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        this.hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        this.minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        this.seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+      } else {
+         window.location.href = '/login';
+      }
     },
   },
   mounted() {
-    this.calculateTimeRemaining();
-    setInterval(this.calculateTimeRemaining, 1000);
+    this.calculateTimeRemaining(); // Initial calculation
+    setInterval(this.calculateTimeRemaining, 1000); // Update every second
   },
 };
 </script>
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Ubuntu:400,400i');
 
