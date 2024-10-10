@@ -1,7 +1,6 @@
 const config = {
   hosts: {
-    // todo: development
-    production: "http://103.16.42.51:5000",
+    backendApi: "http://103.16.42.51:5000",
   },
 
   getTokenFromLocalStorage: () => {
@@ -13,7 +12,7 @@ const config = {
   },
 
   getHost: () => {
-    return config.hosts.production;
+    return config.hosts.backendApi;
   },
 
   getHeadersWithToken: () => {
