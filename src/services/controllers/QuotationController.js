@@ -150,7 +150,7 @@ const QuotationController = {
                     approval_remarks: data.remark,
                     approval_status: 'Approved',
                     call_for_quotation_id: data.cqId,
-                    call_for_quotation_subcon_list_id: data.callForQuotationListId
+                    call_for_quotation_subcon_list_id: data.subconListIds
                 }, { headers });
 
                 
@@ -194,7 +194,7 @@ const QuotationController = {
                         approval_type: '',
                         approval_status: 'Reject',
                         call_for_quotation_id: data.cqId,
-                        call_for_quotation_subcon_list_id: data.callForQuotationListId
+                        call_for_quotation_subcon_list_id: data.subconListIds
                     }, { headers });
                    
                     const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {

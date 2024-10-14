@@ -153,7 +153,7 @@
           <template><br>
             <div class="container" style="width: 100%;">
               <ApprovalTable v-if="cmCQapproval.length > 0" :cmCQapproval="cmCQapproval" />
-              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 60%;margin-top: 15px; margin-right: 20px;">
+              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="margin-top: 15px; margin-right: 20px;">
                 <div class="cqbox">
                   <div class="left-container">
                     <div class="md-card-avatar" style="margin-bottom: 160px;">
@@ -167,9 +167,8 @@
                     <p style="margin: 8px 0 10px;">Recommend Award To:</p>
                     <div v-if="(approvalData.system_user_id === Number(getUserIdLocal)) && index === 0 ">
                       <select v-model="selectedQuotations[index]" class="quotation-select" >
-                        <option value="">Select Recommend</option>
-                        <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.id">
-                          {{ quotationData.Subcon.name }}
+                        <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
+                          {{ selectSubconListId.Subcon.name }}
                         </option>
                       </select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
@@ -179,7 +178,6 @@
                     </div>
                     <div v-else>
                       <select style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
-                        <option value="1" >Select Recommend</option>
                       </select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
                       <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
@@ -406,12 +404,12 @@ export default {
     async submitAdminApproval(systemUserId,index) {
       this.isLoading = true;
       const approvalDataToSubmit = [];
-      const selectedSubconListName = this.selectedQuotations[index];
+      const subconListId = this.selectedQuotations[index];
       const remark = this.remarks[index];
       approvalDataToSubmit.push({
       cqId: this.cqId,
       userId: systemUserId,
-      callForQuotationListId: selectedSubconListName,
+      subconListIds: subconListId,
       remark: remark
     });
 
@@ -441,12 +439,12 @@ export default {
       this.isLoading = true;
       const approvalDataToSubmit = [];
       const remark = this.remarks[index];
-      const selectSubcon = this.selectedQuotations[index];
+      const subconListId = this.selectedQuotations[index];
 
       approvalDataToSubmit.push({
         cqId: this.cqId,
         userId: systemUserId,
-        selectSubcon: selectSubcon,
+        subconListIds: subconListId,
         remark: remark || "" 
       });
      
@@ -759,7 +757,6 @@ export default {
               const SubconListData = getCQ.Call_For_Quotation_Subcon_Lists;
               this.SubconListId = SubconListData.filter(subconData => subconData.subcon_id !== 1);
               SubconListData.forEach((subconData, subconIndex) => {
-              this.$set(this.selectedQuotations, cqIndex, '');
               const GetRemarksSubcon = subconData.Cq_Approvals;
               GetRemarksSubcon.forEach((remarkData, remarksIndex) => {
                 if(remarkData.system_user_id === approval.system_user_id ){
