@@ -406,12 +406,19 @@ export default {
       const approvalDataToSubmit = [];
       const subconListId = this.selectedQuotations[index];
       const remark = this.remarks[index];
-      approvalDataToSubmit.push({
-      cqId: this.cqId,
-      userId: systemUserId,
-      subconListIds: subconListId,
-      remark: remark
-    });
+
+      if (subconListId){
+        approvalDataToSubmit.push({
+        cqId: this.cqId,
+        userId: systemUserId,
+        subconListIds: subconListId,
+        remark: remark
+      });
+      }else {
+        this.FailMessage = 'Error message: Please select a recommended award.';
+
+      }
+      
 
       try {
           window.scrollTo({
