@@ -153,7 +153,7 @@
           <template><br>
             <div class="container" style="width: 100%;">
               <ApprovalTable v-if="cmCQapproval.length > 0" :cmCQapproval="cmCQapproval" />
-              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style=" margin-top: 15px; margin-right: 20px;">
+              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="width: 60%;margin-top: 15px; margin-right: 20px;">
                 <div class="cqbox">
                   <div class="left-container">
                     <div class="md-card-avatar" style="margin-bottom: 160px;">
@@ -167,7 +167,8 @@
                     <p style="margin: 8px 0 10px;">Recommend Award To:</p>
                     <div v-if="(approvalData.system_user_id === Number(getUserIdLocal)) && index === 0 ">
                       <select v-model="selectedQuotations[index]" class="quotation-select" >
-                        <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.Subcon.name">
+                        <option value="">Select Recommend</option>
+                        <option v-for="(quotationData, qIndex) in SubconListId" :key="qIndex" :value="quotationData.id">
                           {{ quotationData.Subcon.name }}
                         </option>
                       </select>
@@ -177,7 +178,8 @@
                       <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approve</button><br>
                     </div>
                     <div v-else>
-                      <select v-model="selectedQuotations[index]"  style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
+                      <select style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
+                        <option value="1" >Select Recommend</option>
                       </select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
                       <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
@@ -406,26 +408,18 @@ export default {
       const approvalDataToSubmit = [];
       const selectedSubconListName = this.selectedQuotations[index];
       const remark = this.remarks[index];
-      this.SubconListId.forEach((getSubconList) => {
-        const subconName = getSubconList.Subcon;
-        if (subconName.name === selectedSubconListName) {
-          if (selectedSubconListName) {
-            approvalDataToSubmit.push({
-              cqId: this.cqId,
-              userId: systemUserId,
-              callForQuotationListId: getSubconList.id,
-              remark: remark
-            });
-          }
-        }
-      });
+      approvalDataToSubmit.push({
+      cqId: this.cqId,
+      userId: systemUserId,
+      callForQuotationListId: selectedSubconListName,
+      remark: remark
+    });
 
       try {
           window.scrollTo({
             top: 0,
             behavior: 'smooth' 
-          });
-          
+          });    
 
           const SuccessMessage = await QuotationController.addCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
@@ -447,15 +441,15 @@ export default {
       this.isLoading = true;
       const approvalDataToSubmit = [];
       const remark = this.remarks[index];
+      const selectSubcon = this.selectedQuotations[index];
 
-      this.SubconListId.forEach((getSubconList) => {
-        approvalDataToSubmit.push({
-          cqId: this.cqId,
-          userId: systemUserId,
-          callForQuotationListId: getSubconList.id,
-          remark: remark || "" 
-        });
+      approvalDataToSubmit.push({
+        cqId: this.cqId,
+        userId: systemUserId,
+        selectSubcon: selectSubcon,
+        remark: remark || "" 
       });
+     
 
       try {
         
@@ -463,7 +457,7 @@ export default {
             top: 0,
             behavior: 'smooth' 
           });
-
+    
           const SuccessMessage = await QuotationController.rejectCQApproval(approvalDataToSubmit);
           const concatenatedMessage = SuccessMessage.join(', ');
           const Message = concatenatedMessage.split(',')[0].trim();
@@ -765,7 +759,7 @@ export default {
               const SubconListData = getCQ.Call_For_Quotation_Subcon_Lists;
               this.SubconListId = SubconListData.filter(subconData => subconData.subcon_id !== 1);
               SubconListData.forEach((subconData, subconIndex) => {
-              this.$set(this.selectedQuotations, cqIndex, subconData.Subcon.name || '');
+              this.$set(this.selectedQuotations, cqIndex, '');
               const GetRemarksSubcon = subconData.Cq_Approvals;
               GetRemarksSubcon.forEach((remarkData, remarksIndex) => {
                 if(remarkData.system_user_id === approval.system_user_id ){
