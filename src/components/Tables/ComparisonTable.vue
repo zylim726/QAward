@@ -747,7 +747,7 @@ export default {
               ${winnerTDs}
             </tr>
             <tr>
-              <td colspan="${colspan}" title="BQ Total Amount - After Discount Given"><b>Provisional Sum (RM)</b></td>
+              <td colspan="${colspan}" title="BQ Total Amount - After Discount Given"><b>Contingency Sum (RM)</b></td>
               ${previsionalSumTDs}
             </tr>
             <tr>
