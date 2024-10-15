@@ -370,7 +370,10 @@ export default {
 
       } catch (error) {
         this.FailMessage = "Error issue: download document failed: " + error.message;
-
+        setTimeout(() => {
+            this.FailMessage = '';
+            window.location.reload();
+         }, 1000);
       }
     },
     async handleCheckboxChange() {
