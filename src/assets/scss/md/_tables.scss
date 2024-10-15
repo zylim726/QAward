@@ -308,6 +308,34 @@ label {
   cursor: pointer;
 }
 
+.approvalSelection {
+  overflow-wrap: anywhere;
+  word-wrap: anywhere; 
+  white-space: normal; 
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #EFEFEF4D;
+  appearance: none;
+  cursor: pointer;
+}
+
+.approvalRemarks {
+  min-height: 220px; 
+  overflow-wrap: anywhere; 
+  word-wrap: anywhere; 
+  white-space: normal; 
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #EFEFEF4D;
+  padding: 10px;
+  font-size: 14px;
+}
+
+
 
 thead th{
   background-color: $orangeLight;
