@@ -1,6 +1,6 @@
 const config = {
   hosts: {
-    backendApi: "http://103.16.42.51:12000",
+    backendApi: `${process.env.VUE_APP_QAWARD_BACKEND_HOST}`,
   },
 
   getTokenFromLocalStorage: () => {
