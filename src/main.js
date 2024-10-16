@@ -15,6 +15,9 @@ import Modal from "./models/plugin/modal";
 
 import Chartist from "chartist";
 
+//CONSOLE.LOG CHECK HOST
+console.log('Backend Host:', process.env.VUE_APP_QAWARD_BACKEND_HOST);
+
 // configure router
 const router = new VueRouter({
   mode: "history",
