@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve --mode local",
     "dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
     "prod": "cross-env NODE_ENV=production vue-cli-service serve --mode production",
-    "lint": "vue-cli-servicde lint",
+    "lint": "vue-cli-service lint",
     "prettify": "prettier --write ."
   },
   "dependencies": {

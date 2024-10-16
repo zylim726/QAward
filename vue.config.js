@@ -8,7 +8,7 @@ if (!port || isNaN(port) || port < 0 || port >= 65536) {
 module.exports = {
   devServer: {
     // Set the port, defaulting to 8080 if not valid
-    port: port && !isNaN(port) && port >= 0 && port < 65536 ? port : 9090,
+    port: port && !isNaN(port) && port >= 0 && port < 65536 ? port : 8080,
   },
   chainWebpack: (config) => {
     config.module
