@@ -36,7 +36,7 @@
                       <th>LA Ref</th>
                       <th>Trade</th>
                       <th>Subcon Name</th>
-                      <th>Provisional Sum</th>
+                      <th>Contingency Sum</th>
                       <th>Contact Sum</th>
                       <th>Date</th>
                     </tr>
@@ -87,7 +87,7 @@
                       <th>Work Order Ref</th>
                       <th>Trade</th>
                       <th>Subcon Name</th>
-                      <th>Provisional Sum</th>
+                      <th>Contingency Sum</th>
                       <th>Contact Sum</th>
                       <th>Date</th>
                     </tr>
@@ -268,7 +268,7 @@ export default {
           Type: 'Work Order',
           Code: item.code,
           'Subcon Name': item.subconName,
-          'Provisional Sum': item.provisional_sum,
+          'Contingency Sum': item.provisional_sum,
           'Contact Sum': item.contract_sum,
           Date: item.updateDate
         })),
@@ -276,7 +276,7 @@ export default {
           Type: 'LA Data',
           Code: item.code,
           'Subcon Name': item.subconName,
-          'Provisional Sum': item.provisional_sum,
+          'Contingency Sum': item.provisional_sum,
           'Contact Sum': item.contract_sum,
           Date: item.updateDate
         }))
