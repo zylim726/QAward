@@ -3,9 +3,9 @@
   "version": "1.5.2",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 11000",
-    "dev": "npm run serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve --mode local",
+    "dev": "cross-env NODE_ENV=development vue-cli-service serve --mode development",
+    "prod": "cross-env NODE_ENV=production vue-cli-service serve --mode production",
     "lint": "vue-cli-service lint",
     "prettify": "prettier --write ."
   },
@@ -39,6 +39,7 @@
     "@vue/cli-plugin-router": "5.0.8",
     "@vue/cli-service": "5.0.8",
     "@vue/eslint-config-prettier": "7.1.0",
+    "cross-env": "^7.0.3",
     "es6-promise": "4.2.8",
     "eslint": "8.56.0",
     "eslint-plugin-prettier": "4.2.1",
