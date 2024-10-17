@@ -34,9 +34,8 @@
           <tr class="header-row-1">
             <th class="sticky-col"></th>
             <th colspan="3" v-if="!isHide"  class="sticky-col"></th>
-            <th></th>
+            <th colspan="2"></th>
             <template v-if="!isHide">
-              <th></th>
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
             </template>
             <th v-if="!isHide"></th>
@@ -98,7 +97,7 @@
             <th scope="col" v-if="!isHide"  class="sticky-col">Sub Element</th>
             <th scope="col" v-if="!isHide"  class="sticky-col">Sub Sub Element</th>
             <th scope="col"   class="sticky-col">Description</th>
-            <th scope="col" v-if="!isHide"  class="sticky-col">Unit</th>
+            <th scope="col"   class="sticky-col">Unit</th>
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
             </template>
@@ -122,9 +121,9 @@
           }">
             <th class="sticky-col"></th>
             <th colspan="3" v-if="!isHide"  class="sticky-col"></th>
-            <th></th>
+            <th colspan="2"></th>
             <template v-if="!isHide">
-              <th></th>
+              
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
             </template>
             <th ></th>
@@ -644,7 +643,7 @@ export default {
                 ${!isHide ? `<td class="sticky-col">${formData.sub_element || ''}</td>` : ''}
                 ${!isHide ? `<td class="sticky-col">${formData.description_sub_sub_element || ''}</td>` : ''}
                 <td style="padding-left:10px !important;" class="sticky-col td-max-width">${formData.description_item}</td>
-                 ${!isHide ? `<td>${formData.description_unit || ''}</td>` : ''}
+                <td>${formData.description_unit || ''}</td>
                 ${unitQuantityHTML}
                 ${getHideHTML}
                 <td>${this.formatAccounting(formData.adj_quantity)}</td>
@@ -661,7 +660,7 @@ export default {
           const getRemeauserement = UnitType[0].is_remeasurement;
 
           const colspan = isHide
-            ? (getRemeauserement ? 3 : 3)
+            ? (getRemeauserement ? 4 : 4)
             : (getRemeauserement ? numberOfArrays + 9 : numberOfArrays + 8);
 
           let bqTotalAmountTDs = '';
