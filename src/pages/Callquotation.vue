@@ -68,7 +68,7 @@
                       <th>Subcontract Amount (RM)</th>
                       <th>Subcontract (ADJ) Amount (RM)</th>
                       <th>Cost Saving / (Overrun) (RM)</th>
-                      <th>Provisional Sum</th>
+                      <th>Contingency Sum</th>
                       <th style="text-align: center">Status</th>
                     </tr>
                     <tr :class="maxprojectApprovalData.length > 0 ? headerClass : ''">

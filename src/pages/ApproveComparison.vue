@@ -24,7 +24,7 @@
             <md-card class="summary-item">
               <md-card-content class="summary-card" style="border-right: 2px solid blue;">
                 <div class="card-header">
-                  <p>Provisional Sum</p>
+                  <p>Contingency Sum</p>
                   <div class="icon-circle" style="background-color: #F1F7FF;">
                     <md-icon style="color: blue;">signal_cellular_alt</md-icon>
                   </div>
