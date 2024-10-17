@@ -32,11 +32,14 @@
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr class="header-row-1">
-            <th colspan="6"  class="sticky-col"></th>
+            <th class="sticky-col"></th>
+            <th colspan="3" v-if="!isHide"  class="sticky-col"></th>
+            <th></th>
             <template v-if="!isHide">
+              <th></th>
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
             </template>
-            <th></th>
+            <th v-if="!isHide"></th>
             <th>
               <div class="tooltip" >
                 <span class="tooltiptext" style="margin-bottom: -118px !important;margin-left: -142px;width: 210px !important;">
@@ -44,7 +47,7 @@
                 <md-icon style="color: red;margin-top: 10px;margin-right: -10px;">priority_high</md-icon>
               </div>
             </th>
-            <th v-if="hasRemeasurement">
+            <th v-if="hasRemeasurement && !isHide">
               <div class="tooltip" >
                 <span class="tooltiptext" style="margin-bottom: -116px !important;margin-left: -107px;width: 200px !important;">
                   For reference purpose only</span>
@@ -89,19 +92,19 @@
               </button>
             </th>
           </tr>
-          <tr  class="header-row-2">
+           <tr  class="header-row-2">
             <th scope="col"   class="sticky-col">Item</th>
-            <th scope="col"   class="sticky-col">Element</th>
-            <th scope="col"   class="sticky-col">Sub Element</th>
-            <th scope="col"   class="sticky-col">Sub Sub Element</th>
+            <th scope="col" v-if="!isHide"  class="sticky-col">Element</th>
+            <th scope="col" v-if="!isHide"  class="sticky-col">Sub Element</th>
+            <th scope="col" v-if="!isHide"  class="sticky-col">Sub Sub Element</th>
             <th scope="col"   class="sticky-col">Description</th>
-            <th scope="col"   class="sticky-col">Unit</th>
+            <th scope="col" v-if="!isHide"  class="sticky-col">Unit</th>
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
             </template>
-            <th scope="col">BQ QTY</th>
+            <th scope="col" v-if="!isHide">BQ QTY</th>
             <th scope="col">(ADJ) QTY</th>
-            <th scope="col" v-if="hasRemeasurement">(Remeasurement) QTY</th>
+            <th scope="col" v-if="hasRemeasurement && !isHide">(Remeasurement) QTY</th>
             <th 
               scope="col" 
               colspan="2" 
@@ -117,12 +120,16 @@
             'header-row-4': Unittype.length > 0 && QuotationName.length === 2, 
             'header-row-3': Unittype.length > 0 && QuotationName.length > 2
           }">
-            <th colspan="6"   class="sticky-col"></th>
+            <th class="sticky-col"></th>
+            <th colspan="3" v-if="!isHide"  class="sticky-col"></th>
+            <th></th>
             <template v-if="!isHide">
+              <th></th>
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
             </template>
-            <th colspan="2"></th>
-            <th v-if="hasRemeasurement"></th>
+            <th ></th>
+            <th v-if="!isHide" ></th>
+            <th v-if="hasRemeasurement && !isHide"></th>
             <th v-for="(header, index) in generatedHeaders" :key="index" style="text-align: center;border-left:1px solid #ddd !important;border-right:1px solid #ddd !important">{{ header }}</th>
           </tr>
         </thead>
@@ -141,7 +148,7 @@
           <button class="btn-save" @click="approvalQuotation">Submit</button>
         </div>
       </template>
-      <template v-if="(project.status === 'Waiting Approval') && QuotationName.length > 0 ">
+      <template v-if="(project.status !== 'Pending') && QuotationName.length > 0 ">
         <div class="confirmation-message" >
           <p>It this a work order.</p> 
           <label >
@@ -151,30 +158,48 @@
         </div>
         <div class="cqapprovalBox-container">   
           <template><br>
-            <div class="container" style="width: 100%;">
-              <ApprovalTable v-if="cmCQapproval.length > 0" :cmCQapproval="cmCQapproval" />
-              <div class="row" v-for="(approvalData, index) in filteredCQApprovalData" :key="index" style="margin-top: 15px; margin-right: 20px;">
-                <div class="cqbox">
+            <div class="container" style="width: 100%;" >      
+              <div class="row" v-for="(cmapproval, index) in cqApprovalData" :key="index" :style="{ width: itemWidth, marginRight: '20px', marginTop: '15px' }" >
+                <div class="cqbox" style="align-items: start;">
                   <div class="left-container">
-                    <div class="md-card-avatar" style="margin-bottom: 160px;">
+                    <div class="md-card-avatar">
                       <img class="img" src="@/assets/img/admin.png" />
                     </div>
                   </div>
-                  <div class="right-container">
-                    <div v-for="(user, userIndex) in approvalData.systemuser" :key="userIndex" class="user-info">
-                      <p class="user-name">Name: {{ user.name }}</p>
+                  <div class="right-container" v-if="cmapproval.approval_status === 'Approved'">
+                    <div class="user-info">
+                      <p class="user-name">Name: {{ cmapproval.user[0].name }}</p>
+                    </div>
+                    <h6 style="margin: 8px 0 10px;">Recommend Award To:</h6>
+                    <h6 class="approvalSelection">
+                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }}
+
+                    </h6>
+                    <h6 style="margin: 8px 0 10px;">Date:</h6>
+                    <h6 class="approvalSelection">
+                      {{ formatDate(cmapproval.updatedAt) }}
+                    </h6>
+                    <h6 style="margin: 8px 0 10px;">Remarks:</h6>
+                    <h6 class="approvalRemarks">
+                      {{ cmapproval.approval_remarks }}
+                    </h6>
+                  </div>
+                  <div class="right-container" v-else>
+                    <div class="user-info">
+                      <p class="user-name">Name: {{ cmapproval.user[0].name }}</p>
                     </div>
                     <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                    <div v-if="(approvalData.system_user_id === Number(getUserIdLocal)) && index === 0 ">
+                    <div v-if="(canWriteApproval() === cmapproval.sequence) && (cmapproval.system_user_id === Number(getUserIdLocal))">
                       <select v-model="selectedQuotations[index]" class="quotation-select" >
+                        <option value=""> </option>
                         <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
-                          {{ selectSubconListId.Subcon.name }}
+                          {{ selectSubconListId.Subcon.name}}
                         </option>
                       </select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
                       <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" required ></textarea>
-                      <button class="btn-save"  @click="rejectAdminApproval(approvalData.system_user_id, index)">Reject</button><br>
-                      <button class="btn-save"  @click="submitAdminApproval(approvalData.system_user_id, index)">Approve</button><br>
+                      <button class="btn-save"  @click="rejectAdminApproval(cmapproval.system_user_id, index, cmapproval.id)">Reject</button><br>
+                      <button class="btn-save"  @click="submitAdminApproval(cmapproval.system_user_id, index, cmapproval.id)">Approve</button><br>
                     </div>
                     <div v-else>
                       <select style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
@@ -185,13 +210,9 @@
                   </div>
                 </div>
               </div>
+             
             </div>
           </template>
-        </div>
-      </template>
-      <template v-if="(project.status === 'Approved' ) && QuotationName.length > 0 "> 
-        <div class="cqapprovalBox-container">
-          <ApprovalTable :cmCQapproval="cmCQapproval" />
         </div>
       </template>
   </div> 
@@ -209,7 +230,6 @@ import DescriptionController from '@/services/controllers/DescriptionController.
 import QuotationController from '@/services/controllers/QuotationController.js';
 import CallofQuotationController from '@/services/controllers/CallofQuotationController.js';
 import RejectModal from '@/components/Pop-Up-Modal/RejectModal.vue';
-import ApprovalTable from '@/components/Tables/ApprovalTable.vue';
 import DelSubcon from '@/components/Pop-Up-Modal/DelSubcon.vue';
 import { checkAccess } from "@/services/axios/accessControl.js";
 import _ from 'lodash';
@@ -223,7 +243,6 @@ export default {
     DelSubcon,
     RejectModal,
     LoadingModal,
-    ApprovalTable
   },
   props: {
     cqId: {
@@ -250,7 +269,6 @@ export default {
       selectedQuotations: {},
       remarks: {},
       hasAccess: false,
-      cmCQapproval:[],
       SubconListId:[],
       excelFile: null,
       isLoading: false,
@@ -262,11 +280,20 @@ export default {
       this.getCQApproval(newValue);
       this.getProject(newValue);
       this.checkPermission();
-      this.getCMcqApproval(newValue);
       this.handleCheckboxChange();
     },
   },
   computed: {
+    itemWidth() {
+   
+    const cqApprovalData = this.cqApprovalData || [];
+
+    // Calculate lengths
+    const cmApprovalLength = cqApprovalData.length; 
+
+    // Return width based on total items, ensuring it doesn't divide by zero
+    return cmApprovalLength > 0 ? `${100 / cmApprovalLength}%` : '0%'; // Adjusted to return '0%' when no items
+  },
     hasRemeasurement(){   
       if (Array.isArray(this.Unittype) && this.Unittype.length > 0) {
         const firstUnit = this.Unittype[0];
@@ -279,10 +306,7 @@ export default {
       const isChecked = this.Unittype[0].Cq_Unit_Type.Call_For_Quotation.is_work_order === true;
       return isChecked;
     },
-    filteredCQApprovalData() {
-      const cmSystemUserIds = this.cmCQapproval.map(approval => approval.system_user_id);
-      return this.cqApprovalData.filter(approval => !cmSystemUserIds.includes(approval.system_user_id));
-    },
+
     generatedHeaders() {
       const headers = [];
       for (let i = 0; i < this.QuotationName.length; i++) {
@@ -304,6 +328,22 @@ export default {
     },
   },
   methods: {
+    canWriteApproval() {
+    // Check for pending cases assigned to the current user
+    const pendingCases = this.cqApprovalData.filter(approval => 
+        approval.approval_status === 'Pending'
+    );
+
+    // If there are pending cases, return the sequence of the first one
+    if (pendingCases.length > 0) {
+      // Access the first pending case
+      const firstPendingCase = pendingCases[0]; 
+      
+      return firstPendingCase.sequence; 
+    }
+
+    return null;
+},
    async downloadDocument(url) {
       try {
         const apiHost = config.getHost();
@@ -329,8 +369,11 @@ export default {
         URL.revokeObjectURL(blobUrl);
 
       } catch (error) {
-        this.errorMessage = "Error issue: download document failed: " + error.message;
-        console.error(this.errorMessage);
+        this.FailMessage = "Error issue: download document failed: " + error.message;
+        setTimeout(() => {
+            this.FailMessage = '';
+            window.location.reload();
+         }, 1000);
       }
     },
     async handleCheckboxChange() {
@@ -396,12 +439,8 @@ export default {
         this.FailMessage =  `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       }
     },
-    getRowData(rowIndex) {
-      const start = rowIndex * 4;
-      const end = start + 4;
-      return this.cqApprovalData.slice(start, end);
-    },
-    async submitAdminApproval(systemUserId,index) {
+   
+    async submitAdminApproval(systemUserId,index, cqapprovalId) {
       this.isLoading = true;
       const approvalDataToSubmit = [];
       const subconListId = this.selectedQuotations[index];
@@ -412,7 +451,8 @@ export default {
         cqId: this.cqId,
         userId: systemUserId,
         subconListIds: subconListId,
-        remark: remark
+        remark: remark,
+        cqApprovalId: cqapprovalId,
       });
       }else {
         this.FailMessage = 'Error message: Please select a recommended award.';
@@ -442,7 +482,7 @@ export default {
         this.isLoading = false;
       }
     },
-    async rejectAdminApproval(systemUserId,index) {
+    async rejectAdminApproval(systemUserId,index,cqApprovalId) {
       this.isLoading = true;
       const approvalDataToSubmit = [];
       const remark = this.remarks[index];
@@ -452,7 +492,8 @@ export default {
         cqId: this.cqId,
         userId: systemUserId,
         subconListIds: subconListId,
-        remark: remark || "" 
+        remark: remark || "",
+        cqApprovalId: cqApprovalId
       });
      
 
@@ -552,13 +593,13 @@ export default {
 
             if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === "" ) ) {
               head1Counter++;
-             
+            
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
                 <td  class="sticky-col"><b><u>${head1Counter}</u></b></td>
-                <td  class="sticky-col"><b><u>${formData.element || ''}</u></b></td>
-                <td  class="sticky-col"><b><u>${formData.sub_element || ''}</u></b></td>
-                <td  class="sticky-col"><b><u>${formData.description_sub_sub_element || ''}</u></b></td>
+                ${!isHide ? `<td class="sticky-col"><b><u>${formData.element || ''}</u></b></td>` : ''}
+                ${!isHide ? `<td class="sticky-col"><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
+                ${!isHide ? `<td class="sticky-col"><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
                 <td style="padding-left:10px !important" class="sticky-col td-max-width"><b><u>${formData.description_item}</u></b></td>
               `;
               tableBody.appendChild(head1Row);
@@ -588,21 +629,22 @@ export default {
 
               let remeasuremntQuantityTDs = '';
               if (formData.remeasurement_quantity >= 0) {
-                remeasuremntQuantityTDs = `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>`;
+                remeasuremntQuantityTDs = `${!isHide ? `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>` : ''}`;
+               
               }
 
 
-              const getHideHTML = `<td>${this.formatAccounting(formData.bq_quantity)}</td>`;
+              const getHideHTML = `${!isHide ? `<td>${this.formatAccounting(formData.bq_quantity)}</td>` : ''}`;
               const unitQuantityHTML = isHide ? '' : unitQuantityTDs;
-
+  
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
                 <td class="sticky-col" >${head1Counter}.${head2Counter}</td>
-                <td class="sticky-col">${formData.element || ''}</td>
-                <td class="sticky-col">${formData.sub_element || ''}</td>
-                <td class="sticky-col">${formData.description_sub_sub_element || ''}</td>
+                ${!isHide ? `<td class="sticky-col">${formData.element || ''}</td>` : ''}
+                ${!isHide ? `<td class="sticky-col">${formData.sub_element || ''}</td>` : ''}
+                ${!isHide ? `<td class="sticky-col">${formData.description_sub_sub_element || ''}</td>` : ''}
                 <td style="padding-left:10px !important;" class="sticky-col td-max-width">${formData.description_item}</td>
-                <td>${formData.description_unit || ''}</td>
+                 ${!isHide ? `<td>${formData.description_unit || ''}</td>` : ''}
                 ${unitQuantityHTML}
                 ${getHideHTML}
                 <td>${this.formatAccounting(formData.adj_quantity)}</td>
@@ -619,7 +661,7 @@ export default {
           const getRemeauserement = UnitType[0].is_remeasurement;
 
           const colspan = isHide
-            ? (getRemeauserement ? 9 : 8)
+            ? (getRemeauserement ? 3 : 3)
             : (getRemeauserement ? numberOfArrays + 9 : numberOfArrays + 8);
 
           let bqTotalAmountTDs = '';
@@ -755,37 +797,18 @@ export default {
     },
     async getCQApproval(id) {
       try {
-        const response = await QuotationController.getCQApproval();
-        this.cqApprovalData = response;
-        response.forEach((approval, index) => {
-          const GetSubconList = approval.callForQuotation;
-          GetSubconList.forEach((getCQ, cqIndex) => {
-            if(getCQ.id === Number(id)){
-              const SubconListData = getCQ.Call_For_Quotation_Subcon_Lists;
-              this.SubconListId = SubconListData.filter(subconData => subconData.subcon_id !== 1);
-              SubconListData.forEach((subconData, subconIndex) => {
-              const GetRemarksSubcon = subconData.Cq_Approvals;
-              GetRemarksSubcon.forEach((remarkData, remarksIndex) => {
-                if(remarkData.system_user_id === approval.system_user_id ){
-                  this.$set(this.remarks, index , '');
-                }
-              
-              });
-            });
-            }
-          });
-        });
+        const response = await QuotationController.getCQApproval(id);
+        this.cqApprovalData = response.data;
+        const getCallForQuotationSubconList = response.callForQuotationSubconLists;
+        // Filter out items where subcon_id is 1
+        const filteredSubconList = getCallForQuotationSubconList.filter(item => item.subcon_id !== 1);
+        this.SubconListId = filteredSubconList;
+
+        console.log('this cqApprovalData',response.data);
+        console.log('this getSubconList',response.callForQuotationSubconLists);
+        console.log('this subconlistid',this.SubconListId);
       } catch (error) {
         console.log('Error fetching CQ approvals:', error);
-      }
-    },
-    async getCMcqApproval() {
-      try {
-        const id = this.cqId;
-        const response = await QuotationController.getCMcqApproval(id);
-        this.cmCQapproval = response.filter(approval => approval.approval_status === 'Approved');
-      } catch (error) {
-         //this.FailMessage = 'Error CM approval:', error;
       }
     },
     async getProject(id) {
