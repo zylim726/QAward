@@ -32,8 +32,8 @@
       <table ref="dataTable" class="nested-table" id="data-table">
         <thead>
           <tr class="header-row-1">
-            <th class="sticky-col"></th>
-            <th colspan="3" v-if="!isHide"  class="sticky-col"></th>
+            <th></th>
+            <th colspan="3" v-if="!isHide" ></th>
             <th colspan="2"></th>
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
@@ -92,12 +92,13 @@
             </th>
           </tr>
            <tr  class="header-row-2">
-            <th scope="col"   class="sticky-col">Item</th>
-            <th scope="col" v-if="!isHide"  class="sticky-col">Element</th>
-            <th scope="col" v-if="!isHide"  class="sticky-col">Sub Element</th>
-            <th scope="col" v-if="!isHide"  class="sticky-col">Sub Sub Element</th>
-            <th scope="col"   class="sticky-col">Description</th>
-            <th scope="col"   class="sticky-col">Unit</th>
+            <th scope="col"   >Item</th>
+            <th scope="col" v-if="!isHide"  >Element</th>
+            <th scope="col" v-if="!isHide"  >Sub Element</th>
+            <th scope="col" v-if="!isHide" >Sub Sub Element</th>
+            <th scope="col" >Description</th>
+            <th scope="col"  >Unit</th>
+
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
             </template>
@@ -119,9 +120,10 @@
             'header-row-4': Unittype.length > 0 && QuotationName.length === 2, 
             'header-row-3': Unittype.length > 0 && QuotationName.length > 2
           }">
-            <th class="sticky-col"></th>
-            <th colspan="3" v-if="!isHide"  class="sticky-col"></th>
+            <th ></th>
+            <th colspan="3" v-if="!isHide"  ></th>
             <th colspan="2"></th>
+
             <template v-if="!isHide">
               
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
@@ -196,7 +198,7 @@
                         </option>
                       </select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
-                      <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" required ></textarea>
+                      <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" ></textarea>
                       <button class="btn-save"  @click="rejectAdminApproval(cmapproval.system_user_id, index, cmapproval.id)">Reject</button><br>
                       <button class="btn-save"  @click="submitAdminApproval(cmapproval.system_user_id, index, cmapproval.id)">Approve</button><br>
                     </div>
@@ -595,11 +597,11 @@ export default {
             
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                <td  class="sticky-col"><b><u>${head1Counter}</u></b></td>
-                ${!isHide ? `<td class="sticky-col"><b><u>${formData.element || ''}</u></b></td>` : ''}
-                ${!isHide ? `<td class="sticky-col"><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
-                ${!isHide ? `<td class="sticky-col"><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
-                <td style="padding-left:10px !important" class="sticky-col td-max-width"><b><u>${formData.description_item}</u></b></td>
+                <td ><b><u>${head1Counter}</u></b></td>
+                ${!isHide ? `<td><b><u>${formData.element || ''}</u></b></td>` : ''}
+                ${!isHide ? `<td><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
+                ${!isHide ? `<td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
+                <td style="padding-left:10px !important" class="td-max-width"><b><u>${formData.description_item}</u></b></td>
               `;
               tableBody.appendChild(head1Row);
 
@@ -638,12 +640,14 @@ export default {
   
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
+
                 <td class="sticky-col" >${head1Counter}.${head2Counter}</td>
-                ${!isHide ? `<td class="sticky-col">${formData.element || ''}</td>` : ''}
-                ${!isHide ? `<td class="sticky-col">${formData.sub_element || ''}</td>` : ''}
-                ${!isHide ? `<td class="sticky-col">${formData.description_sub_sub_element || ''}</td>` : ''}
-                <td style="padding-left:10px !important;" class="sticky-col td-max-width">${formData.description_item}</td>
+                ${!isHide ? `<td>${formData.element || ''}</td>` : ''}
+                ${!isHide ? `<td>${formData.sub_element || ''}</td>` : ''}
+                ${!isHide ? `<td>${formData.description_sub_sub_element || ''}</td>` : ''}
+                <td style="padding-left:10px !important;" class="td-max-width">${formData.description_item}</td>
                 <td>${formData.description_unit || ''}</td>
+
                 ${unitQuantityHTML}
                 ${getHideHTML}
                 <td>${this.formatAccounting(formData.adj_quantity)}</td>
