@@ -34,9 +34,8 @@
           <tr class="header-row-1">
             <th></th>
             <th colspan="3" v-if="!isHide" ></th>
-            <th></th>
+            <th colspan="2"></th>
             <template v-if="!isHide">
-              <th></th>
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
             </template>
             <th v-if="!isHide"></th>
@@ -93,12 +92,13 @@
             </th>
           </tr>
            <tr  class="header-row-2">
-            <th scope="col"  >Item</th>
-            <th scope="col" v-if="!isHide" >Element</th>
-            <th scope="col" v-if="!isHide" >Sub Element</th>
+            <th scope="col"   >Item</th>
+            <th scope="col" v-if="!isHide"  >Element</th>
+            <th scope="col" v-if="!isHide"  >Sub Element</th>
             <th scope="col" v-if="!isHide" >Sub Sub Element</th>
-            <th scope="col"  >Description</th>
-            <th scope="col" v-if="!isHide" >Unit</th>
+            <th scope="col" >Description</th>
+            <th scope="col"  >Unit</th>
+
             <template v-if="!isHide">
               <th v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.type }}</th>
             </template>
@@ -120,11 +120,12 @@
             'header-row-4': Unittype.length > 0 && QuotationName.length === 2, 
             'header-row-3': Unittype.length > 0 && QuotationName.length > 2
           }">
-            <th></th>
-            <th colspan="3" v-if="!isHide" ></th>
-            <th></th>
+            <th ></th>
+            <th colspan="3" v-if="!isHide"  ></th>
+            <th colspan="2"></th>
+
             <template v-if="!isHide">
-              <th></th>
+              
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;">{{ unitdata.cqUnitType.quantity }}</th>
             </template>
             <th ></th>
@@ -639,12 +640,14 @@ export default {
   
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
-                <td >${head1Counter}.${head2Counter}</td>
+
+                <td class="sticky-col" >${head1Counter}.${head2Counter}</td>
                 ${!isHide ? `<td>${formData.element || ''}</td>` : ''}
                 ${!isHide ? `<td>${formData.sub_element || ''}</td>` : ''}
                 ${!isHide ? `<td>${formData.description_sub_sub_element || ''}</td>` : ''}
                 <td style="padding-left:10px !important;" class="td-max-width">${formData.description_item}</td>
-                 ${!isHide ? `<td>${formData.description_unit || ''}</td>` : ''}
+                <td>${formData.description_unit || ''}</td>
+
                 ${unitQuantityHTML}
                 ${getHideHTML}
                 <td>${this.formatAccounting(formData.adj_quantity)}</td>
@@ -661,7 +664,7 @@ export default {
           const getRemeauserement = UnitType[0].is_remeasurement;
 
           const colspan = isHide
-            ? (getRemeauserement ? 3 : 3)
+            ? (getRemeauserement ? 4 : 4)
             : (getRemeauserement ? numberOfArrays + 9 : numberOfArrays + 8);
 
           let bqTotalAmountTDs = '';
