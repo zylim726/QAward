@@ -282,16 +282,6 @@ export default {
     },
   },
   computed: {
-  //   itemWidth() {
-   
-  //   const cqApprovalData = this.cqApprovalData || [];
-
-  //   // Calculate lengths
-  //   const cmApprovalLength = cqApprovalData.length; 
-
-  //   // Return width based on total items, ensuring it doesn't divide by zero
-  //   return cmApprovalLength > 0 ? `${100 / cmApprovalLength}%` : '0%'; // Adjusted to return '0%' when no items
-  // },
     hasRemeasurement(){   
       if (Array.isArray(this.Unittype) && this.Unittype.length > 0) {
         const firstUnit = this.Unittype[0];
