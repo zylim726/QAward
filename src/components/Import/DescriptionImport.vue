@@ -303,7 +303,7 @@ export default {
        });
     } catch (error) {
       
-      //this.$emit('fail-message', `Error Message: ` + error.errorMessage);
+      this.$emit('fail-message', `Error Message: ` + error.errorMessage);
       
     } finally {
       this.isLoading = false;
