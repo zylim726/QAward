@@ -160,7 +160,7 @@
         <div class="cqapprovalBox-container">   
           <template><br>
             <div class="container" style="width: 100%;" >      
-              <div class="row" v-for="(cmapproval, index) in cqApprovalData" :key="index" :style="{ width: itemWidth, marginRight: '20px', marginTop: '15px' }" >
+              <div class="row align-baseline" v-for="(cmapproval, index) in cqApprovalData" :key="index" :style="{ width: itemWidth, marginRight: '20px', marginTop: '15px' }" >
                 <div class="cqbox" style="align-items: start;">
                   <div class="left-container">
                     <div class="md-card-avatar">
@@ -1006,6 +1006,9 @@ export default {
 /* Optional: Arrow styling */
 .tippy-box[data-theme~='custom'] .tippy-arrow {
   color: #FFE5B4; 
+}
+.align-baseline {
+  align-items: baseline !important;
 }
 
 </style>
