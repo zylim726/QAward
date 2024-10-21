@@ -157,10 +157,10 @@
             Yes
           </label>
         </div>
-        <div class="cqapprovalBox-container">   
-          <template><br>
-            <div class="container" style="width: 100%;" >      
-              <div class="row align-baseline" v-for="(cmapproval, index) in cqApprovalData" :key="index" :style="{ width: itemWidth, marginRight: '20px', marginTop: '15px' }" >
+        <div class="cqapprovalBox-container">
+          <template>
+            <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
+              <div class="cqbox-item" v-for="(cmapproval, index) in cqApprovalData"  :key="index" :style="getCardStyle()">
                 <div class="cqbox" style="align-items: start;">
                   <div class="left-container">
                     <div class="md-card-avatar">
@@ -171,16 +171,15 @@
                     <div class="user-info">
                       <p class="user-name">Name: {{ cmapproval.user[0].name }}</p>
                     </div>
-                    <h6 style="margin: 8px 0 10px;">Recommend Award To:</h6>
+                    <h6>Recommend Award To:</h6>
                     <h6 class="approvalSelection">
                       {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }}
-
                     </h6>
-                    <h6 style="margin: 8px 0 10px;">Date:</h6>
+                    <h6>Date:</h6>
                     <h6 class="approvalSelection">
                       {{ formatDate(cmapproval.updatedAt) }}
                     </h6>
-                    <h6 style="margin: 8px 0 10px;">Remarks:</h6>
+                    <h6>Remarks:</h6>
                     <h6 class="approvalRemarks">
                       {{ cmapproval.approval_remarks }}
                     </h6>
@@ -189,29 +188,27 @@
                     <div class="user-info">
                       <p class="user-name">Name: {{ cmapproval.user[0].name }}</p>
                     </div>
-                    <p style="margin: 8px 0 10px;">Recommend Award To:</p>
-                    <div v-if="(canWriteApproval() === cmapproval.sequence) && (cmapproval.system_user_id === Number(getUserIdLocal))">
-                      <select v-model="selectedQuotations[index]" class="quotation-select" >
+                    <p>Recommend Award To:</p>
+                    <div v-if="canWriteApproval() === cmapproval.sequence && cmapproval.system_user_id === Number(getUserIdLocal)">
+                      <select v-model="selectedQuotations[index]" class="quotation-select">
                         <option value=""> </option>
                         <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
-                          {{ selectSubconListId.Subcon.name}}
+                          {{ selectSubconListId.Subcon.name }}
                         </option>
                       </select>
-                      <p style="margin: 8px 0 10px;">Remarks:</p>
+                      <p>Remarks:</p>
                       <textarea v-model="remarks[index]" class="remarks-textarea" style="height: 77px !important;" ></textarea>
                       <button class="btn-save"  @click="rejectAdminApproval(cmapproval.system_user_id, index, cmapproval.id)">Reject</button><br>
                       <button class="btn-save"  @click="submitAdminApproval(cmapproval.system_user_id, index, cmapproval.id)">Approve</button><br>
                     </div>
                     <div v-else>
-                      <select style="background-color: #EFEFEF4D;" class="quotation-select" disabled>
-                      </select>
+                      <select style="background-color: #EFEFEF4D;" class="quotation-select" disabled></select>
                       <p style="margin: 8px 0 10px;">Remarks:</p>
                       <textarea v-model="remarks[index]" class="remarks-textarea" disabled></textarea>
                     </div>
                   </div>
                 </div>
               </div>
-             
             </div>
           </template>
         </div>
@@ -285,16 +282,16 @@ export default {
     },
   },
   computed: {
-    itemWidth() {
+  //   itemWidth() {
    
-    const cqApprovalData = this.cqApprovalData || [];
+  //   const cqApprovalData = this.cqApprovalData || [];
 
-    // Calculate lengths
-    const cmApprovalLength = cqApprovalData.length; 
+  //   // Calculate lengths
+  //   const cmApprovalLength = cqApprovalData.length; 
 
-    // Return width based on total items, ensuring it doesn't divide by zero
-    return cmApprovalLength > 0 ? `${100 / cmApprovalLength}%` : '0%'; // Adjusted to return '0%' when no items
-  },
+  //   // Return width based on total items, ensuring it doesn't divide by zero
+  //   return cmApprovalLength > 0 ? `${100 / cmApprovalLength}%` : '0%'; // Adjusted to return '0%' when no items
+  // },
     hasRemeasurement(){   
       if (Array.isArray(this.Unittype) && this.Unittype.length > 0) {
         const firstUnit = this.Unittype[0];
@@ -329,6 +326,29 @@ export default {
     },
   },
   methods: {
+    getCardStyle() {
+  const windowWidth = window.innerWidth; // Get the current window width
+  let width;
+
+  if (windowWidth >= 1024) { // Desktop view
+    const cmApprovalLength = this.cqApprovalData.length;
+
+    // Calculate width based on the number of items for desktop
+    if (cmApprovalLength > 0) {
+      width = `calc(${100 / cmApprovalLength}% - 20px)`; // Dynamic width for desktop
+    } else {
+      width = '0%'; // No items
+    }
+  } else { // Mobile or tablet view
+    width = '100%'; // Full width for mobile/tablet
+  }
+
+  return {
+    width: width, // Use the calculated width
+    marginRight: '20px',
+    marginTop: '15px'
+  };
+},
     canWriteApproval() {
     // Check for pending cases assigned to the current user
     const pendingCases = this.cqApprovalData.filter(approval => 
@@ -1007,8 +1027,28 @@ export default {
 .tippy-box[data-theme~='custom'] .tippy-arrow {
   color: #FFE5B4; 
 }
-.align-baseline {
-  align-items: baseline !important;
+.cqbox-item {
+  margin-bottom: 15px;
 }
+
+/* Add media queries to ensure one card per row on smaller screens */
+@media (min-width: 1024px) {
+  .cqbox-item {
+    flex: 1 1 calc(33.33% - 20px); /* Three cards per row on desktop */
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cqbox-item {
+    flex: 1 1 calc(50% - 20px); /* Two cards per row on tablets */
+  }
+}
+
+@media (max-width: 767px) {
+  .cqbox-item {
+    flex: 1 1 100%; /* One card per row on mobile */
+  }
+}
+
 
 </style>
