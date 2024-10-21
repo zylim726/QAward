@@ -216,7 +216,6 @@ export default {
     const matchedValues = {};
 
     unittype.forEach(unit => {
-  // Variable for unit type (unit quantity)
   const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
   console.log('combineObjects:', combineObjects);
 
@@ -230,8 +229,6 @@ export default {
   if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
     matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
 
-    // console.log('Value of sanitizedObjectKeys[combineObjects]:', sanitizedObjectKeys[combineObjects]);
-    // console.log('matchedValue for ownpropert:', matchedValues[unit.id]);
   }
 });
 
@@ -281,7 +278,7 @@ export default {
       sub_element: object["Sub Element"],
       description_sub_sub_element: object["Sub Sub Element"],
       description_unit: object["Unit"],
-      description: object["Description"],
+      description_item: object["Description"],
       budget: object["Budget Rate"],
     });
 
@@ -290,7 +287,7 @@ export default {
 
   if (!hasErrors) {
     try {
-      
+
       const successMessage = await DescriptionController.addDescription(cqId, validData);
       const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
