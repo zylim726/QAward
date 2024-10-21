@@ -7,16 +7,12 @@ const DescriptionController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        console.log('matchedData',matchedData);
-
-
+        
         const descriptionResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/addBudget`, {
           call_for_quotation_id: cqId,
           subcon_id: 1,
           matchedData: matchedData,
       }, { headers });
-
-      console.log('descriptionResponse',descriptionResponse);
 
       return descriptionResponse.data.message;
 
