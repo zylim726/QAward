@@ -261,7 +261,6 @@ export default {
 .row {
   display: flex;
   align-items: center;
-  margin-top: -12px;
 }
 .row h6 {
   margin-right: 10px; 

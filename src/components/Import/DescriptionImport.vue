@@ -216,7 +216,6 @@ export default {
     const matchedValues = {};
 
     unittype.forEach(unit => {
-  // Variable for unit type (unit quantity)
   const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
   console.log('combineObjects:', combineObjects);
 
@@ -230,8 +229,6 @@ export default {
   if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
     matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
 
-    // console.log('Value of sanitizedObjectKeys[combineObjects]:', sanitizedObjectKeys[combineObjects]);
-    // console.log('matchedValue for ownpropert:', matchedValues[unit.id]);
   }
 });
 
@@ -281,16 +278,20 @@ export default {
       sub_element: object["Sub Element"],
       description_sub_sub_element: object["Sub Sub Element"],
       description_unit: object["Unit"],
-      description: object["Description"],
+      description_item: object["Description"],
       budget: object["Budget Rate"],
     });
+
+
 
     
   });
 
   if (!hasErrors) {
     try {
-      
+
+      console.log('validData',validData);
+
       const successMessage = await DescriptionController.addDescription(cqId, validData);
       const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
@@ -299,14 +300,10 @@ export default {
       await this.$router.push({
         path: '/comparison',
         query: { cqID: cqId, projectID: storedProjectId }
-      });
+       });
     } catch (error) {
-
-      if(error){
-        this.$emit('fail-message', `Error Message:`+ error);
-      }else {
-        this.$emit('fail-message', `Error Message: The template is outdated. Please download it again`);
-      }
+      
+      this.$emit('fail-message', `Error Message: ` + error.errorMessage);
       
     } finally {
       this.isLoading = false;

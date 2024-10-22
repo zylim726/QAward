@@ -7,60 +7,14 @@ const DescriptionController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        const messageArray = [];
-  
-      
-        let SubconListId = "";
-
         
-        try {
-            const cqSubconResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/add`, {
-                discount: 0.00,
-                call_for_quotation_id: cqId,
-                subcon_id: 1 //id 1 is budget
-            }, { headers });
-    
-            SubconListId = cqSubconResponse.data.data.id;
-          
-        } catch (error) {
-          const errorMessage = handleApiError(error);
-          throw { errorMessage };
-        }
-       
+        const descriptionResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/addBudget`, {
+          call_for_quotation_id: cqId,
+          subcon_id: 1,
+          matchedData: matchedData,
+      }, { headers });
 
-        for (const data of matchedData) {
-          const descriptionResponse = await axios.post(`${apiHost}/description/add`, {
-              element: data.element,
-              sub_element: data.sub_element,
-              description_sub_sub_element: data.description_sub_sub_element,
-              description_unit: data.description_unit,
-              description_item: data.description
-          }, { headers });
-       
-          const quotationResponse = await axios.post(`${apiHost}/quotation/add`, {
-              quote_rate: data.budget,
-              call_for_quotation_subcon_list_id: SubconListId,
-              description_id: descriptionResponse.data.data.id
-          }, { headers });
-
-          for (const [unitId, value] of Object.entries(data.matchedValues)) {
-            try {
-                const descriptionCQUnitResponse = await axios.post(`${apiHost}/description_cq_unit_type_list/add`, {
-                    cq_unit_type_id: unitId,
-                    description_id: descriptionResponse.data.data.id,
-                    quantity: value
-                }, { headers });
-
-                const message = descriptionCQUnitResponse.data.message;
-                messageArray.push(message);
-            } catch (error) {
-                const errorMessage = handleApiError(error);
-                throw { errorMessage };
-            }
-          }
-        }
-
-        return messageArray;
+      return descriptionResponse.data.message;
 
     } catch (error) {
      

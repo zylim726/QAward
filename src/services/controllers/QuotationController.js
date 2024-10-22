@@ -98,29 +98,14 @@ const QuotationController = {
         throw errorMessage;
     }
   },
-  async getCQApproval(){
-    try {
-        const apiHost = config.getHost();
-        const headers = config.getHeadersWithToken();
-        const ProjectId = localStorage.getItem('projectId');
-        
-        const response = await axios.get(`${apiHost}/project_approval/showByProject/${ProjectId}`, { headers });
-
-        return response.data.data;
-
-    } catch (error) {
-        const errorMessage = handleApiError(error);
-        throw errorMessage;
-    }
-  },
-  async getCMcqApproval(id){
+  async getCQApproval(id){
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         
         const response = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${id}`, { headers });
 
-        return response.data.data;
+        return response.data;
 
     } catch (error) {
         const errorMessage = handleApiError(error);
@@ -132,31 +117,21 @@ const QuotationController = {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const messages = [];
-        let foundId = null;
+        
         for (const data of approvalDataToSubmit) {
-            const Cqresponse = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${data.cqId}`, { headers });
 
-            const CheckCQ = Cqresponse.data.data;
-            CheckCQ.forEach(cq => {
-            if (cq.system_user_id === Number(data.userId)) {
-                
-                foundId = cq.id;
-            }
-            });
 
-            if (foundId){
-            
-                const response = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
-                    approval_remarks: data.remark,
-                    approval_status: 'Approved',
-                    call_for_quotation_id: data.cqId,
-                    call_for_quotation_subcon_list_id: data.subconListIds
-                }, { headers });
+            const response = await axios.put(`${apiHost}/cq_approval/edit/${data.cqApprovalId}`, {
+                approval_remarks: data.remark,
+                approval_status: 'Approved',
+                call_for_quotation_id: data.cqId,
+                call_for_quotation_subcon_list_id: data.subconListIds
+            }, { headers });
 
+
+            messages.push(response.data.message);
                 
-                messages.push(response.data.message);
-                
-            }
+           
         }
         
          return messages;
@@ -175,47 +150,20 @@ const QuotationController = {
         const messages = [];
   
         for (const data of approvalDataToSubmit) {
-            try {
+           
+            const cqApprovalResponse = await axios.put(`${apiHost}/cq_approval/edit/${data.cqApprovalId}`, {
+                approval_remarks: data.remark,
+                approval_status: 'Reject',
+                call_for_quotation_id: data.cqId,
+                call_for_quotation_subcon_list_id: data.subconListIds
+            }, { headers });
+            
+            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
+                status: 'Pending',
+            }, { headers });
 
-                const Cqresponse = await axios.get(`${apiHost}/cq_approval/showByCallForQuotation/${data.cqId}`, { headers });
-
-                const CheckCQ = Cqresponse.data.data;
-                CheckCQ.forEach(cq => {
-                    if (Number(cq.system_user_id) === Number(data.userId)) {
-                        foundId = cq.id;
-                    }
-                });
-
-
-                if (foundId){
-
-                    const cqApprovalResponse = await axios.put(`${apiHost}/cq_approval/edit/${foundId}`, {
-                        approval_remarks: data.remark,
-                        approval_type: '',
-                        approval_status: 'Reject',
-                        call_for_quotation_id: data.cqId,
-                        call_for_quotation_subcon_list_id: data.subconListIds
-                    }, { headers });
-                   
-                    const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
-                        status: 'Pending',
-                    }, { headers });
-
-                    messages.push(cqApprovalResponse.data.message);
-                }else {
-
-                    const response = await axios.put(`${apiHost}/call_for_quotation/edit/${data.cqId}`, {
-                        status: 'Pending',
-                    }, { headers });
-
-
-                    messages.push(response.data.message);
-                }
-                    
-            } catch (error) {
-                const errorMessage = handleApiError(error);
-                throw errorMessage;
-            }
+            messages.push(cqApprovalResponse.data.message);
+               
         }
 
         return response.data.message;
