@@ -282,11 +282,15 @@ export default {
       budget: object["Budget Rate"],
     });
 
+
+
     
   });
 
   if (!hasErrors) {
     try {
+
+      console.log('validData',validData);
 
       const successMessage = await DescriptionController.addDescription(cqId, validData);
       const message = successMessage[0].split(',')[0].trim(); 
@@ -296,14 +300,10 @@ export default {
       await this.$router.push({
         path: '/comparison',
         query: { cqID: cqId, projectID: storedProjectId }
-      });
+       });
     } catch (error) {
-
-      if(error){
-        this.$emit('fail-message', `Error Message:`+ error);
-      }else {
-        this.$emit('fail-message', `Error Message: The template is outdated. Please download it again`);
-      }
+      
+      this.$emit('fail-message', `Error Message: ` + error.errorMessage);
       
     } finally {
       this.isLoading = false;
