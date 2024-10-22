@@ -13,7 +13,7 @@
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
-        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 2">Add Description</button></a>
+        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  >Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" style="width: 178px !important;">
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
