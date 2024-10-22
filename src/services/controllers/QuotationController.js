@@ -303,19 +303,16 @@ const QuotationController = {
 
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-      
-        if(checked === true) {
-            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-                is_work_order : 1
-            }, { headers });
-        }else {
-            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-                is_work_order : 0
-            }, { headers });
-        }
+
+        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+            is_work_order: checked ? 1 : 0 // Use a ternary operator to set is_work_order
+        }, { headers });
+
+        return response.data.message;
+
     
         
-        return response.data.message;
+       
     } catch (error) {
         const errorMessage = handleApiError(error);
         throw errorMessage;
