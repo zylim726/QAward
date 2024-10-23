@@ -36,7 +36,7 @@
         <br>
         <md-card style="height: 65%">
           <div class="status">
-            <i class="material-icons">notifications_active</i>
+            <i class="material-icons" style="margin-top: 9px;">notifications_active</i>
             <h7>Status : <b class="titleHeader">{{ callQuotation.status }}</b></h7>
           </div>
           <div class="comparison-title">
@@ -82,6 +82,13 @@
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -40px;">
         <md-card style="min-height: 97%">
           <md-card-content style="line-height: 16px !important;">
+            <workorder-table :cqId="cqId" ></workorder-table>
+          </md-card-content>
+        </md-card>
+      </div>
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -40px;">
+        <md-card style="min-height: 97%">
+          <md-card-content style="line-height: 16px !important;">
             <comparison-table :cqId="cqId" ></comparison-table>
           </md-card-content>
         </md-card>
@@ -93,13 +100,14 @@
 </template>
 
 <script>
-import { ComparisonTable } from "@/components";
+import { ComparisonTable, WorkorderTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { EditCQ,DeleteCQ }  from "@/components";
 
 export default {
   components: {
     ComparisonTable,
+    WorkorderTable,
     EditCQ,
     DeleteCQ,
   },

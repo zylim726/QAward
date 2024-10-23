@@ -150,13 +150,6 @@
         </div>
       </template>
       <template v-if="(project.status !== 'Pending') && QuotationName.length > 0 ">
-        <div class="confirmation-message" >
-          <p>It this a work order.</p> 
-          <label >
-            <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
-            Yes
-          </label>
-        </div>
         <div class="cqapprovalBox-container">
           <template>
             <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
@@ -278,7 +271,6 @@ export default {
       this.getCQApproval(newValue);
       this.getProject(newValue);
       this.checkPermission();
-      this.handleCheckboxChange();
     },
   },
   computed: {
@@ -290,10 +282,7 @@ export default {
       }
       return false;
     },
-    isPermissionChecked() {
-      const isChecked = this.Unittype[0].Cq_Unit_Type.Call_For_Quotation.is_work_order === true;
-      return isChecked;
-    },
+
 
     generatedHeaders() {
       const headers = [];
@@ -386,16 +375,6 @@ export default {
             window.location.reload();
          }, 1000);
       }
-    },
-    async handleCheckboxChange() {
-       if (event && event.target) {
-        const isChecked = event.target.checked; 
-        try {
-          const SuccessMessage = await QuotationController.updateWorkOrder(isChecked,this.cqId);
-        } catch (error) {
-          
-        }
-       }
     },
     getDisplayName(budgetId, name) {
       budgetId = parseFloat(budgetId);

@@ -8,6 +8,7 @@ import GetcallquotationTable from "./Tables/GetcallquotationTable.vue";
 import SubconTable from "./Tables/SubconTable.vue";
 import ProjectTable from "./Tables/ProjectTable.vue";
 import NotificationTable from "./Tables/NotificationTable.vue";
+import WorkorderTable from "./Tables/WoTable.vue";
 
 // MODAL
 import Modal from "./Pop-Up-Modal/Modal.vue";
@@ -28,6 +29,7 @@ import DescriptionImport from "./Import/DescriptionImport.vue";
 
 export {
   ComparisonTable,
+  WorkorderTable,
   CQImport,
   Modal,
   CreatecqTable,
