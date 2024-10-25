@@ -23,7 +23,7 @@ import Description from "@/pages/Layout/Description.vue";
 import Remeasurement from "@/pages/Layout/Remeasurement.vue";
 import Notification from "@/pages/Layout/Notification.vue";
 
-
+import Mygrid from "@/pages/Layout/Mygrid.vue";
 const routes = [
   {
     path: "/",
@@ -154,6 +154,7 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/logout", name: "Logout", component: Logout },
   { path: "/maintenance", name: "Maintenance", component: Maintenance },
+  { path: "/mygrid", name: "Mygrid", component: Mygrid },
 ];
 
 export default routes;

@@ -73,6 +73,26 @@ const DescriptionController = {
     }
 
   },
+  async getFullDetails(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+
+      console.log('id show full api',id);
+      const response = await axios.get(`${apiHost}/call_for_quotation/comparisonTable/${id}`, {
+        headers,
+      });
+      console.log('response',response.data);
+
+      return response.data;
+
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      throw { errorMessage };
+      
+    }
+
+  },
   async getTotalQuotation(id,SubconId){
     try {
       const apiHost = config.getHost();
