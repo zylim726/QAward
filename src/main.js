@@ -12,6 +12,7 @@ import routes from "./routes/routes";
 import GlobalComponents from "./models/plugin/globalComponents";
 import Dashboard from "./models/plugin/dashboard";
 import Modal from "./models/plugin/modal";
+import WijmoPlugin from "./models/plugin/wijmo";
 
 import Chartist from "chartist";
 
@@ -68,6 +69,7 @@ Vue.use(VueRouter);
 Vue.use(Dashboard);
 Vue.use(GlobalComponents);
 Vue.use(Modal);
+Vue.use(WijmoPlugin);
 
 new Vue({
   store,

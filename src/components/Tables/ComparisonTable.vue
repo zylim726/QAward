@@ -11,6 +11,7 @@
       </div>
       <div class="filter-container" v-if="!isLoading">
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
+        <a :href="'mygrid?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Full Details</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  >Add Description</button></a>
