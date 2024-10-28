@@ -3,7 +3,7 @@
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
       <p>Work Order</p>
       <div class="tooltip" style="width: 77px !important;">
-        <span class="tooltiptext">QS can edit the Work Order. CM can view the Work Order.</span>
+        <span class="tooltiptext">Editable by QS and CM only.</span>
         <label class="wo_switchon">
           <input type="checkbox" v-model="isSwitchOn" @change="handleCheckboxChange" :disabled="!hasAccess || projectData[0].status !== 'Pending'" />
           <span class="wo_slider"></span>
