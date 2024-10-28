@@ -36,7 +36,7 @@
             <wj-flex-grid-column-group 
                 v-for="(subconList, index) in SubconList" 
                 :key="index" 
-                :header="`SUBCON NAME`" :wordWrap="true"  align="center">
+                :header="GetDisplayName(index)" :wordWrap="true"  align="center">
                 <wj-flex-grid-column-group  :binding="`quotes[` + index + `].rate`"   align="right" header="Rate" :wordWrap="true"  :isReadOnly="true"></wj-flex-grid-column-group>
                 <wj-flex-grid-column-group   :binding="`quotes[` + index + `].adjAmt`"  align="right" header="Amount"  :wordWrap="true"   :isReadOnly="true"></wj-flex-grid-column-group>
             </wj-flex-grid-column-group>
@@ -81,6 +81,22 @@ export default {
         }
     },
     methods: {
+        GetDisplayName(index) {
+            const subcon = this.SubconList[index];
+            let getDisplay = '';
+
+            if (index === 0 && subcon.Subcon.name === 'Budget') {
+                getDisplay = 'Budget Cost';
+            } else if (index === 1 && subcon.Subcon.name === 'Budget') {
+                getDisplay = 'Budget Adj';
+            } else if (index === 2 && subcon.Subcon.name === 'Budget') {
+                getDisplay = subcon.Subcon.name === 'Budget' ? 'Budget Remeasurement' : subcon.Subcon.name;
+            } else if (this.SubconList.length >= 2) {
+                getDisplay = subcon.Subcon.name;
+            }
+            
+            return getDisplay;
+        },
         async getFullDetails() {
             try {
                 const id = this.$route.query.cqId;
@@ -104,10 +120,12 @@ export default {
                 ];
 
                 totalRows.forEach((totalRow) => {
-                    data.conlists.forEach((item) => { // Loop through each item in conlists
+        
+                    data.conlists.forEach((item, index) => { // Loop through each item in conlists
                         let adjAmtValue;
-              
-                        if(item.Subcon && item.Subcon.name === 'Budget'){
+
+                        console.log('Current index and name in data.conlists:', index , item.Subcon.name); // Log the current index
+                        if(index === 1 && item.Subcon && item.Subcon.name === 'Budget'){
                             switch (totalRow.element) {
                                 case 'ADJ Total Amount (RM)':
                                     adjAmtValue = item.adjTotal;
@@ -116,7 +134,27 @@ export default {
                                     adjAmtValue = ''; 
                             }
 
-                        }else {
+                        } else if (index === 0 && item.Subcon && item.Subcon.name === 'Budget'){
+
+                            switch (totalRow.element) {
+                                case 'BQ Total Amount (RM)':
+                                    adjAmtValue = item.bqTotal;
+                                    break;
+                                default:
+                                    adjAmtValue = ''; 
+                            }
+
+                        } else if (index === 2 && item.Subcon && item.Subcon.name === 'Budget') {
+
+                            switch (totalRow.element) {
+                                case 'Remeasurement Total Amount (RM)':
+                                    adjAmtValue = item.remeasureTotal;
+                                    break;
+                                default:
+                                    adjAmtValue = ''; 
+                            }
+
+                        } else {
                             switch (totalRow.element) {
                                 case 'BQ Total Amount (RM)':
                                     adjAmtValue = item.bqTotal;
@@ -272,7 +310,7 @@ export default {
                     }
                 }
 
-               console.log('s topleftcells',e.panel);
+             
                 if (e.panel === s.topLeftCells) {
                     if (e.row === 0) { // Remember, the row index is 0-based
                         e.cell.innerHTML = '<span class="column-picker-icon">⚙️</span>'; // Show the gear icon

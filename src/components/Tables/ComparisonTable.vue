@@ -7,11 +7,17 @@
       <div class="search-container" v-if="!isLoading">
         <form class="Searchbar">
           <input type="text" v-model="searchQuery" @input="handleInputChange" placeholder="Search Description....." />
+          <a :href="'mygrid?cqId=' + cqId">
+            <div class="tooltip" >
+              <span class="tooltiptext">Show a Full Detailed Comparison on New Pages</span>
+              <md-icon  class="mdIcon" style="margin-left: 20px;font-size: 40px !important;margin-top: 10px;">fullscreen</md-icon>
+            </div>
+          </a>
+
         </form>
       </div>
       <div class="filter-container" v-if="!isLoading">
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
-        <a :href="'mygrid?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Full Details</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  >Add Description</button></a>
