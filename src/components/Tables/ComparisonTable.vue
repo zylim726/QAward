@@ -13,7 +13,7 @@
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'mygrid?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Full Details</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
-        <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
+        <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Description</button></a>
         <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  >Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" style="width: 178px !important;">
@@ -582,7 +582,7 @@ export default {
             
             this.Unittype = formData.cqUnitType;
 
-            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === "" ) ) {
+            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
               head1Counter++;
             
               const head1Row = document.createElement('tr');
@@ -592,6 +592,7 @@ export default {
                 ${!isHide ? `<td><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
                 ${!isHide ? `<td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
                 <td style="padding-left:10px !important" class="td-max-width"><b><u>${formData.description_item}</u></b></td>
+                <td><b>${formData.description_unit || ''}</b></td>
               `;
               tableBody.appendChild(head1Row);
 

@@ -29,44 +29,54 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-' + formIndex">
-                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === '')  ">
-                      <td><b>{{ formIndex + 1 }}</b></td>
+                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === '')  ">
+                      <td @click="editDescription(formData.id)" style="width:75px !important"><b>
+                        {{ formIndex + 1}}
+                        <md-icon style="font-size: 20px !important; margin-top: -5px; color: orange;">
+                        edit_square
+                        </md-icon>
+                      </b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
                       <td><b>{{ formData.description_sub_sub_element || '' }}</b></td>
                       <td class="td-max-width"><b>{{ formData.description_item }}</b></td>
+                      <td><b>{{ formData.description_unit || '' }}</b></td>
                     </template>
                     <template v-else>
-                      <td>{{ formIndex + 1 }}</td>
+                      <td  @click="editDescription(formData.id)" >
+                        {{ formIndex + 1}}
+                        <md-icon style="font-size: 20px !important; margin-top: -5px; color: orange;">
+                        edit_square
+                        </md-icon>
+                      </td>
                       <td>{{ formData.element || '' }}</td>
                       <td>{{ formData.sub_element || '' }}</td>
                       <td>{{ formData.description_sub_sub_element || '' }}</td>
                       <td class="td-max-width">{{ formData.description_item }}</td>
                       <td>{{ formData.description_unit || '' }}</td>
                       <template v-for="(unitdata, index) in formData.cqUnitType">
-  <td :key="'bq-quantity-' + formIndex + '-' + index" style="border-left: 1px solid #ddd;">
-    {{ unitdata.bq_quantity || 0 }}
-  </td>
-  <td :key="'adj-quantity-' + formIndex + '-' + index">
-    <input 
-      style="width: 100px;"
-      type="number" 
-      :value="unitdata.adj_quantity || 0" 
-      @input="updateAdjQuantity(formIndex, index, $event.target.value)" 
-      :min="0" 
-      @keydown="blockNegativeInput">
-  </td>
-  <td :key="'remeasurement-quantity-' + formIndex + '-' + index" style="border-right: 1px solid #ddd;">
-    <input 
-      style="width: 100px;"
-      type="number" 
-      :value="unitdata.remeasurement_quantity || 0" 
-      @input="updateRemeasurementQuantity(formIndex, index, $event.target.value)" 
-      :min="0" 
-      @keydown="blockNegativeInput">
-  </td>
-</template>
-
+                        <td :key="'bq-quantity-' + formIndex + '-' + index" style="border-left: 1px solid #ddd;">
+                          {{ unitdata.bq_quantity || 0 }}
+                        </td>
+                        <td :key="'adj-quantity-' + formIndex + '-' + index">
+                          <input 
+                            style="width: 100px;"
+                            type="number" 
+                            :value="unitdata.adj_quantity || 0" 
+                            @input="updateAdjQuantity(formIndex, index, $event.target.value)" 
+                            :min="0" 
+                            @keydown="blockNegativeInput">
+                        </td>
+                        <td :key="'remeasurement-quantity-' + formIndex + '-' + index" style="border-right: 1px solid #ddd;">
+                          <input 
+                            style="width: 100px;"
+                            type="number" 
+                            :value="unitdata.remeasurement_quantity || 0" 
+                            @input="updateRemeasurementQuantity(formIndex, index, $event.target.value)" 
+                            :min="0" 
+                            @keydown="blockNegativeInput">
+                        </td>
+                      </template>
                     </template>
                   </tr>
                 </tbody>
@@ -81,6 +91,8 @@
         <br>
       </div>
     </div>
+    <EditDescription :edit-modal="editModal" @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
+
   </div>
 </template>
 
@@ -88,9 +100,13 @@
 <script>
 import DescriptionController from "@/services/controllers/DescriptionController.js";
 import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
+import EditDescription from "@/components/Pop-Up-Modal/EditDescription.vue";
+
+
 export default {
   components: {
     LoadingModal,
+    EditDescription
   },
   data() {
     return {
@@ -100,6 +116,8 @@ export default {
       Unittype: [],
       Description: [],
       RateInput: {}, 
+      editModal: false,
+      editId: null,
       isLoading: false,
     };
   },
@@ -117,11 +135,19 @@ export default {
     this.getNewDescription(id);
   },
   methods: {
+    editDescription(id) {
+      this.editId = id;
+      this.editModal = true;
+    },
+    closeEditModal() {
+      this.editModal = false;
+    },
     async getNewDescription(id) {
       try {
         this.isLoading = true;
         const processedData = await DescriptionController.getNewDescription(id);
         this.Description = processedData;
+        console.log('formDescrption',this.Description);
         if (processedData.length > 0) {
           this.Unittype = processedData[0].cqUnitType;
         }
@@ -171,3 +197,4 @@ export default {
   },
 };
 </script>
+

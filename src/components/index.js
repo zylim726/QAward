@@ -23,6 +23,7 @@ import Createproject from "./Pop-Up-Modal/Createproject.vue";
 import EditProject from "./Pop-Up-Modal/EditProject.vue";
 import DelSubcon from "./Pop-Up-Modal/DelSubcon.vue";
 import LoadingModal from  "./Pop-Up-Modal/LoadingModal.vue";
+import EditDescription from "./Pop-Up-Modal/EditDescription.vue";
 // IMPORT
 import CQImport from "./Import/CQImport.vue";
 import DescriptionImport from "./Import/DescriptionImport.vue";
@@ -30,6 +31,7 @@ import DescriptionImport from "./Import/DescriptionImport.vue";
 export {
   ComparisonTable,
   WorkorderTable,
+  EditDescription,
   CQImport,
   Modal,
   CreatecqTable,
