@@ -1,12 +1,15 @@
 <template>
   <div class="confirmation-message"  style="width: fit-content; justify-content: left !important;">
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
-    <p>Work Order</p>
-    <label class="wo_switchon">
-      <input type="checkbox" v-model="isSwitchOn" @change="handleCheckboxChange" :disabled="!hasAccess || projectData[0].status !== 'Pending'" />
-      <span class="wo_slider"></span>
-    </label>
-    <span>{{ isSwitchOn ? 'Yes' : 'No' }}</span>
+      <p>Work Order</p>
+      <div class="tooltip" style="width: 77px !important;">
+        <span class="tooltiptext">Editable by QS and CM only.</span>
+        <label class="wo_switchon">
+          <input type="checkbox" v-model="isSwitchOn" @change="handleCheckboxChange" :disabled="!hasAccess || projectData[0].status !== 'Pending'" />
+          <span class="wo_slider"></span>
+        </label>
+        <span>{{ isSwitchOn ? 'Yes' : 'No' }}</span>
+      </div>
   </div>
 </template>
 
