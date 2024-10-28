@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
+    <div v-if="isModalVisible && CQunitType.length === 0 && callQuotation.length > 0" class="modal-overlay">
       <div class="modal-content" style="max-height: 550px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
         <table class="project-table">
@@ -31,8 +31,8 @@
 
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -65px;">
-        <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
-        <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+        <div v-if="UpdateMessage" class="notification success" style="margin-top: 65px;">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+        <div v-if="FailMessage" class="notification fail" style="margin-top: 65px;">{{ FailMessage }} <md-icon>cancel</md-icon></div>
         <br>
         <md-card style="height: 65%">
           <div class="status">
@@ -196,15 +196,15 @@ export default {
     async getDetailCQ(Id) {
       try {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
-
+       
         this.callQuotation = processedData[0];
+        
         const projectName = this.callQuotation.project_code;
         localStorage.setItem('projectName', projectName);
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
             if (processedData[i]) {
-              this.callQuotation = processedData[i];
-              
+              this.callQuotation = processedData[i]; 
               await this.getProject(this.callQuotation.project_id);
               break;
             }
@@ -222,7 +222,7 @@ export default {
           this.isModalVisible = true;
         }
       } catch (error) {
-        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
+       
       }
     },
     async getUTypes() {
