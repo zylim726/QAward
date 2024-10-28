@@ -175,10 +175,12 @@ const DescriptionController = {
       const messageArray = [];
      
       for (const data of dataToSave){
-    
+
+
         const Quoteresponse = await axios.put(`${apiHost}/description_cq_unit_type_list/edit/${data.cqUnitTypeId}`, 
         {
           adj_quantity : data.adj_quantity,
+          quantity : data.bq_quantity,
           remeasurement_quantity : data.remeasurement_quantity,
 
         }, { headers, });
