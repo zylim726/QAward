@@ -145,7 +145,7 @@ const routes = [
 
       {
         path: "remeasurement",
-        name: "Edit Quantity",
+        name: "Edit Description",
         component: Remeasurement,
         meta: { requiresAuth: true },
       },

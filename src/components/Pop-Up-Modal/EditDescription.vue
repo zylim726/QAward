@@ -36,7 +36,6 @@
           placeholder="Description Item"
           class="typeInput"
         />
-  
         <p>Unit : </p>
         <input
           type="text"
@@ -111,3 +110,8 @@ export default {
   },
 };
 </script>
+
+<style>
+p{
+  text-align: left;
+}</style>
