@@ -20,7 +20,7 @@
         <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
         <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
         <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Description</button></a>
-        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  >Add Description</button></a>
+        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending"  >Add Description</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" style="width: 178px !important;">
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
@@ -41,7 +41,7 @@
           <tr class="header-row-1">
             <th></th>
             <th colspan="3" v-if="!isHide" ></th>
-            <th colspan="2"></th>
+            <th colspan="2"></th> 
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
             </template>
