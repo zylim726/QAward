@@ -7,13 +7,12 @@
       <div class="search-container" v-if="!isLoading">
         <form class="Searchbar">
           <input type="text" v-model="searchQuery" @input="handleInputChange" placeholder="Search Description....." />
-          <a :href="'mygrid?cqId=' + cqId">
-            <div class="tooltip" >
+          <a :href="'mygrid?cqId=' + cqId" target="_blank">
+            <div class="tooltip">
               <span class="tooltiptext">Show a Full Detailed Comparison on New Pages</span>
-              <md-icon  class="mdIcon" style="margin-left: 20px;font-size: 40px !important;margin-top: 10px;">fullscreen</md-icon>
+              <md-icon class="mdIcon" style="margin-left: 20px; font-size: 40px !important; margin-top: 10px;">fullscreen</md-icon>
             </div>
           </a>
-
         </form>
       </div>
       <div class="filter-container" v-if="!isLoading">
