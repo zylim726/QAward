@@ -68,14 +68,22 @@
               <h5 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h5>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
-                <div class="tooltip">
-                  <span class="tooltiptext">Edit Comparison Summary</span>
-                  <md-icon style="color: orange;">edit_square</md-icon></div></button>
-              <br>
-              <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
-                <div class="tooltip" v-if="callQuotation && callQuotation.status !== 'Waiting Approval' &&  callQuotation.status !== 'Approved' "  >
-                  <span class="tooltiptext">Delete Comparison Summary</span>
-                  <md-icon style="color: orange;">delete</md-icon></div></button>
+            <div class="tooltip">
+              <span class="tooltiptext">Edit Comparison Summary</span>
+              <md-icon style="color: orange;">edit_square</md-icon></div>
+            </button>
+            <br>
+            <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
+            <div class="tooltip" v-if="callQuotation && callQuotation.status !== 'Waiting Approval' &&  callQuotation.status !== 'Approved' "  >
+              <span class="tooltiptext">Delete Comparison Summary</span>
+              <md-icon style="color: orange;">delete</md-icon></div>
+            </button>
+            <a :href="'revision?cqId=' + callQuotation.id" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext">Comparison Revision List</span>
+                <md-icon style="color: orange;">library_books</md-icon>
+              </div>
+          </a>
           </div>
         </md-card>
       </div>
