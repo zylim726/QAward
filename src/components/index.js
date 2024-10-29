@@ -25,6 +25,8 @@ import DelSubcon from "./Pop-Up-Modal/DelSubcon.vue";
 import LoadingModal from  "./Pop-Up-Modal/LoadingModal.vue";
 import EditDescription from "./Pop-Up-Modal/EditDescription.vue";
 import DeleteDescription from "./Pop-Up-Modal/DeleteDescription.vue";
+import ErrorviewModal from "./Pop-Up-Modal/ErrorviewModal.vue";
+
 // IMPORT
 import CQImport from "./Import/CQImport.vue";
 import DescriptionImport from "./Import/DescriptionImport.vue";
@@ -34,6 +36,7 @@ export {
   WorkorderTable,
   EditDescription,
   DeleteDescription,
+  ErrorviewModal,
   CQImport,
   Modal,
   CreatecqTable,

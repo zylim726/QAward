@@ -70,9 +70,12 @@ const CallofQuotationController = {
       return response.data.data;
       
     } catch (error) {
+     
       const errorMessage = error.response.data.message;
+      const errorStatus = error.response.status;
+    
    
-      throw { errorMessage };
+      throw { errorMessage,errorStatus };
       
     }
   },
