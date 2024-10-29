@@ -211,8 +211,20 @@ export default {
           }
         } 
       } catch (error) {
-        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
+        this.FailMessage = `${error.errorMessage || 'Unknown error'}`;
+        this.FailStatus = error.errorStatus || 'Unknown status';
+        this.goToCallQuotation();
+
       }
+    },
+    goToCallQuotation() {
+      this.$router.push({ 
+        name: 'Comparison Summary', 
+        query: { 
+          errorViewMessage: this.FailMessage, 
+          errorViewStatus: this.FailStatus 
+        } 
+      });
     },
     async getCQUnitType(Id) {
       try {

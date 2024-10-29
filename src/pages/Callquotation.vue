@@ -169,7 +169,13 @@
         </md-card>
       </div>
     </div>
-    </div>
+    <errorview-modal 
+      :showErrorModal="showErrorModal" 
+      :errorViewMessage="errorViewMssg" 
+      :errorViewStatus="errorViewSts" 
+      @close="closeEditModal">
+    </errorview-modal>
+</div>
 </template>
 
 <script>
@@ -177,11 +183,13 @@ const XLSX = require('xlsx');
 import { ref } from "vue";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import LoadingModal from "@/components/Pop-Up-Modal/LoadingModal.vue";
+import ErrorviewModal from "@/components/Pop-Up-Modal/ErrorviewModal.vue";
 import { checkAccess } from "@/services/axios/accessControl.js";
 
 export default {
   components: {
-    LoadingModal
+    LoadingModal,
+    ErrorviewModal
   },
   data() {
     return {
@@ -199,6 +207,9 @@ export default {
       hasAccess: false,
       isLoading: false,
       isMobile: false,
+      showErrorModal: false,
+      errorViewMessage: '', 
+      errorViewStatus: true
     };
   },
   computed: {
@@ -235,10 +246,19 @@ export default {
       } else {
         return this.isMobile ? 'header-title-2 mobile' : 'header-title-2 default';
       }
-}
-
+    },
+    errorViewMssg() {
+      return this.$route.query.errorViewMessage;
+    },
+    errorViewSts() {
+      return this.$route.query.errorViewStatus;
+    }
   },
   mounted() {
+    if (this.errorViewMssg && this.errorViewSts) {
+      this.showErrorModal = true; 
+    }
+    
     if (!this.callQuotation[0]?.project_code) {
       const projectName = localStorage.getItem('projectName');
       if (projectName) {
@@ -253,6 +273,7 @@ export default {
     this.accessCQ();
     this.checkScreenSize();
     window.addEventListener('resize', this.checkScreenSize);
+  
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.checkScreenSize);
@@ -261,6 +282,15 @@ export default {
     await this.checkPermission();
   },
   methods: {
+    openErrorModal(message) {
+      this.errorViewMessage = message;
+      this.showErrorModal = true;
+    },
+    closeEditModal() {
+      this.showErrorModal = false; // Hide the modal
+      this.$router.push({ name: 'Comparison Summary' });
+
+    },
     checkScreenSize() {
       this.isMobile = window.innerWidth < 768; // Adjust breakpoint as needed
     },
