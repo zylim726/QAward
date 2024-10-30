@@ -70,10 +70,6 @@ export default {
 
         // Initialize the column picker
         if (this.columnPicker) {
-            // Filter out columns with headers 'Rate' and 'Amount'
-            const filteredColumns = this.flex.columns.filter(column => 
-                column.header !== 'Rate' && column.header !== 'Amount'
-            );
 
             this.columnPicker.itemsSource = filteredColumns;
             this.columnPicker.checkedMemberPath = 'visible';
