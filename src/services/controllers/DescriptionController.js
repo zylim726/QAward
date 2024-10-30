@@ -56,6 +56,31 @@ const DescriptionController = {
         throw { errorMessage };
     }
   },
+  async removeDescription(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+  
+      // Convert the id object into an array of values
+      const idArray = Object.values(id);
+
+      const requestData = {
+        description_ids: idArray
+      };
+
+      const response = await axios.delete(`${apiHost}/description/remove`, {
+        headers,
+        data: requestData 
+      });   
+
+      console.log('response',response);
+      return response.data.message; 
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+  
+      throw { errorMessage };
+    }
+  },  
   async getNewDescription(id) {
     try {
       const apiHost = config.getHost();
