@@ -66,10 +66,16 @@
                 </tbody>
               </table>
             </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 17px;">
+              <div style="display: flex; align-items: center;">
+                <label for="qtName" style="width: 100%;margin-right: 3px;">Quotation Name:</label>
+                <input type="text" id="qtName" v-model="qtName" style="width: 157%;" />
+              </div>
+            </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 15px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
-                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" @keydown="blockNegativeInput" />
+                <input type="number" id="discount" v-model.number="discount" style="width: 73%;" @keydown="blockNegativeInput" />
               </div>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 22px;">
@@ -83,7 +89,7 @@
 
               </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 6px;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 16px;">
               <div>
                 <label for="documents" style="margin-right: 5px;">Documents:
                   <button v-if="QuotationName.length === 1 && QuotationName[0].document_api" 
@@ -111,6 +117,7 @@
 <script>
 import DescriptionController from "@/services/controllers/DescriptionController.js";
 import {  config } from "@/services";
+import Quotation from "./Quotation.vue";
 export default {
   data() {
     return {
@@ -121,6 +128,7 @@ export default {
       QuotationName: [],
       Description: [],
       discount: 0,
+      qtName: '',
       RateInput: {}, 
       remarks: '',
       documents: {},
@@ -187,12 +195,12 @@ export default {
           if (filteredQuotations.length > 0) {
             this.QuotationName = filteredQuotations;
 
-            console.log('Document Api',this.QuotationName[0].document_api);
 
             const QuotationRemark = this.QuotationName[0].Call_For_Quotation_Subcon_List;
-           
+   
             this.$set(this, 'remarks', QuotationRemark.remark || '');
             this.$set(this, 'discount', QuotationRemark.discount || '');
+            this.$set(this, 'qtName', QuotationRemark.name || '');
            
             filteredQuotations.forEach(quotation => {
               this.$set(this.RateInput, formData.id, quotation.quote_rate || '')
@@ -225,8 +233,9 @@ export default {
       
         const discount = this.discount;
         const remark = this.remarks;
+        const qtName = this.qtName;
         const Documents = this.documents;
-        const SuccessMessage = await DescriptionController.editQuotation(dataToSave,discount, remark,Documents);
+        const SuccessMessage = await DescriptionController.editQuotation(dataToSave,discount, remark,Documents,qtName);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;

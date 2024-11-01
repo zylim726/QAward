@@ -4,11 +4,12 @@ import { handleApiError } from "@/services/axios/handleApiError.js";
 
 
 const QuotationController = {
-  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id) {
+  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id,QuotationName) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
+
         const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${SubConName}`, {
             headers,
         });
@@ -26,7 +27,8 @@ const QuotationController = {
                 discount: Discount,
                 remark: Remarks,
                 call_for_quotation_id: id,
-                subcon_id: SubconId 
+                subcon_id: SubconId,
+                name: QuotationName,
             }, { headers });
 
             SubconListId = cqSubconResponse.data.data.id;
