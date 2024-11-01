@@ -596,6 +596,8 @@ export default {
             
             this.Unittype = formData.cqUnitType;
 
+            console.log('getQuotation',getQuotation);
+
             if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
               head1Counter++;
             
@@ -812,9 +814,6 @@ export default {
         const filteredSubconList = getCallForQuotationSubconList.filter(item => item.subcon_id !== 1);
         this.SubconListId = filteredSubconList;
 
-        console.log('this cqApprovalData',response.data);
-        console.log('this getSubconList',response.callForQuotationSubconLists);
-        console.log('this subconlistid',this.SubconListId);
       } catch (error) {
         console.log('Error fetching CQ approvals:', error);
       }

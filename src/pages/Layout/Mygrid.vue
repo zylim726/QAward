@@ -103,8 +103,6 @@ export default {
                 this.Description = data.descriptions;
                 this.UnitType = data.types;
                 this.SubconList = data.conlists;
-                console.log('data by getfull',data);
-                console.log('data by subconList',this.SubconList);
 
                 const totalRows = [
                     { element: 'BQ Total Amount (RM)', quotes: [] },
