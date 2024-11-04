@@ -591,19 +591,31 @@ export default {
 
           let maxLength = 0;
           let maxQuotation = [];
+          let count = 0; // Initialize the counter
           for (const formData of processedData) {
             const getQuotation = formData.quotation;
-            
+
+           
             this.Unittype = formData.cqUnitType;
 
-            console.log('getQuotation',getQuotation);
+            const getFirstCreatetime = new Date(this.processedData[0].createdAt);
+            const currentCreateTime = new Date(formData.createdAt);
+            let notifyNewBlockDescription = ''; 
+          
+            if (currentCreateTime > getFirstCreatetime) {
+                count++; // Increment count for each valid update
+                notifyNewBlockDescription = `<span title="${count} times update${count > 1 ? 's' : ''} for new description">&#128308;</span>`;
+                console.log('notifyNewBlockDescription:', notifyNewBlockDescription);
+            } else {
+                notifyNewBlockDescription = '';
+            }
 
             if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
               head1Counter++;
             
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                <td ><b><u>${head1Counter}</u></b></td>
+                <td ><b>${notifyNewBlockDescription} ${head1Counter}</b></td>
                 ${!isHide ? `<td><b><u>${formData.element || ''}</u></b></td>` : ''}
                 ${!isHide ? `<td><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
                 ${!isHide ? `<td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
@@ -614,8 +626,11 @@ export default {
 
               head2Counter = 0;
 
-              
             }else {
+
+              if (head1Counter === 0) {
+                head1Counter = 1;
+              }
          
               head2Counter++;
               if (getQuotation.length > maxLength) {
@@ -648,7 +663,7 @@ export default {
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
 
-                <td class="sticky-col" >${head1Counter}.${head2Counter}</td>
+                <td class="sticky-col" >${notifyNewBlockDescription} ${head1Counter}.${head2Counter}</td>
                 ${!isHide ? `<td>${formData.element || ''}</td>` : ''}
                 ${!isHide ? `<td>${formData.sub_element || ''}</td>` : ''}
                 ${!isHide ? `<td>${formData.description_sub_sub_element || ''}</td>` : ''}
