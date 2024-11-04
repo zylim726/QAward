@@ -104,6 +104,8 @@ export default {
                 this.UnitType = data.types;
                 this.SubconList = data.conlists;
 
+                console.log('get response',data);
+
                 const totalRows = [
                     { element: 'BQ Total Amount (RM)', quotes: [] },
                     { element: 'ADJ Total Amount (RM)', quotes: [] },
@@ -119,67 +121,67 @@ export default {
                 totalRows.forEach((totalRow) => {
         
                     data.conlists.forEach((item, index) => { // Loop through each item in conlists
-                        let adjAmtValue;
+                        let smyValue;
                         if(index === 1 && item.Subcon && item.Subcon.name === 'Budget'){
                             switch (totalRow.element) {
                                 case 'ADJ Total Amount (RM)':
-                                    adjAmtValue = item.adjTotal;
+                                    smyValue = item.adjTotal;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
 
                         } else if (index === 0 && item.Subcon && item.Subcon.name === 'Budget'){
 
                             switch (totalRow.element) {
                                 case 'BQ Total Amount (RM)':
-                                    adjAmtValue = item.bqTotal;
+                                    smyValue = item.bqTotal;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
 
                         } else if (index === 2 && item.Subcon && item.Subcon.name === 'Budget') {
 
                             switch (totalRow.element) {
                                 case 'Remeasurement Total Amount (RM)':
-                                    adjAmtValue = item.remeasureTotal;
+                                    smyValue = item.remeasureTotal;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
 
                         } else {
                             switch (totalRow.element) {
                                 case 'BQ Total Amount (RM)':
-                                    adjAmtValue = item.bqTotal;
+                                    smyValue = item.bqTotal;
                                     break;
                                 case 'ADJ Total Amount (RM)':
-                                    adjAmtValue = item.adjTotal; 
+                                    smyValue = item.adjTotal; 
                                     break;
                                 case 'Remeasurement Total Amount (RM)':
-                                    adjAmtValue = item.remeasureTotal;
+                                    smyValue = item.remeasureTotal;
                                     break;
                                 case 'Discount Given (RM)':
-                                    adjAmtValue = item.discount;
+                                    smyValue = item.discount;
                                     break;
                                 case 'After Discount Given (RM)':
-                                    adjAmtValue = item.adjAfterDiscount; 
+                                    smyValue = item.adjAfterDiscount; 
                                     break;
                                 case 'Total Saving / Overrun (RM)':
-                                    adjAmtValue = item.adjSaving; 
+                                    smyValue = item.adjSaving; 
                                     break;
                                 case 'Total Saving / Overrun (%)':
-                                    adjAmtValue ='' ; 
+                                    adjAmtValue = item.saveRate; 
                                     break;
                                 case 'Ranking':
-                                    adjAmtValue = item.ranking; 
+                                    smyValue = item.ranking; 
                                     break;
                                 case 'Contingency Sum (RM)':
-                                    adjAmtValue = item.contingencySum;
+                                    smyValue = item.contingencySum;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
                         }
 
@@ -187,7 +189,7 @@ export default {
 
                     
                         totalRow.quotes.push({
-                            adjAmt: adjAmtValue, 
+                            adjAmt: smyValue, 
                         });
                     });
                 });
