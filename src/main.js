@@ -5,7 +5,7 @@ import store from "@/services/axios/store";
 import config from "@/services/axios/config.js";
 import MaintenanceController from "@/services/controllers/MaintenanceController.js";
 
-// router setup
+// Router setup
 import routes from "./routes/routes";
 
 // Plugins
@@ -13,13 +13,10 @@ import GlobalComponents from "./models/plugin/globalComponents";
 import Dashboard from "./models/plugin/dashboard";
 import Modal from "./models/plugin/modal";
 import WijmoPlugin from "./models/plugin/wijmo";
-
 import Chartist from "chartist";
 
-//CONSOLE.LOG CHECK HOST
 console.log('Backend Host:', process.env.VUE_APP_QAWARD_BACKEND_HOST);
 
-// configure router
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
@@ -27,18 +24,31 @@ const router = new VueRouter({
   linkExactActiveClass: "nav-item active",
 });
 
-router.beforeEach(async (to, from, next) => {
-  try {
+let maintenanceMessage;
 
+// Function to perform maintenance check
+async function checkMaintenance() {
+  try {
+    maintenanceMessage = await MaintenanceController.checkMaintenance();
+
+  } catch (fetchError) {
+    if (router.currentRoute.path !== '/nofound') {
+      router.push('/nofound');
+    }
+    throw new Error('Server down or maintenance check failed');
+  }
+}
+
+// Run the maintenance check once at startup
+checkMaintenance().then(() => {
+  // Setup router guard after maintenance check
+  router.beforeEach((to, from, next) => {
     if (to.path === "/maintenance") {
-      next(); // Already on maintenance page, no need to check
+      next();
       return;
     }
 
-    const maintenanceMessage = await MaintenanceController.checkMaintenance();
-      console.log('end',maintenanceMessage.end);
-      console.log('status',maintenanceMessage.isMaintenance);
-
+    console.log('Checking maintenance status:', maintenanceMessage);
     if (maintenanceMessage.isMaintenance === 1) {
       next({
         path: "/maintenance",
@@ -54,14 +64,12 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next();
     }
-    
-
-  } catch (error) {
-    next("/login");
+  });
+}).catch((error) => {
+  if (router.currentRoute.path !== '/nofound') {
+    router.push('/nofound');
   }
 });
-
-
 
 Vue.prototype.$Chartist = Chartist;
 
