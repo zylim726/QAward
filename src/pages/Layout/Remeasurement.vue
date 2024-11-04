@@ -128,7 +128,7 @@
       </div>
     </div>
     <EditDescription :edit-modal="editModal"  @editMessage="EditMessage" @editfail-message="EditErrorMessage"  @close="closeEditModal" :id="editId" title="Edit Description"></EditDescription>
-    <DeleteDescription :show-modal="showModal"  @close="closeModal" :id="deleteId" title="Delete Comparison Summary"></DeleteDescription>
+    <DeleteDescription :show-modal="showModal"  @close="closeModal" :id="deleteId" @message="Message" @fail-message="ErrorMessage"  title="Delete Comparison Summary"></DeleteDescription>
   </div>
 </template>
 
@@ -189,6 +189,18 @@ export default {
         this.UpdateMessage = '';
       }, 2000);
     },
+    Message(message) {
+      this.UpdateMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
+    ErrorMessage(message) {
+      this.FailMessage = message; 
+      setTimeout(() => {
+        this.UpdateMessage = '';
+      }, 2000);
+    },
     editDescription(id) {
       this.editId = id;
       this.editModal = true;
@@ -208,9 +220,12 @@ export default {
       }
     },
     deleteDescription() {
-      const multipleCheck = this.selectedIds; // Accessing selectedIds directly
+      const multipleCheck = this.selectedIds; 
       if (multipleCheck.length === 0) {
         this.FailMessage = "Please select at least one item to delete.";
+        setTimeout(() => {
+        this.FailMessage = '';
+      }, 2000);
         return;
       }
 
@@ -235,9 +250,7 @@ export default {
         const getMaxQuotationLength = isRemeasurementQuantityValid ? maxQuotationLength - 1 : maxQuotationLength;
 
         this.getMaxQuotation = getMaxQuotationLength;
-        console.log('this getMaxQuotation',this.getMaxQuotation);
-
-        console.log('formDescrption',this.Description);
+  
         if (processedData.length > 0) {
           this.Unittype = processedData[0].cqUnitType;
         }

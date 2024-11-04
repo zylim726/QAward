@@ -13,13 +13,18 @@
               <md-icon class="mdIcon" style="margin-left: 20px; font-size: 40px !important; margin-top: 10px;">fullscreen</md-icon>
             </div>
           </a>
+          <div class="hidden-toggles" style="margin-left: 10px;"  v-if="isPending" >
+            <input  name="coloration-level"  type="radio" id="coloration-low" class="hidden-toggles__input"  value="add" v-model="selectedAction" />
+            <label for="coloration-low"  class="hidden-toggles__label"  @click="navigateTo('description')" >Add</label>
+            <span class="hidden-toggles__label static-label">Description</span>
+            <input name="coloration-level" type="radio" id="coloration-high" class="hidden-toggles__input" value="edit" v-model="selectedAction"/>
+            <label  for="coloration-high" class="hidden-toggles__label"  @click="navigateTo('remeasurement')">Edit</label>
+          </div>
         </form>
       </div>
       <div class="filter-container" v-if="!isLoading">
-        <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
-        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
-        <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Description</button></a>
-        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending"  >Add Description</button></a>
+        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >
+          <md-icon style="color: antiquewhite;margin-right: 3px;">assignment_add</md-icon> Quotation</button></a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" style="width: 178px !important;">
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
@@ -311,6 +316,10 @@ export default {
     },
   },
   methods: {
+    navigateTo(page) {
+      const url = `${page}?cqId=${this.cqId}`;
+      window.location.href = url; // Redirect to the URL
+    },
     getCardStyle() {
   const windowWidth = window.innerWidth; // Get the current window width
   let width;
@@ -587,6 +596,8 @@ export default {
             
             this.Unittype = formData.cqUnitType;
 
+            console.log('getQuotation',getQuotation);
+
             if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
               head1Counter++;
             
@@ -803,9 +814,6 @@ export default {
         const filteredSubconList = getCallForQuotationSubconList.filter(item => item.subcon_id !== 1);
         this.SubconListId = filteredSubconList;
 
-        console.log('this cqApprovalData',response.data);
-        console.log('this getSubconList',response.callForQuotationSubconLists);
-        console.log('this subconlistid',this.SubconListId);
       } catch (error) {
         console.log('Error fetching CQ approvals:', error);
       }
@@ -1026,5 +1034,31 @@ export default {
   }
 }
 
+
+.hidden-toggles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 0px 0px 8px;
+}
+
+.hidden-toggles__input {
+  display: none; /* Hide the radio inputs */
+}
+
+.hidden-toggles__label {
+  padding: 7px 12px;
+  background-color: orange; 
+  color: white;
+  border-radius: 10px;
+}
+
+
+.hidden-toggles__label.static-label {
+  background-color: transparent; 
+  color: #333; 
+  margin:0 ;
+  font-weight: bold; 
+}
 
 </style>

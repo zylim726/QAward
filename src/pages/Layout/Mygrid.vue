@@ -6,19 +6,20 @@
             :autoGenerateColumns="false" 
             :itemsSource="Description" 
             :initialized="initializedGrid" 
-            :frozenColumns="5" 
+            :frozenColumns="6" 
             :stickyHeaders=true
             allowPinning="SingleColumn"  
         >
             <wj-flex-grid-filter />
 
             <!-- Define grid columns -->
-            <wj-flex-grid-column-group :binding="'item_index'" :header="'Item'" :wordWrap="true" :width="70" :isReadOnly="true"></wj-flex-grid-column-group>
+            <wj-flex-grid-column-group :binding="'itemIndex'" :header="'Item'" :wordWrap="true" :width="70" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'element'" :header="'Element'" :minWidth="220" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'sub_element'" :header="'Sub Element'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'description_sub_sub_element'" :header="'Sub Sub Element'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'description_item'" :header="'Description'" :minWidth="400" :width="'*'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             
+         
             <wj-flex-grid-column-group 
                 v-for="(unit, index) in UnitType" 
                 :key="unit.type" 
@@ -30,13 +31,13 @@
             <wj-flex-grid-column-group :binding="'bqQty'"  :header="'BQ Qty'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'adjQty'" :header="'ADJ Qty'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'remeasureQty'" :header="'Reameasurement Qty'" :width="150" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
-           
+            
             <wj-flex-grid-column-group 
                 v-for="(subconList, index) in SubconList" 
                 :key="index" 
                 :header="GetDisplayName(index)" :wordWrap="true"  align="center">
-                <wj-flex-grid-column-group  :binding="`quotes[` + index + `].rate`"   align="right"  :header="'Rate'"  :wordWrap="true"  :isReadOnly="true"></wj-flex-grid-column-group>
-                <wj-flex-grid-column-group   :binding="`quotes[` + index + `].adjAmt`"  align="right"  :header="'Amount'"   :wordWrap="true"   :isReadOnly="true"></wj-flex-grid-column-group>
+                <wj-flex-grid-column-group  :binding="`quotes[` + index + `].rate`"   align="right" header="Rate" :wordWrap="true"  :isReadOnly="true"></wj-flex-grid-column-group>
+                <wj-flex-grid-column-group   :binding="`quotes[` + index + `].adjAmt`"  align="right" header="Amount"  :wordWrap="true"   :isReadOnly="true"></wj-flex-grid-column-group>
             </wj-flex-grid-column-group>
 
             
@@ -70,15 +71,13 @@ export default {
 
         // Initialize the column picker
         if (this.columnPicker) {
-
-            this.columnPicker.itemsSource = filteredColumns;
+            this.columnPicker.itemsSource = this.flex.columns;
             this.columnPicker.checkedMemberPath = 'visible';
             this.columnPicker.displayMemberPath = 'header';
             this.columnPicker.lostFocus.addHandler(() => {
                 hidePopup(this.columnPicker.hostElement);
             });
         }
-
     },
     methods: {
         GetDisplayName(index) {
@@ -101,22 +100,11 @@ export default {
             try {
                 const id = this.$route.query.cqId;
                 const data = await DescriptionController.getFullDetails(id);
-                this.Description = data.descriptions.map(item => {
-                    if (item.adjQty === 0.00) {
-                        // Call the specific function here
-                        this.callFunctionWhenAdjQtyIsZero(item); 
-                    }
-                    
-                    return {
-                        ...item,
-                        adjQty: item.adjQty === 0.00 ? '' : item.adjQty
-                    };
-                });
-
+                this.Description = data.descriptions;
                 this.UnitType = data.types;
                 this.SubconList = data.conlists;
-                console.log('data by getfull',data);
-                console.log('data by subconList',this.Description);
+
+                console.log('get response',data);
 
                 const totalRows = [
                     { element: 'BQ Total Amount (RM)', quotes: [] },
@@ -133,66 +121,67 @@ export default {
                 totalRows.forEach((totalRow) => {
         
                     data.conlists.forEach((item, index) => { // Loop through each item in conlists
+                        let smyValue;
                         if(index === 1 && item.Subcon && item.Subcon.name === 'Budget'){
                             switch (totalRow.element) {
                                 case 'ADJ Total Amount (RM)':
-                                    adjAmtValue = item.adjTotal;
+                                    smyValue = item.adjTotal;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
 
                         } else if (index === 0 && item.Subcon && item.Subcon.name === 'Budget'){
 
                             switch (totalRow.element) {
                                 case 'BQ Total Amount (RM)':
-                                    adjAmtValue = item.bqTotal;
+                                    smyValue = item.bqTotal;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
 
                         } else if (index === 2 && item.Subcon && item.Subcon.name === 'Budget') {
 
                             switch (totalRow.element) {
                                 case 'Remeasurement Total Amount (RM)':
-                                    adjAmtValue = item.remeasureTotal;
+                                    smyValue = item.remeasureTotal;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
 
                         } else {
                             switch (totalRow.element) {
                                 case 'BQ Total Amount (RM)':
-                                    adjAmtValue = item.bqTotal;
+                                    smyValue = item.bqTotal;
                                     break;
                                 case 'ADJ Total Amount (RM)':
-                                    adjAmtValue = item.adjTotal; 
+                                    smyValue = item.adjTotal; 
                                     break;
                                 case 'Remeasurement Total Amount (RM)':
-                                    adjAmtValue = item.remeasureTotal;
+                                    smyValue = item.remeasureTotal;
                                     break;
                                 case 'Discount Given (RM)':
-                                    adjAmtValue = item.discount;
+                                    smyValue = item.discount;
                                     break;
                                 case 'After Discount Given (RM)':
-                                    adjAmtValue = item.adjAfterDiscount; 
+                                    smyValue = item.adjAfterDiscount; 
                                     break;
                                 case 'Total Saving / Overrun (RM)':
-                                    adjAmtValue = item.adjSaving; 
+                                    smyValue = item.adjSaving; 
                                     break;
                                 case 'Total Saving / Overrun (%)':
-                                    adjAmtValue ='' ; 
+                                    adjAmtValue = item.saveRate; 
                                     break;
                                 case 'Ranking':
-                                    adjAmtValue = item.ranking; 
+                                    smyValue = item.ranking; 
                                     break;
                                 case 'Contingency Sum (RM)':
-                                    adjAmtValue = item.contingencySum;
+                                    smyValue = item.contingencySum;
                                     break;
                                 default:
-                                    adjAmtValue = ''; 
+                                    smyValue = ''; 
                             }
                         }
 
@@ -200,7 +189,7 @@ export default {
 
                     
                         totalRow.quotes.push({
-                            adjAmt: adjAmtValue, 
+                            adjAmt: smyValue, 
                         });
                     });
                 });
@@ -215,25 +204,13 @@ export default {
                 this.error = `Error Message: ${error.message || 'Unknown error'}`;
             } 
         },
-        callFunctionWhenAdjQtyIsZero(item) {
-            if (item.adjQty === 0 || item.adjQty === '0.00' || item.adjQty === '' || item.adjQty === null) {
-                for (const key in item) {
-                    if (item[key] === 0) {
-                        item[key] = ''; 
-                    }
-                    if (key === 'typeQty' && Array.isArray(item[key])) {
-                        item[key] = item[key].map(qty => qty === '0.00' || qty === 0.00 ? '' : qty);
-                    }
-                }
-            }
-        },
         initializedPicker(picker) {
             this.columnPicker = picker; 
         },
         initializedGrid(ctl) {
             this.flex = ctl; 
 
-            this.flex.frozenColumns = 5;
+            this.flex.frozenColumns = 6;
 
             this.flex.formatItem.addHandler((s, e) => {
                 // Check if the current row is one of the additional rows
@@ -345,17 +322,13 @@ export default {
             ref.addEventListener("mousedown", (e) => {
                 if (hasClass(e.target, "column-picker-icon")) {
                     let host = this.columnPicker.hostElement;
-                 
                     if (!host.offsetHeight) {
-                    
                         showPopup(host, ref, false, true, false);
                         this.columnPicker.focus();
-                        
                     } else {
                         hidePopup(host, true, true);
                         this.flex.focus();
                     }
-        
                 }
             });
             

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
+import DescriptionController from "@/services/controllers/DescriptionController.js";
 
 export default {
   props: {
@@ -46,20 +46,22 @@ export default {
       this.$emit("close");
     },
     saveAndCloseModal(id) {
-      console.log('id',id);
-      // this.removeDescription(id);
-      // this.closeModal();
+      this.removeDescription(id);
+      this.closeModal();
     },
-    // async removeDescription(id) {
-    //   try {
-    //     const UpdateMessage = await CallofQuotationController.removeDescription(id);
-    //     this.$emit('message', UpdateMessage);
-    //     this.$router.push('/callquotation'); 
-    //   } catch (error) {
-    //     const FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
-    //     this.$emit('fail-message', FailMessage);
-    //   }
-    // }
+    async removeDescription(id) {
+      try {
+
+        const UpdateMessage = await DescriptionController.removeDescription(id);
+        this.$emit('message', UpdateMessage);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000); 
+      } catch (error) {
+        const FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
+        this.$emit('fail-message', FailMessage);
+      }
+    }
   },
 };
 </script>

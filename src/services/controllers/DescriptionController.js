@@ -7,11 +7,12 @@ const DescriptionController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        
-        const descriptionResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/addBudget`, {
+
+        const descriptionResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/addDescription`, {
           call_for_quotation_id: cqId,
           subcon_id: 1,
           matchedData: matchedData,
+          
       }, { headers });
 
       return descriptionResponse.data.message;
@@ -56,6 +57,31 @@ const DescriptionController = {
         throw { errorMessage };
     }
   },
+  async removeDescription(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+  
+      // Convert the id object into an array of values
+      const idArray = Object.values(id);
+
+      const requestData = {
+        description_ids: idArray
+      };
+
+      const response = await axios.delete(`${apiHost}/description/remove`, {
+        headers,
+        data: requestData 
+      });   
+
+
+      return response.data.message; 
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+  
+      throw { errorMessage };
+    }
+  },  
   async getNewDescription(id) {
     try {
       const apiHost = config.getHost();
@@ -78,11 +104,11 @@ const DescriptionController = {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
 
-      console.log('id show full api',id);
+
       const response = await axios.get(`${apiHost}/call_for_quotation/comparisonTable/${id}`, {
         headers,
       });
-      console.log('response',response.data);
+
 
       return response.data;
 
