@@ -122,8 +122,14 @@
               v-for="(quotationData, index) in QuotationName" 
               :key="index" 
               style="text-align: center; border: 1px solid #ddd !important; width: 200px; word-break: break-word; overflow-wrap: break-word;">
+              <template v-if="quotationData.Call_For_Quotation_Subcon_List.name === 'Budget'">
+                {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+                 </template>
               
-              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+              <template v-else>
+                {{ quotationData.Call_For_Quotation_Subcon_List.name }} <br>
+                ({{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }})
+              </template>
 
             </th>
           </tr>

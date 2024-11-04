@@ -243,7 +243,6 @@ const CallofQuotationController = {
       });
 
        return response.data.data;
-
     } catch (error) {
       const errorMessage = handleApiError(error);
       throw { errorMessage };

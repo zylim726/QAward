@@ -2,7 +2,7 @@
   <div class="content">
     <!-- Modal -->
     <div v-if="isModalVisible" class="modal-overlay">
-      <div class="modal-content" style="max-height: 300px;">
+      <div class="modal-content" style="max-height: 400px;">
         <div class="modal-header">
           <h1 class="titleHeader">Select Subcon</h1>
           <span class="close-icon" @click="closeModal">&times;</span>
@@ -14,6 +14,11 @@
             <select class="dropdownSubcon" v-model="selectedOption" style="height: 32px;width: 278px;">
               <option v-for="(subconData, index) in filteredSubconData" :key="index" :value="subconData.name">{{ subconData.name }}</option>
             </select>
+          </div>
+
+          <div class="file-upload-container" v-if="selectedOption">
+            <label for="fileInput">Quotation Name: </label>
+            <input type="text" id="quotationName" v-model="quotationName" placeholder="Enter quotation name">
           </div>
           
           <!-- File input section -->
@@ -81,7 +86,8 @@
                     {{ unitdata.cqUnitType.type }}({{ unitdata.cqUnitType.quantity }})
                     </th>
                     <th scope="col">Qty</th>
-                    <th style="text-align: center;">{{ selectedSubconName }}
+                    <th style="text-align: center;">
+                      {{ quotationName && selectedSubconName ? `${quotationName} (${selectedSubconName})` : '' }}
                     </th>
                   </tr>
                   <tr>
@@ -149,6 +155,7 @@ export default {
       columnKData: [],
       selectedOption: null,
       selectedSubconName: '',
+      quotationName: '',
       searchTerm: '',
       QuotationDataArray: [],
       isModalVisible: false,
@@ -383,6 +390,7 @@ export default {
             this.isLoading = true;
             window.scrollTo(0, 0);
             const SubConName = this.selectedSubconName;
+            const QuotationName = this.quotationName;
             const Discount = this.discount;
             const Remarks = this.remarks;
             const Documents = this.documents;
@@ -397,7 +405,7 @@ export default {
                 return;
             }
             if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-              const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
+              const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id,QuotationName);
            
               const concatenatedMessage = SuccessMessage.join(', ');
               this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
@@ -486,7 +494,7 @@ export default {
   text-align: center;
   width: 500px;
   overflow-y: clip;
-  height: 300px;
+  height: 350px;
   position: relative;
 }
 

@@ -135,7 +135,7 @@ const DescriptionController = {
       
     }
   },
-  async editQuotation(dataToSave,discount, remark,Documents) {
+  async editQuotation(dataToSave,discount, remark,Documents,qtName) {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
@@ -169,7 +169,8 @@ const DescriptionController = {
       const CQListresponse = await axios.put(`${apiHost}/call_for_quotation_subcon_list/edit/${dataToSave[0].subconListId}`, 
       {
         discount : discount,
-        remark : remark
+        remark : remark,
+        name: qtName
       }, { headers, });
       
 
