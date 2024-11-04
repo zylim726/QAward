@@ -9,14 +9,14 @@
       class="file-label"
     >
       <div class="tooltip">
-        <span class="tooltiptext">Upload your BQ Description.</span>
+        <span class="tooltiptext"  style="width: 160px;margin-left: -127px;">Upload your BQ Description.</span>
         <md-icon class="mdIcon">upload_file</md-icon>
       </div>
       <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
     </label>
     <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px; float: right">
       <div class="tooltip">
-        <span class="tooltiptext">Download BQ Template and field in data.</span>
+        <span class="tooltiptext" style="width: 160px;margin-left: -110px !important;">Download BQ Template and field in data.</span>
         <md-icon class="mdIcon">download_for_offline</md-icon>
       </div>
     </button>
@@ -41,30 +41,42 @@
             <th scope="col" v-for="(unitdata, index) in Unittype" :key="index">
               {{ unitdata.type }} ({{ unitdata.quantity }})
             </th>
-            <th scope="col">Budget Rate</th>
+            <th 
+              scope="col" 
+              v-for="(subcon, index) in SubconList.length > 0 ? SubconList : [{ Subcon: { name: 'Budget' } }]" 
+              :key="index"
+            >
+              {{ subcon.Subcon.name }}
+            </th>
+
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(row, index) in importedData"
-            :key="index"
-            :class="{ 'selected-row': row.selected }"
-          >
-            <td v-if="shouldDisplayCheckbox(row)">
-              <label class="control control--checkbox">
-                <input type="checkbox" v-model="row.selected" />
-              </label>
-            </td>
-            <td v-else></td>
-            <td v-for="column in filteredColumns" :key="column" class="td-max-width">
-              {{ 
-                (rowIndex > 4 && !isNaN(row[column])) 
-                  ? parseFloat(row[column]).toFixed(2) 
-                  : row[column] 
-              }}
-            </td>
-          </tr>
-        </tbody>
+  <tr
+    v-for="(row, rowIndex) in importedData"
+    :key="rowIndex"
+    :class="{ 'selected-row': row.selected }"
+  >
+    <td v-if="shouldDisplayCheckbox(row)">
+      <label class="control control--checkbox">
+        <input type="checkbox" v-model="row.selected" />
+      </label>
+    </td>
+    <td v-else></td>
+    <td
+      v-for="(column, colIndex) in filteredColumns"
+      :key="column"
+      class="td-max-width"
+    >
+      {{ 
+        (colIndex > 4 && !isNaN(row[column]) && row[column] !== "")
+          ? parseFloat(row[column]).toFixed(2)
+          : row[column]
+      }}
+    </td>
+  </tr>
+</tbody>
+
       </table>
     </div>
     <button type="submit" class="btn-save" @click="saveData">Save</button><br /><br />
@@ -90,6 +102,7 @@ export default {
     return {
       importedData: [],
       Unittype: [],
+      SubconList: [],
       columnTitles: [],
       selectAll: true,
       isLoading: false,
@@ -109,7 +122,8 @@ export default {
     async getUnittype(id) {
       try {
         const processedData = await CallofQuotationController.getUnittype(id);
-        this.Unittype = processedData;
+        this.Unittype = processedData.cqUnitTypes;
+        this.SubconList = processedData.subconLists;
       } catch (error) {
         const FailMessage = 'Error fetching Unittype: ' + error;
         this.$emit('fail-message', FailMessage);
@@ -203,96 +217,108 @@ export default {
       }
     },
     async saveData() {
-  this.isLoading = true;
-  const cqId = this.cqId;
+      this.isLoading = true;
+      const cqId = this.cqId;
 
-  const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
-  const unittype = this.Unittype;
+      const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
+      const unittype = this.Unittype;
+      const getSubconDetails = this.SubconList;
 
-  const validData = [];
-  let hasErrors = false;
+      const matchedData = [];
+      let hasErrors = false;
 
-  selectImportData.forEach(object => {
-    const matchedValues = {};
+      selectImportData.forEach(object => {
+        const matchedValues = {};
+        const getSubconValue = {};
 
-    unittype.forEach(unit => {
-  const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
-  console.log('combineObjects:', combineObjects);
+        unittype.forEach(unit => {
+          const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+          // Clean the object keys by removing extra spaces
+          const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+            acc[key.replace(/\s+/g, ' ').trim()] = object[key];
+            return acc;
+          }, {});
 
-  // Clean the object keys by removing extra spaces
-  const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
-    acc[key.replace(/\s+/g, ' ').trim()] = object[key];
-    return acc;
-  }, {});
+          // If the unit type exists in the sanitized import data 
+          if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
+            matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
+          }
+        });
 
-  // If the unit type exists in the sanitized import data 
-  if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
-    matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
+        getSubconDetails.forEach(subcon => {
+          const getSubconObject = `${subcon.Subcon.name}`;
+          // Clean the object keys by removing extra spaces
+          const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+            acc[key.replace(/\s+/g, ' ').trim()] = object[key];
+            return acc;
+          }, {});
 
-  }
-});
+          if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
+            getSubconValue[subcon.id] = `${sanitizedObjectKeys[getSubconObject]}`;
+          }
+        });
+
+        if (getSubconDetails.length === 0) {
+          getSubconValue[0] = object["Budget"];
+        }
 
 
-    // Check if Budget Rate is negative
-    if (object["Budget Rate"] < 0) {
-      this.$emit('fail-message', "Budget Rate cannot be negative.");
-      hasErrors = true;
-      return;
-    }
+        
 
-    // Check if any of the matched unit quantities are negative
-    for (const key in matchedValues) {
-      if (matchedValues[key] < 0) {
-        this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
+      //Check if Budget Rate is negative
+      if (object["Budget Rate"] < 0) {
+        this.$emit('fail-message', "Budget Rate cannot be negative.");
         hasErrors = true;
         return;
       }
-    }
 
-    if (object["Unit"] !== "") {
-
-      if (object["Budget Rate"] === "" || object["Budget Rate"] === undefined) {
-        object["Budget Rate"] = 0; 
+      // Check if any of the matched unit quantities are negative
+      for (const key in matchedValues) {
+        if (matchedValues[key] < 0) {
+          this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
+          hasErrors = true;
+          return;
+        }
       }
 
-      unittype.forEach(unit => {
-        const combineObjects = `${unit.type} (${unit.quantity})`;
-        if (object.hasOwnProperty(combineObjects) && (object[combineObjects] === "" || object[combineObjects] === undefined)) {
-          object[combineObjects] = 0; 
+      if (object["Unit"] !== "") {
+
+        if (object["Budget Rate"] === "" || object["Budget Rate"] === undefined) {
+          object["Budget Rate"] = 0; 
         }
+
+        unittype.forEach(unit => {
+          const combineObjects = `${unit.type} (${unit.quantity})`;
+          if (object.hasOwnProperty(combineObjects) && (object[combineObjects] === "" || object[combineObjects] === undefined)) {
+            object[combineObjects] = 0; 
+          }
+        });
+      }
+
+      const hasMatches = Object.keys(matchedValues).length === unittype.length;
+
+      if (!hasMatches) {
+        this.$emit('fail-message', "Error Message: The template is outdated. Please download it again.");
+        hasErrors = true;
+        return;
+        
+      }
+
+      matchedData.push({
+        matchedValues,
+        element: object["Element"],
+        sub_element: object["Sub Element"],
+        description_sub_sub_element: object["Sub Sub Element"],
+        description_unit: object["Unit"],
+        description_item: object["Description"],
+        budget: getSubconValue,
       });
-    }
-
-    const hasMatches = Object.keys(matchedValues).length === unittype.length;
-
-    if (!hasMatches) {
-      this.$emit('fail-message', "Error Message: The template is outdated. Please download it again.");
-      hasErrors = true;
-      return;
-      
-    }
-
-    validData.push({
-      matchedValues,
-      element: object["Element"],
-      sub_element: object["Sub Element"],
-      description_sub_sub_element: object["Sub Sub Element"],
-      description_unit: object["Unit"],
-      description_item: object["Description"],
-      budget: object["Budget Rate"],
-    });
-
-
-
-    
   });
 
   if (!hasErrors) {
     try {
 
-      console.log('validData',validData);
-
-      const successMessage = await DescriptionController.addDescription(cqId, validData);
+      const successMessage = await DescriptionController.addDescription(cqId, matchedData);
       const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
 

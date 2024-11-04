@@ -1,7 +1,6 @@
 import { axios, config } from "@/services";
 import CallQuotationModels from "@/models/CallQuotationModels.js";
 import LawoModels from "@/models/LawoModels.js";
-import UnittypeModels from "@/models/UnittypeModels.js";
 import { handleApiError } from "@/services/axios/handleApiError.js"; 
 
 const CallofQuotationController = {
@@ -242,10 +241,9 @@ const CallofQuotationController = {
       const response = await axios.get(`${apiHost}/cq_unit_type/showByCallForQuotation/${id}`, {
         headers,
       });
-       const processedData = UnittypeModels.processResponseData(response.data);
 
-       return processedData;
-      
+       return response.data.data;
+
     } catch (error) {
       const errorMessage = handleApiError(error);
       throw { errorMessage };
