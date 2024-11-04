@@ -10,8 +10,8 @@
     </div>
     <h1 class="header">500 ERROR</h1>
     <div class="instructions">
-      <h2>Sorry, something went wrong on our end. We are currently trying to fix the problem.</h2>
-      <p>In the meantime, you can:</p>
+      <h2>We apologize for the inconvenience. It looks like there is a problem with the website.</h2>
+      <p>Please consider the following options:</p>
       <div class="step">
         <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 489.711 489.711">
           <path d="M112.156,97.111c72.3-65.4,180.5-66.4,253.8-6.7l-58.1,2.2c-7.5,0.3-13.3,6.5-13,14c0.3,7.3,6.3,13,13.5,13c0.2,0,0.3,0,0.5,0l89.2-3.3c7.3-0.3,13-6.2,13-13.5v-1c0-0.2,0-0.3,0-0.5v-0.1l0,0l-3.3-88.2c-0.3-7.5-6.6-13.3-14-13c-7.5,0.3-13.3,6.5-13,14l2.1,55.3c-36.3-29.7-81-46.9-128.8-49.3c-59.2-3-116.1,17.3-160,57.1c-60.4,54.7-86,137.9-66.8,217.1c1.5,6.2,7,10.3,13.1,10.3c1.1,0,2.1-0.1,3.2-0.4c7.2-1.8,11.7-9.1,9.9-16.3C36.656,218.211,59.056,145.111,112.156,97.111z"></path>
@@ -25,6 +25,12 @@
           <path d="M30,6c-0.552,0-1,0.447-1,1v23H14c-0.552,0-1,0.447-1,1s0.448,1,1,1h16c0.552,0,1-0.447,1-1V7C31,6.447,30.552,6,30,6z"></path>
         </svg>
         <p>Wait a few minutes</p>
+      </div>
+      <div class="step">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+            <path d="M30,2C24.07,2,20,6.07,20,12c0,6.75,5.25,12,12,12s12-5.25,12-12C40,6.07,35.93,2,30,2z M30,24c-9.94,0-18,8.06-18,18c0,2.21,1.79,4,4,4h28c2.21,0,4-1.79,4-4C48,32.06,39.94,24,30,24z"></path>
+        </svg>
+        <p>Contact the IT department for further assistance</p>
       </div>
     </div>
   </div>
@@ -76,7 +82,7 @@
 
 .instructions {
   background: #FEFEFE;
-  width: 80%;
+  width: 82%;
   height: auto;
   padding: 1rem;
   border: 1px solid #DCDCDC;
@@ -91,6 +97,7 @@
   font-size: 1.25em;
   line-height: 1.3;
   color: #e30528;
+  margin-top: 0px;
 }
 @media (max-width: 650px) {
   .instructions h2 {
