@@ -220,7 +220,7 @@ export default {
       }
     },
     deleteDescription() {
-      const multipleCheck = this.selectedIds; // Accessing selectedIds directly
+      const multipleCheck = this.selectedIds; 
       if (multipleCheck.length === 0) {
         this.FailMessage = "Please select at least one item to delete.";
         setTimeout(() => {
@@ -250,9 +250,7 @@ export default {
         const getMaxQuotationLength = isRemeasurementQuantityValid ? maxQuotationLength - 1 : maxQuotationLength;
 
         this.getMaxQuotation = getMaxQuotationLength;
-        console.log('this getMaxQuotation',this.getMaxQuotation);
-
-        console.log('formDescrption',this.Description);
+  
         if (processedData.length > 0) {
           this.Unittype = processedData[0].cqUnitType;
         }
