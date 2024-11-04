@@ -53,11 +53,9 @@ export default {
   methods: {
     async checkPermission() {
       try {
-        const permission = await checkAccess();
-        console.log('permission',permission);
+        const permission = await checkAccess();  
         const accessIds = ['Submit Work Order'];
         this.hasAccess = accessIds.some((id) => permission.includes(id));
-        console.log('this hassAccess',this.hasAccess);
       } catch (error) {
         this.FailMessage = `Error Message: ${error.errorMessage || 'Unknown Data.'}`;
       }
@@ -90,7 +88,6 @@ export default {
     async handleCheckboxChange() {
       try {
         const successMessage = await QuotationController.updateWorkOrder(this.isSwitchOn, this.cqId);
-        console.log('Success updating Work Order:', successMessage);
       } catch (error) {
         this.FailMessage = `Error updating Work Order: ${error.errorMessage || 'Unknown Data.'}`;
         console.error(this.FailMessage);

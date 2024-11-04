@@ -187,8 +187,6 @@ export default {
           if (filteredQuotations.length > 0) {
             this.QuotationName = filteredQuotations;
 
-            console.log('Document Api',this.QuotationName[0].document_api);
-
             const QuotationRemark = this.QuotationName[0].Call_For_Quotation_Subcon_List;
            
             this.$set(this, 'remarks', QuotationRemark.remark || '');
