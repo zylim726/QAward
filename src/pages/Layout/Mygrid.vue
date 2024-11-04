@@ -172,7 +172,7 @@ export default {
                                     adjAmtValue = item.adjSaving; 
                                     break;
                                 case 'Total Saving / Overrun (%)':
-                                    adjAmtValue ='' ; 
+                                    adjAmtValue = item.saveRate; 
                                     break;
                                 case 'Ranking':
                                     adjAmtValue = item.ranking; 
