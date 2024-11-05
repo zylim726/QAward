@@ -89,9 +89,10 @@ export default {
             } else if (index === 1 && subcon.Subcon.name === 'Budget') {
                 getDisplay = 'Budget Adj';
             } else if (index === 2 && subcon.Subcon.name === 'Budget') {
-                getDisplay = subcon.Subcon.name === 'Budget' ? 'Budget Remeasurement' : subcon.Subcon.name;
+                getDisplay = 'Budget Remeasurement';
             } else if (this.SubconList.length >= 2) {
-                getDisplay = subcon.Subcon.name;
+                // Display both subcon.Subcon.name and subcon.name
+                getDisplay = subcon.name ? `${subcon.Subcon.name} (${subcon.name})` : subcon.Subcon.name;
             }
             
             return getDisplay;
@@ -182,9 +183,6 @@ export default {
                         smyValue = ''; 
                     }
                     }
-
-                    // Log each smyValue before pushing to quotes
-                    console.log(`    smyValue for '${totalRow.element}':`, smyValue);
 
                     // Push the value to quotes array in totalRow
                     totalRow.quotes.push({
