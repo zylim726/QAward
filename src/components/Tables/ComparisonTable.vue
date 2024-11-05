@@ -122,13 +122,13 @@
               v-for="(quotationData, index) in QuotationName" 
               :key="index" 
               style="text-align: center; border: 1px solid #ddd !important; width: 200px; word-break: break-word; overflow-wrap: break-word;">
-              <template v-if="quotationData.Call_For_Quotation_Subcon_List.name === 'Budget'">
+              <template v-if="quotationData.Call_For_Quotation_Subcon_List.name === 'Budget' || quotationData.Call_For_Quotation_Subcon_List.name === '' ">
                 {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
                  </template>
               
               <template v-else>
-                {{ quotationData.Call_For_Quotation_Subcon_List.name }} <br>
-                ({{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }})
+                {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+                <br> ({{ quotationData.Call_For_Quotation_Subcon_List.name }})
               </template>
 
             </th>
@@ -183,8 +183,10 @@
                     </div>
                     <h6>Recommend Award To:</h6>
                     <h6 class="approvalSelection">
-                      {{ cmapproval.Call_For_Quotation_Subcon_List.name }} <br>
-                      ({{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }})
+                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }} <br>
+                      <span v-if="cmapproval.Call_For_Quotation_Subcon_List.name">
+                        ({{ cmapproval.Call_For_Quotation_Subcon_List.name }})
+                      </span>
                     </h6>
                     <h6>Date:</h6>
                     <h6 class="approvalSelection">
@@ -204,7 +206,10 @@
                       <select v-model="selectedQuotations[index]" class="quotation-select">
                         <option value=""> </option>
                         <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
-                          {{ selectSubconListId.name }} ({{ selectSubconListId.Subcon.name }})
+                          {{ selectSubconListId.Subcon.name }}
+                          <span v-if="selectSubconListId.name">
+                            ({{ selectSubconListId.name }})
+                          </span>
                         </option>
                       </select>
                       <p>Remarks:</p>
@@ -1009,13 +1014,13 @@ export default {
 
 .header-row-2 th {
   position: sticky;
-  top: 55px;
+  top: 53px;
   height: 48px;
 }
 
 .header-row-3 th {
   position: sticky;
-  top: 104px;
+  top: 112px;
   z-index: 11; 
 }
 
