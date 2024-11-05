@@ -134,7 +134,7 @@
 
             </th>
           </tr>
-          <!--Header row 4 is mean by when quotation have 2 fixed by adj , Header row 3 is when quotation more than 2 -->
+          <!--Header row 4 is mean by when quotation fixed by adj and bq , Header row 3 is when quotation more than 2 -->
           <tr :class="{
             'header-row-4': Unittype.length > 0 && QuotationName.length <= 3, 
             'header-row-3': Unittype.length > 0 && QuotationName.length > 3
