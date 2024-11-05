@@ -122,14 +122,15 @@
               v-for="(quotationData, index) in QuotationName" 
               :key="index" 
               style="text-align: center; border: 1px solid #ddd !important; width: 200px; word-break: break-word; overflow-wrap: break-word;">
-              <template v-if="quotationData.Call_For_Quotation_Subcon_List.name === 'Budget' || quotationData.Call_For_Quotation_Subcon_List.name === '' ">
+              <template v-if="!quotationData.Call_For_Quotation_Subcon_List.name || quotationData.Call_For_Quotation_Subcon_List.name === 'Budget'">
                 {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
-                 </template>
-              
+              </template>
+
               <template v-else>
                 {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
                 <br> ({{ quotationData.Call_For_Quotation_Subcon_List.name }})
               </template>
+
 
             </th>
           </tr>
@@ -1020,7 +1021,7 @@ export default {
 
 .header-row-3 th {
   position: sticky;
-  top: 112px;
+  top: 122px;
   z-index: 11; 
 }
 
