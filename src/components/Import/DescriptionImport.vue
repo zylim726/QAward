@@ -46,7 +46,7 @@
               v-for="(subcon, index) in SubconList.length > 0 ? SubconList : [{ Subcon: { name: 'Budget' } }]" 
               :key="index"
             >
-              {{ subcon.Subcon.name }}
+              {{ subcon.Subcon.name }} <span v-if="subcon.Subcon.name !== 'Budget'"> ({{ subcon.name }})</span>
             </th>
 
           </tr>
@@ -124,6 +124,7 @@ export default {
         const processedData = await CallofQuotationController.getUnittype(id);
         this.Unittype = processedData.cqUnitTypes;
         this.SubconList = processedData.subconLists;
+        console.log('this subconlist',this.SubconList);
       } catch (error) {
         const FailMessage = 'Error fetching Unittype: ' + error;
         this.$emit('fail-message', FailMessage);
@@ -246,7 +247,14 @@ export default {
         });
 
         getSubconDetails.forEach(subcon => {
-          const getSubconObject = `${subcon.Subcon.name}`;
+
+          let getSubconObject;
+          if (subcon.Subcon.name === 'Budget') {
+            getSubconObject = `${subcon.Subcon.name}`;
+          } else {
+            getSubconObject = `${subcon.Subcon.name} (${subcon.name})`;
+          }
+          
           // Clean the object keys by removing extra spaces
           const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
             acc[key.replace(/\s+/g, ' ').trim()] = object[key];

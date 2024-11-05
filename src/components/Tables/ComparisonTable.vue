@@ -122,13 +122,13 @@
               v-for="(quotationData, index) in QuotationName" 
               :key="index" 
               style="text-align: center; border: 1px solid #ddd !important; width: 200px; word-break: break-word; overflow-wrap: break-word;">
-              <template v-if="quotationData.Call_For_Quotation_Subcon_List.name === 'Budget'">
+              <template v-if="quotationData.Call_For_Quotation_Subcon_List.name === 'Budget' || quotationData.Call_For_Quotation_Subcon_List.name === '' ">
                 {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
                  </template>
               
               <template v-else>
-                {{ quotationData.Call_For_Quotation_Subcon_List.name }} <br>
-                ({{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }})
+                {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+                <br> ({{ quotationData.Call_For_Quotation_Subcon_List.name }})
               </template>
 
             </th>
@@ -183,7 +183,10 @@
                     </div>
                     <h6>Recommend Award To:</h6>
                     <h6 class="approvalSelection">
-                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }}
+                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }} <br>
+                      <span v-if="cmapproval.Call_For_Quotation_Subcon_List.name">
+                        ({{ cmapproval.Call_For_Quotation_Subcon_List.name }})
+                      </span>
                     </h6>
                     <h6>Date:</h6>
                     <h6 class="approvalSelection">
@@ -204,6 +207,9 @@
                         <option value=""> </option>
                         <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
                           {{ selectSubconListId.Subcon.name }}
+                          <span v-if="selectSubconListId.name">
+                            ({{ selectSubconListId.name }})
+                          </span>
                         </option>
                       </select>
                       <p>Remarks:</p>
@@ -597,24 +603,27 @@ export default {
 
           let maxLength = 0;
           let maxQuotation = [];
-          let count = 0; // Initialize the counter
+
+          let count = 0; 
+          let notifyNewBlockDescription = '';
+          let previousCreateTime = null; // Track the previous createdAt time
           for (const formData of processedData) {
             const getQuotation = formData.quotation;
 
            
             this.Unittype = formData.cqUnitType;
 
-            const getFirstCreatetime = new Date(this.processedData[0].createdAt);
-            const currentCreateTime = new Date(formData.createdAt);
-            let notifyNewBlockDescription = ''; 
-          
-            if (currentCreateTime > getFirstCreatetime) {
+             const currentCreateTime = new Date(formData.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (previousCreateTime && currentCreateTime !== previousCreateTime) {
                 count++; // Increment count for each valid update
-                notifyNewBlockDescription = `<span title="${count} times update${count > 1 ? 's' : ''} for new description">&#128308;</span>`;
-                console.log('notifyNewBlockDescription:', notifyNewBlockDescription);
+                notifyNewBlockDescription = `<span title="${count} times import: ${formData.createdAt} ">&#128308;</span>`;
             } else {
                 notifyNewBlockDescription = '';
             }
+
+            // Update previousCreateTime for the next iteration
+            previousCreateTime = currentCreateTime;
 
             if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
               head1Counter++;
@@ -832,6 +841,7 @@ export default {
         this.cqApprovalData = response.data;
         const getCallForQuotationSubconList = response.callForQuotationSubconLists;
         // Filter out items where subcon_id is 1
+        console.log('response cqApproval',response);
         const filteredSubconList = getCallForQuotationSubconList.filter(item => item.subcon_id !== 1);
         this.SubconListId = filteredSubconList;
 
@@ -1004,13 +1014,13 @@ export default {
 
 .header-row-2 th {
   position: sticky;
-  top: 55px;
+  top: 53px;
   height: 48px;
 }
 
 .header-row-3 th {
   position: sticky;
-  top: 104px;
+  top: 112px;
   z-index: 11; 
 }
 

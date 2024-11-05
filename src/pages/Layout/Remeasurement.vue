@@ -263,6 +263,7 @@ export default {
     async saveAllData() {
       try {
         this.isLoading = true;
+        window.scrollTo(0, 0);
         const dataToSave = this.Description.flatMap(formData => {
           return formData.cqUnitType.map(item => {
             const cqId = this.$route.query.cqId;
@@ -279,9 +280,11 @@ export default {
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;
         const storedProjectId = localStorage.getItem('projectId');
+        window.scrollTo(0, 0);
         this.$router.push({ name: 'Subcon Comparison', query: { cqID: this.$route.query.cqId,projectID: storedProjectId  } }); 
         
       } catch (error) {
+        window.scrollTo(0, 0);
         this.FailMessage = ("Failed to save data.",error.message);
       } finally {
         this.isLoading = false;
