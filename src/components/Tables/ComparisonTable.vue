@@ -183,7 +183,8 @@
                     </div>
                     <h6>Recommend Award To:</h6>
                     <h6 class="approvalSelection">
-                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }}
+                      {{ cmapproval.Call_For_Quotation_Subcon_List.name }} <br>
+                      ({{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }})
                     </h6>
                     <h6>Date:</h6>
                     <h6 class="approvalSelection">
@@ -835,6 +836,7 @@ export default {
         this.cqApprovalData = response.data;
         const getCallForQuotationSubconList = response.callForQuotationSubconLists;
         // Filter out items where subcon_id is 1
+        console.log('response cqApproval',response);
         const filteredSubconList = getCallForQuotationSubconList.filter(item => item.subcon_id !== 1);
         this.SubconListId = filteredSubconList;
 
