@@ -13,8 +13,8 @@
             <wj-flex-grid-filter />
 
             <!-- Define grid columns -->
-            <wj-flex-grid-column-group :binding="'itemIndex'" :header="'Item'" :wordWrap="true" :width="220" :isReadOnly="true"></wj-flex-grid-column-group>
-            <wj-flex-grid-column-group :binding="'element'" :header="'Element'" :minWidth="100" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
+            <wj-flex-grid-column-group :binding="'itemIndex'" :header="'Item'" :wordWrap="true" :width="180" :isReadOnly="true"></wj-flex-grid-column-group>
+            <wj-flex-grid-column-group :binding="'element'" :header="'Element'" :minWidth="80" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'sub_element'" :header="'Sub Element'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'description_sub_sub_element'" :header="'Sub Sub Element'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'description_item'" :header="'Description'" :minWidth="400" :width="'*'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
@@ -118,8 +118,7 @@ export default {
                     { itemIndex: 'Ranking', quotes: [] },
                     { itemIndex: 'Contingency Sum (RM)', quotes: [] },
                 ];
-                
-                // Loop through totalRows and populate quotes
+
                 totalRows.forEach((totalRow, totalRowIndex) => {
                 data.conlists.forEach((item, index) => {
                  
@@ -185,12 +184,8 @@ export default {
                     }
                     });
                 });
-                });
 
-                // Push the processed totalRows to Description and log the result
                 this.Description.push(...totalRows);
-    
-
 
                 if (this.flex) {
                     this.flex.select(-1, -1); // Clear any existing selection
