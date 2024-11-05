@@ -89,9 +89,10 @@ export default {
             } else if (index === 1 && subcon.Subcon.name === 'Budget') {
                 getDisplay = 'Budget Adj';
             } else if (index === 2 && subcon.Subcon.name === 'Budget') {
-                getDisplay = subcon.Subcon.name === 'Budget' ? 'Budget Remeasurement' : subcon.Subcon.name;
+                getDisplay = 'Budget Remeasurement';
             } else if (this.SubconList.length >= 2) {
-                getDisplay = subcon.Subcon.name;
+                // Display both subcon.Subcon.name and subcon.name
+                getDisplay = subcon.name ? `${subcon.Subcon.name} (${subcon.name})` : subcon.Subcon.name;
             }
             
             return getDisplay;
@@ -117,84 +118,83 @@ export default {
                     { element: 'Ranking', quotes: [] },
                     { element: 'Contingency Sum (RM)', quotes: [] },
                 ];
+                
+                // Loop through totalRows and populate quotes
+                totalRows.forEach((totalRow, totalRowIndex) => {
+                data.conlists.forEach((item, index) => {
+                 
+                    let smyValue;
 
-                totalRows.forEach((totalRow) => {
-        
-                    data.conlists.forEach((item, index) => { // Loop through each item in conlists
-                        let smyValue;
-                        if(index === 1 && item.Subcon && item.Subcon.name === 'Budget'){
-                            switch (totalRow.element) {
-                                case 'ADJ Total Amount (RM)':
-                                    smyValue = item.adjTotal;
-                                    break;
-                                default:
-                                    smyValue = ''; 
-                            }
+                    // Check for specific conditions and assign smyValue
+                    if (index === 1 && item.Subcon && item.Subcon.name === 'Budget') {
+                    switch (totalRow.element) {
+                        case 'ADJ Total Amount (RM)':
+                        smyValue = item.adjTotal;
+                        break;
+                        default:
+                        smyValue = ''; 
+                    }
+                    } else if (index === 0 && item.Subcon && item.Subcon.name === 'Budget') {
+                    switch (totalRow.element) {
+                        case 'BQ Total Amount (RM)':
+                        smyValue = item.bqTotal;
+                        break;
+                        default:
+                        smyValue = ''; 
+                    }
+                    } else if (index === 2 && item.Subcon && item.Subcon.name === 'Budget') {
+                    switch (totalRow.element) {
+                        case 'Remeasurement Total Amount (RM)':
+                        smyValue = item.remeasureTotal;
+                        break;
+                        default:
+                        smyValue = ''; 
+                    }
+                    } else {
+                    switch (totalRow.element) {
+                        case 'BQ Total Amount (RM)':
+                        smyValue = item.bqTotal;
+                        break;
+                        case 'ADJ Total Amount (RM)':
+                        smyValue = item.adjTotal; 
+                        break;
+                        case 'Remeasurement Total Amount (RM)':
+                        smyValue = item.remeasureTotal;
+                        break;
+                        case 'Discount Given (RM)':
+                        smyValue = item.discount;
+                        break;
+                        case 'After Discount Given (RM)':
+                        smyValue = item.adjAfterDiscount; 
+                        break;
+                        case 'Total Saving / Overrun (RM)':
+                        smyValue = item.adjSaving; 
+                        break;
+                        case 'Total Saving / Overrun (%)':
+                        smyValue = item.saveRate; 
+                        break;
+                        case 'Ranking':
+                        smyValue = item.ranking; 
+                        break;
+                        case 'Contingency Sum (RM)':
+                        smyValue = item.contingencySum;
+                        break;
+                        default:
+                        smyValue = ''; 
+                    }
+                    }
 
-                        } else if (index === 0 && item.Subcon && item.Subcon.name === 'Budget'){
-
-                            switch (totalRow.element) {
-                                case 'BQ Total Amount (RM)':
-                                    smyValue = item.bqTotal;
-                                    break;
-                                default:
-                                    smyValue = ''; 
-                            }
-
-                        } else if (index === 2 && item.Subcon && item.Subcon.name === 'Budget') {
-
-                            switch (totalRow.element) {
-                                case 'Remeasurement Total Amount (RM)':
-                                    smyValue = item.remeasureTotal;
-                                    break;
-                                default:
-                                    smyValue = ''; 
-                            }
-
-                        } else {
-                            switch (totalRow.element) {
-                                case 'BQ Total Amount (RM)':
-                                    smyValue = item.bqTotal;
-                                    break;
-                                case 'ADJ Total Amount (RM)':
-                                    smyValue = item.adjTotal; 
-                                    break;
-                                case 'Remeasurement Total Amount (RM)':
-                                    smyValue = item.remeasureTotal;
-                                    break;
-                                case 'Discount Given (RM)':
-                                    smyValue = item.discount;
-                                    break;
-                                case 'After Discount Given (RM)':
-                                    smyValue = item.adjAfterDiscount; 
-                                    break;
-                                case 'Total Saving / Overrun (RM)':
-                                    smyValue = item.adjSaving; 
-                                    break;
-                                case 'Total Saving / Overrun (%)':
-                                    adjAmtValue = item.saveRate; 
-                                    break;
-                                case 'Ranking':
-                                    smyValue = item.ranking; 
-                                    break;
-                                case 'Contingency Sum (RM)':
-                                    smyValue = item.contingencySum;
-                                    break;
-                                default:
-                                    smyValue = ''; 
-                            }
-                        }
-
-                        
-
-                    
-                        totalRow.quotes.push({
-                            adjAmt: smyValue, 
-                        });
+                    // Push the value to quotes array in totalRow
+                    totalRow.quotes.push({
+                    adjAmt: smyValue, 
                     });
                 });
+                });
 
+                // Push the processed totalRows to Description and log the result
                 this.Description.push(...totalRows);
+    
+
 
                 if (this.flex) {
                     this.flex.select(-1, -1); // Clear any existing selection
