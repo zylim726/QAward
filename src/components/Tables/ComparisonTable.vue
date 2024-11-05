@@ -203,7 +203,7 @@
                       <select v-model="selectedQuotations[index]" class="quotation-select">
                         <option value=""> </option>
                         <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
-                          {{ selectSubconListId.Subcon.name }}
+                          {{ selectSubconListId.name }} ({{ selectSubconListId.Subcon.name }})
                         </option>
                       </select>
                       <p>Remarks:</p>
@@ -597,24 +597,27 @@ export default {
 
           let maxLength = 0;
           let maxQuotation = [];
-          let count = 0; // Initialize the counter
+
+          let count = 0; 
+          let notifyNewBlockDescription = '';
+          let previousCreateTime = null; // Track the previous createdAt time
           for (const formData of processedData) {
             const getQuotation = formData.quotation;
 
            
             this.Unittype = formData.cqUnitType;
 
-            const getFirstCreatetime = new Date(this.processedData[0].createdAt);
-            const currentCreateTime = new Date(formData.createdAt);
-            let notifyNewBlockDescription = ''; 
-          
-            if (currentCreateTime > getFirstCreatetime) {
+             const currentCreateTime = new Date(formData.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (previousCreateTime && currentCreateTime !== previousCreateTime) {
                 count++; // Increment count for each valid update
-                notifyNewBlockDescription = `<span title="${count} times update${count > 1 ? 's' : ''} for new description">&#128308;</span>`;
-                console.log('notifyNewBlockDescription:', notifyNewBlockDescription);
+                notifyNewBlockDescription = `<span title="${count} times import: ${formData.createdAt} ">&#128308;</span>`;
             } else {
                 notifyNewBlockDescription = '';
             }
+
+            // Update previousCreateTime for the next iteration
+            previousCreateTime = currentCreateTime;
 
             if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
               head1Counter++;
