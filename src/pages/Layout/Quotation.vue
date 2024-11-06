@@ -87,7 +87,7 @@
                     </th>
                     <th scope="col">Qty</th>
                     <th style="text-align: center;">
-                      {{ quotationName && selectedSubconName ? `${quotationName} (${selectedSubconName})` : '' }}
+                      {{ quotationName && selectedSubconName ? `${selectedSubconName} (${quotationName})` : '' }}
                     </th>
                   </tr>
                   <tr>

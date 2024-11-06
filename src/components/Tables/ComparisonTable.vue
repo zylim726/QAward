@@ -134,9 +134,10 @@
 
             </th>
           </tr>
+          <!--Header row 4 is mean by when quotation fixed by budget rate and budget adj, Header row 3 is when quotation more than 2 -->
           <tr :class="{
-            'header-row-4': Unittype.length > 0 && QuotationName.length === 2, 
-            'header-row-3': Unittype.length > 0 && QuotationName.length > 2
+            'header-row-4': Unittype.length > 0 && QuotationName.length <= 3, 
+            'header-row-3': Unittype.length > 0 && QuotationName.length > 3
           }">
             <th ></th>
             <th colspan="3" v-if="!isHide"  ></th>
@@ -1016,12 +1017,12 @@ export default {
 .header-row-2 th {
   position: sticky;
   top: 53px;
-  height: 48px;
+  height: 100px;
 }
 
 .header-row-3 th {
   position: sticky;
-  top: 122px;
+  top: 125px;
   z-index: 11; 
 }
 

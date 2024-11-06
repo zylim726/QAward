@@ -13,8 +13,8 @@
             <wj-flex-grid-filter />
 
             <!-- Define grid columns -->
-            <wj-flex-grid-column-group :binding="'itemIndex'" :header="'Item'" :wordWrap="true" :width="70" :isReadOnly="true"></wj-flex-grid-column-group>
-            <wj-flex-grid-column-group :binding="'element'" :header="'Element'" :minWidth="220" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
+            <wj-flex-grid-column-group :binding="'itemIndex'" :header="'Item'" :wordWrap="true" :width="180" :isReadOnly="true"></wj-flex-grid-column-group>
+            <wj-flex-grid-column-group :binding="'element'" :header="'Element'" :minWidth="80" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'sub_element'" :header="'Sub Element'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'description_sub_sub_element'" :header="'Sub Sub Element'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
             <wj-flex-grid-column-group :binding="'description_item'" :header="'Description'" :minWidth="400" :width="'*'" :wordWrap="true" :isReadOnly="true"></wj-flex-grid-column-group>
@@ -108,18 +108,17 @@ export default {
                 console.log('get response',data);
 
                 const totalRows = [
-                    { element: 'BQ Total Amount (RM)', quotes: [] },
-                    { element: 'ADJ Total Amount (RM)', quotes: [] },
-                    { element: 'Remeasurement Total Amount (RM)', quotes: [] },
-                    { element: 'Discount Given (RM)', quotes: [] },
-                    { element: 'After Discount Given (RM)', quotes: [] },
-                    { element: 'Total Saving / Overrun (RM)', quotes: [] },
-                    { element: 'Total Saving / Overrun (%)', quotes: [] },
-                    { element: 'Ranking', quotes: [] },
-                    { element: 'Contingency Sum (RM)', quotes: [] },
+                    { itemIndex: 'BQ Total Amount (RM)', quotes: [] },
+                    { itemIndex: 'ADJ Total Amount (RM)', quotes: [] },
+                    { itemIndex: 'Remeasurement Total Amount (RM)', quotes: [] },
+                    { itemIndex: 'Discount Given (RM)', quotes: [] },
+                    { itemIndex: 'After Discount Given (RM)', quotes: [] },
+                    { itemIndex: 'Total Saving / Overrun (RM)', quotes: [] },
+                    { itemIndex: 'Total Saving / Overrun (%)', quotes: [] },
+                    { itemIndex: 'Ranking', quotes: [] },
+                    { itemIndex: 'Contingency Sum (RM)', quotes: [] },
                 ];
-                
-                // Loop through totalRows and populate quotes
+
                 totalRows.forEach((totalRow, totalRowIndex) => {
                 data.conlists.forEach((item, index) => {
                  
@@ -183,18 +182,10 @@ export default {
                         smyValue = ''; 
                     }
                     }
-
-                    // Push the value to quotes array in totalRow
-                    totalRow.quotes.push({
-                    adjAmt: smyValue, 
                     });
                 });
-                });
 
-                // Push the processed totalRows to Description and log the result
                 this.Description.push(...totalRows);
-    
-
 
                 if (this.flex) {
                     this.flex.select(-1, -1); // Clear any existing selection
