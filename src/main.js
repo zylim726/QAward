@@ -30,7 +30,9 @@ let maintenanceMessage;
 async function checkMaintenance() {
   try {
     maintenanceMessage = await MaintenanceController.checkMaintenance();
-
+    if (router.currentRoute.path === '/nofound') {
+      router.push('/projectlist');
+    }
   } catch (fetchError) {
     if (router.currentRoute.path !== '/nofound') {
       router.push('/nofound');
