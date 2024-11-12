@@ -3,8 +3,12 @@
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
         <md-card>
-          <a v-if="getMaxQuotation <= 2"
-            @click="deleteDescription()"><button type="button" class="btn-save" style="margin-right: 10px">Delete</button></a>
+            <a v-if="getMaxQuotation <= 2" @click="deleteDescription()">
+              <button type="button" class="btn-save" style="margin-right: 10px">Delete</button>
+            </a>
+            <a @click="backToComparison">
+              <button type="button" class="btn-save" style="margin-right: 10px">Back</button>
+            </a>
           <md-card-content>
             <div v-if="isLoading"><loading-modal /><br><br></div>
             <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
@@ -177,6 +181,14 @@ export default {
     this.getNewDescription(id);
   },
   methods: {
+     backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     EditMessage(message) {
       this.UpdateMessage = message; 
       setTimeout(() => {

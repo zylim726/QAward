@@ -50,6 +50,12 @@
             <span class="tooltiptext" style="bottom: -305% !important;">Download quotation template and field in rate data.</span>
           <md-icon class="mdIcon">download_for_offline</md-icon></div>
         </button>
+        <button @click="backToComparison" class="transparentButton" style="margin-right: 10px; float: right">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -110px !important;margin-bottom: -105px;">Back to comparison pages.</span>
+            <md-icon class="mdIcon">undo</md-icon>
+          </div>
+        </button>
         <md-card>
           <md-card-content>
             <div v-if="UpdateMessage" class="notification success">
@@ -189,6 +195,14 @@ export default {
     }
   },
   methods: {
+    backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     blockNegativeInput(event) {
       if (event.key === '-' || event.key === 'Minus') {
         event.preventDefault();

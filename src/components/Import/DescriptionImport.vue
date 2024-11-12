@@ -20,6 +20,14 @@
         <md-icon class="mdIcon">download_for_offline</md-icon>
       </div>
     </button>
+    <button @click="backToComparison" class="transparentButton" style="margin-right: 10px; float: right">
+      <div class="tooltip">
+        <span class="tooltiptext" style="width: 160px; margin-left: -110px !important;">
+          Back to comparison pages.
+        </span>
+        <md-icon class="mdIcon">undo</md-icon>
+      </div>
+    </button>
     <div class="projectTable-container">
       <table class="project-table">
         <thead>
@@ -190,6 +198,13 @@ export default {
     },
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
+    },
+    backToComparison() {
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: this.cqId, projectID: storedProjectId }
+      });
     },
     exportTableHeaders() {
       try {

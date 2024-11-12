@@ -4,6 +4,12 @@
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
+        <button @click="backToComparison" class="transparentButton" style="margin-right: 10px; float: right">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -110px !important;margin-bottom: -105px;">Back to comparison pages.</span>
+            <md-icon class="mdIcon">undo</md-icon>
+          </div>
+        </button>
         <md-card>
           <md-card-content>
             <div class="table-container" style="margin-top: 10px !important;">
@@ -140,6 +146,14 @@ export default {
     this.getNewDescription(id, subconListId);
   },
   methods: {
+    backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     async downloadDocument(url) {
       try {
         const apiHost = config.getHost();
