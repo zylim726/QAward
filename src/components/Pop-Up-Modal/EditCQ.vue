@@ -148,7 +148,8 @@ export default {
         });
         this.processElement();
 
-        this.unitResult = await CallofQuotationController.getUnittype(id);
+        const getCQUnitData = await CallofQuotationController.getUnittype(id);
+        this.unitResult = getCQUnitData.cqUnitTypes;
 
       } catch (error) {
         const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
