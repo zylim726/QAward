@@ -245,29 +245,38 @@ export default {
             matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
           }
         });
-
-        getSubconDetails.forEach(subcon => {
-
-          let getSubconObject;
-          if (subcon.Subcon.name === 'Budget') {
-            getSubconObject = `${subcon.Subcon.name}`;
-          } else {
-            getSubconObject = `${subcon.Subcon.name} (${subcon.name})`;
-          }
-          
-          // Clean the object keys by removing extra spaces
-          const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
-            acc[key.replace(/\s+/g, ' ').trim()] = object[key];
-            return acc;
-          }, {});
-
-          if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
-            getSubconValue[subcon.id] = `${sanitizedObjectKeys[getSubconObject]}`;
-          }
-        });
-
+        let valueSubconDetails;
         if (getSubconDetails.length === 0) {
-          getSubconValue[0] = object["Budget"];
+            getSubconValue[0] = object["Budget"];
+            valueSubconDetails = 1;
+          } else {
+            getSubconDetails.forEach(subcon => {
+                console.log('subcon:', subcon);  // Debug log to check what subcon object is in each iteration
+                valueSubconDetails = getSubconDetails.length;
+                let getSubconObject;
+
+                if (subcon.Subcon.name === 'Budget') {
+                    getSubconObject = `${subcon.Subcon.name}`;
+                    console.log('If Block - Budget:', getSubconObject);
+                } else if (subcon.name !== '') {
+                    getSubconObject = `${subcon.Subcon.name} (${subcon.name})`;
+                    console.log('Else If Block:', getSubconObject);
+                } else {
+                    getSubconObject = `${subcon.Subcon.name}`;
+                    console.log('Else Block:', getSubconObject);  // This should log for all the remaining cases
+                }
+
+                // Clean the object keys by removing extra spaces
+                const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+                    acc[key.replace(/\s+/g, ' ').trim()] = object[key];
+                    return acc;
+                }, {});
+
+                if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
+                    console.log('Found key in object:', getSubconObject);  // Debug log to verify key existence
+                    getSubconValue[subcon.id] = `${sanitizedObjectKeys[getSubconObject]}`;
+                }
+            });
         }
 
 
@@ -291,9 +300,22 @@ export default {
 
       if (object["Unit"] !== "") {
 
-        if (object["Budget Rate"] === "" || object["Budget Rate"] === undefined) {
-          object["Budget Rate"] = 0; 
-        }
+        getSubconDetails.forEach(subcon => {
+          let getSubconObject;
+       
+          if (subcon.Subcon.name === 'Budget') {
+              getSubconObject = `${subcon.Subcon.name}`;
+          } else if (subcon.name !== '') {
+              getSubconObject = `${subcon.Subcon.name}(${subcon.name})`;
+          } else {
+              getSubconObject = `${subcon.Subcon.name}`;
+          }
+
+
+          if (object.hasOwnProperty(getSubconObject) && (object[getSubconObject] === "" || object[getSubconObject] === undefined)) {
+            getSubconValue[subcon.id] = 0;
+          }
+        });
 
         unittype.forEach(unit => {
           const combineObjects = `${unit.type} (${unit.quantity})`;
@@ -303,7 +325,9 @@ export default {
         });
       }
 
-      const hasMatches = Object.keys(matchedValues).length === unittype.length;
+      const hasMatches = 
+        (Object.keys(matchedValues).length === unittype.length) && 
+        (Object.keys(getSubconValue).length === valueSubconDetails);
 
       if (!hasMatches) {
         this.$emit('fail-message', "Error Message: The template is outdated. Please download it again.");
@@ -325,6 +349,7 @@ export default {
 
   if (!hasErrors) {
     try {
+      console.log('matchedData',matchedData);
 
       const successMessage = await DescriptionController.addDescription(cqId, matchedData);
       const message = successMessage[0].split(',')[0].trim(); 
