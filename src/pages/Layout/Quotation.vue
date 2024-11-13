@@ -152,7 +152,7 @@ export default {
       FailMessage: null,
       cqUnit: [],
       columnKTitle: [],
-      columnKData: [],
+      valueImportRate: [],
       selectedOption: null,
       selectedSubconName: '',
       quotationName: '',
@@ -258,57 +258,47 @@ export default {
 
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
           const rateIndex = jsonData[1].indexOf('Rate');
-          const QtyIndex = jsonData[0].indexOf('Qty');
+          const valueImportRate = jsonData.slice(2) // Skip the first two rows (headers)
+          .map((row, index) => {
+            const Importrate = row[rateIndex];
+            let numericValue;
 
-        // Filter rows where Qty has data or Rate has a valid number
-const rateValues = jsonData.filter((row, rowIndex) => {
-  // Skip the first row (header) and check if Qty or Rate has data
-  const hasQty = row[QtyIndex];
-  const hasRate = typeof row[rateIndex] === 'number';
+            // Check if the rate is empty, null, or undefined
+            if (Importrate === '' || Importrate === null || Importrate === undefined) {
+              numericValue = 0; // Assign 0 if Importrate is empty or invalid
+            } else if (typeof Importrate === 'string') {
+              const numericPart = Importrate.match(/-?\d+(\.\d+)?/);
+              numericValue = numericPart ? parseFloat(numericPart[0]) : 0; // Return 0 if no valid numeric part
+            } else if (typeof Importrate === 'number') {
+              numericValue = Importrate;
+            } else {
+              numericValue = 0; // Default to 0 for any other case
+            }
 
-  // Pass rows with Qty or substitute 0 if Rate has a number and Qty is missing
-  return rowIndex > 1 && (hasQty || hasRate);
-}).map(row => {
-  // Calculate hasQty within the map to make it available here
-  const hasQty = row[QtyIndex];
-  const qtyValue = hasQty || 0;
-  
-  // Check if rate is valid; if qty has data and rate is invalid, set rate to 0
-  const rateValue = hasQty && (typeof row[rateIndex] !== 'number' || isNaN(row[rateIndex])) 
-                    ? 0 
-                    : row[rateIndex];
-  
-  return { qty: qtyValue, rate: rateValue };
-});
+            return numericValue; // Return the numeric value
+          })
+          .filter(value => !isNaN(value)); // Only keep valid numeric values
 
-console.log('Processed rateValues:', rateValues);
-
-
-   
-          const columnKData = rateValues
-            .filter(({ qty }) => qty > 0) // Only keep rows where qty is greater than 0
-            .map(({ rate }) => {
-              if (typeof rate === 'string') {
-                const numericPart = rate.match(/-?\d+(\.\d+)?/);
-                return numericPart ? parseFloat(numericPart[0]) : NaN;
-              } else if (typeof rate === 'number') {
-                return rate;
-              } else {
-                return NaN;
-              }
-          });
+          if (valueImportRate.length !== this.Description.length) {
+            this.FailMessage = "Error: Template format doesnt match the table view. Please re-download and upload again.";
+            setTimeout(() => {
+              this.UpdateMessage = '';
+              window.scrollTo(0, 0); 
+              window.location.reload();
+            }, 2500);
+            return;
+          } else {
+            this.valueImportRate = valueImportRate;
+            this.generateTable(this.Description, this.$route.query.cqId, valueImportRate);
+          }
 
           
-
-
-          this.columnKData = columnKData;
-          this.generateTable(this.Description, this.$route.query.cqId, columnKData);
-
+        
         };
         reader.readAsArrayBuffer(file);
       });
     },
-    generateTable(data, id, columnKData) {
+    generateTable(data, id, valueImportRate) {
       const filteredFormData = data.filter(item => {
         if (item.quotation && item.quotation.length > 0) {
           if (item.quotation[0].total_quote_amount !== 0) {
@@ -317,9 +307,6 @@ console.log('Processed rateValues:', rateValues);
         }
         return false;
       });
-
-      const count = filteredFormData.length;
-      const rateCount = columnKData ? columnKData.length : 0;
       const tableBody = document.querySelector('#data-table tbody');
       let head1Counter = 0;
       let head2Counter = 0;
@@ -327,11 +314,12 @@ console.log('Processed rateValues:', rateValues);
       let prevHead2 = null;
       tableBody.innerHTML = '';
 
-      if (!Array.isArray(columnKData) || columnKData.length === 0) {
-        columnKData = new Array(data.length).fill('');
+      if (!Array.isArray(valueImportRate) || valueImportRate.length === 0) {
+        valueImportRate = new Array(data.length).fill('');
+       
       }
 
-      let columnKDataIndex = 0;
+      let valueImportRateIndex = 0;
 
       data.forEach((formData, dataIndex) => {
         const cqUnitType = formData.cqUnitType;
@@ -348,7 +336,7 @@ console.log('Processed rateValues:', rateValues);
             <td><b>${formData.element || ''}</b></td>
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
-            <td  class="td-max-width"><b>${formData.description_item}</b></td>
+            <td class="td-max-width"><b>${formData.description_item}</b></td>
             <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
@@ -365,6 +353,16 @@ console.log('Processed rateValues:', rateValues);
           });
 
           const head2Row = document.createElement('tr');
+          const numberOfDescription = dataIndex;  
+          const numberOfSubcon = valueImportRate.map((value, index) => index);
+
+          // Default to an empty string
+          let rateValueTable = '';  
+
+          if (numberOfSubcon.includes(numberOfDescription)) {
+            rateValueTable = valueImportRate[numberOfDescription];  
+          }
+
           head2Row.innerHTML = ` 
             <td>${head1Counter}.${head2Counter}</td>
             <td>${formData.element || ''}</td>
@@ -375,30 +373,23 @@ console.log('Processed rateValues:', rateValues);
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
             <td style="text-align:center;">
-            ${columnKData[columnKDataIndex] !== undefined && columnKData[columnKDataIndex] !== null && columnKData[columnKDataIndex] !== '' 
-              ? parseFloat(columnKData[columnKDataIndex]).toFixed(2) 
-              : ''}
-          </td>
-
-
-
+              ${typeof rateValueTable === 'number' && !isNaN(rateValueTable) ? rateValueTable.toFixed(2) : ''}
+            </td>
           `;
           tableBody.appendChild(head2Row);
 
-          if (columnKData[columnKDataIndex] !== '') {
+          if (valueImportRate[valueImportRateIndex] !== '') {
             const existingEntry = this.QuotationDataArray.find(entry => entry.description_id === formData.id);
             if (!existingEntry) {
               this.QuotationDataArray.push({
                 description_id: formData.id,
-                countData: count,
-                rateData: rateCount,
-                rate: columnKData[columnKDataIndex],
+                rate: rateValueTable,
               });
             }
           }
 
 
-          columnKDataIndex++;
+          valueImportRateIndex++;
         }
       });
     },
@@ -429,10 +420,8 @@ console.log('Processed rateValues:', rateValues);
                 }, 2000);
                 return;
             }
-
-            if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {           
+          
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id,QuotationName);
-           
               const concatenatedMessage = SuccessMessage.join(', ');
               this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
               window.scrollTo(0, 0); 
@@ -444,21 +433,11 @@ console.log('Processed rateValues:', rateValues);
                     projectID: storedProjectId }
               });
              
-            } else {
-              console.log('error');
-              this.FailMessage = "Error: Rate data cannot have negative values.";
-              setTimeout(() => {
-                  this.UpdateMessage = '';
-                  window.scrollTo(0, 0); 
-                  window.location.reload();
-              }, 2000);
-            }
-
-
         } catch (error) {
             this.FailMessage = error.message;
             setTimeout(() => {
               this.UpdateMessage = '';
+              window.scrollTo(0, 0); 
               window.location.reload();
             }, 2000);
         } finally {
