@@ -137,7 +137,6 @@ export default {
     };
   },
   mounted() {
-    const pId = this.$route.query.projectID;
     const Id = this.$route.query.cqID;
     this.cqId = Id;
     this.getDetailCQ(this.cqId);
