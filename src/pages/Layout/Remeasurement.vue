@@ -33,7 +33,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-' + formIndex">
-                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === '')  ">
+                    <template v-if="formData.quotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00  ">
                       <td v-if="getMaxQuotation <= 2"> 
                         <input  
                           type="checkbox" 

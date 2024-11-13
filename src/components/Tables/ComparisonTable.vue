@@ -627,7 +627,7 @@ export default {
             // Update previousCreateTime for the next iteration
             previousCreateTime = currentCreateTime;
 
-            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 || formData.description_unit.trim() === "" ) ) {
+            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00) ) {
               head1Counter++;
             
               const head1Row = document.createElement('tr');
