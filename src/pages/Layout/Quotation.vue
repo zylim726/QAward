@@ -258,23 +258,48 @@ export default {
 
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
           const rateIndex = jsonData[1].indexOf('Rate');
+          const QtyIndex = jsonData[0].indexOf('Qty');
 
-          const allValuesAtRateIndex = jsonData.map(row => row[rateIndex]);
+        // Filter rows where Qty has data or Rate has a valid number
+const rateValues = jsonData.filter((row, rowIndex) => {
+  // Skip the first row (header) and check if Qty or Rate has data
+  const hasQty = row[QtyIndex];
+  const hasRate = typeof row[rateIndex] === 'number';
 
-          const finalColumnKData = allValuesAtRateIndex.filter(value => {
-            return typeof value === 'number' || (typeof value === 'string' && /[0-9]/.test(value));
+  // Pass rows with Qty or substitute 0 if Rate has a number and Qty is missing
+  return rowIndex > 1 && (hasQty || hasRate);
+}).map(row => {
+  // Calculate hasQty within the map to make it available here
+  const hasQty = row[QtyIndex];
+  const qtyValue = hasQty || 0;
+  
+  // Check if rate is valid; if qty has data and rate is invalid, set rate to 0
+  const rateValue = hasQty && (typeof row[rateIndex] !== 'number' || isNaN(row[rateIndex])) 
+                    ? 0 
+                    : row[rateIndex];
+  
+  return { qty: qtyValue, rate: rateValue };
+});
+
+console.log('Processed rateValues:', rateValues);
+
+
+   
+          const columnKData = rateValues
+            .filter(({ qty }) => qty > 0) // Only keep rows where qty is greater than 0
+            .map(({ rate }) => {
+              if (typeof rate === 'string') {
+                const numericPart = rate.match(/-?\d+(\.\d+)?/);
+                return numericPart ? parseFloat(numericPart[0]) : NaN;
+              } else if (typeof rate === 'number') {
+                return rate;
+              } else {
+                return NaN;
+              }
           });
 
-          const columnKData = finalColumnKData.map(value => {
-            if (typeof value === 'string') {
-              const numericPart = value.match(/-?\d+(\.\d+)?/); 
-              return numericPart ? parseFloat(numericPart[0]) : NaN;
-            } else if (typeof value === 'number') {
-              return value; 
-            } else {
-              return NaN; 
-            }
-          });
+          
+
 
           this.columnKData = columnKData;
           this.generateTable(this.Description, this.$route.query.cqId, columnKData);
@@ -394,8 +419,8 @@ export default {
             const Discount = this.discount;
             const Remarks = this.remarks;
             const Documents = this.documents;
-            const hasNegativeRate = QuotationData.some(data => data.rate < 0);
-            if (hasNegativeRate) {
+            const hasInvalidRate = QuotationData.some(data => data.rate < 0);
+            if (hasInvalidRate) {
                 this.FailMessage = "Error: Rate data cannot have negative values.";
                 setTimeout(() => {
                     this.UpdateMessage = '';
@@ -404,7 +429,8 @@ export default {
                 }, 2000);
                 return;
             }
-            if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
+
+            if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {           
               const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id,QuotationName);
            
               const concatenatedMessage = SuccessMessage.join(', ');
@@ -417,13 +443,14 @@ export default {
                   query: { cqID: this.$route.query.cqId, 
                     projectID: storedProjectId }
               });
-
              
             } else {
-              this.FailMessage = "Error: Rate data is empty";
+              console.log('error');
+              this.FailMessage = "Error: Rate data cannot have negative values.";
               setTimeout(() => {
-                this.UpdateMessage = '';
-                window.location.reload();
+                  this.UpdateMessage = '';
+                  window.scrollTo(0, 0); 
+                  window.location.reload();
               }, 2000);
             }
 
