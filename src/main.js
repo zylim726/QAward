@@ -20,7 +20,13 @@ console.log('Backend Host:', process.env.VUE_APP_QAWARD_BACKEND_HOST);
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes,
+  routes: [
+    ...routes,  
+    {
+      path: "*", 
+      component: () => import('@/pages/Nolink.vue'), 
+    },
+  ],
   linkExactActiveClass: "nav-item active",
 });
 
