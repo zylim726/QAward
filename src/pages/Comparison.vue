@@ -137,9 +137,6 @@ export default {
     };
   },
   mounted() {
-    const pId = this.$route.query.projectID;
-    localStorage.setItem('projectId', pId);
-    
     const Id = this.$route.query.cqID;
     this.cqId = Id;
     this.getDetailCQ(this.cqId);
@@ -206,9 +203,11 @@ export default {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
        
         this.callQuotation = processedData[0];
-        
+        const projectId = this.callQuotation.project_id;
         const projectName = this.callQuotation.project_code;
         localStorage.setItem('projectName', projectName);
+        localStorage.setItem('projectId', projectId);
+    
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
             if (processedData[i]) {
