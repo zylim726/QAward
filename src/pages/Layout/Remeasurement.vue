@@ -3,13 +3,22 @@
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
         <md-card>
-            <a v-if="getMaxQuotation <= 2" @click="deleteDescription()">
-              <button type="button" class="btn-save" style="margin-right: 10px">Delete</button>
-            </a>
-            <a @click="backToComparison">
-              <button type="button" class="btn-save" style="margin-right: 10px">Back</button>
-            </a>
-          <md-card-content>
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;margin-top: 10px;">
+            <!-- Left Section (Back Button) -->
+            <div>
+              <a @click="backToComparison">
+                <button type="button" class="btn-save" style="margin-left: 10px;">Back</button>
+              </a>
+            </div>
+
+            <!-- Right Section (Delete Button) -->
+            <div v-if="getMaxQuotation <= 2">
+              <a @click="deleteDescription()">
+                <button type="button" class="btn-save" style="margin-right: 10px;">Delete</button>
+              </a>
+            </div>
+          </div>
+          <md-card-content style="margin-top: -28px;">
             <div v-if="isLoading"><loading-modal /><br><br></div>
             <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
             <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>

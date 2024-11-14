@@ -3,31 +3,42 @@
     <div v-if="isLoading">
       <loading-modal /><br><br>
     </div>
-    <label
-      for="desciptionInput"
-      style="margin-right: 10px; float: right"
-      class="file-label"
-    >
-      <div class="tooltip">
-        <span class="tooltiptext"  style="width: 160px;margin-left: -127px;">Upload your BQ Description.</span>
-        <md-icon class="mdIcon">upload_file</md-icon>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <!-- Left Section -->
+      <div style="float: left;">
+        <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -29px !important;">
+              Back to comparison pages.
+            </span>
+            <md-icon class="mdIcon">undo</md-icon>
+          </div>
+        </button>
       </div>
-      <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
-    </label>
-    <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px; float: right">
-      <div class="tooltip">
-        <span class="tooltiptext" style="width: 160px;margin-left: -110px !important;">Download BQ Template and field in data.</span>
-        <md-icon class="mdIcon">download_for_offline</md-icon>
+
+      <!-- Right Section -->
+      <div style="float: right;">
+        <label for="desciptionInput" style="margin-right: 10px;" class="file-label">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -127px;">
+              Upload your BQ Description.
+            </span>
+            <md-icon class="mdIcon">upload_file</md-icon>
+          </div>
+          <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
+        </label>
+
+        <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px;">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -110px !important;">
+              Download BQ Template and field in data.
+            </span>
+            <md-icon class="mdIcon">download_for_offline</md-icon>
+          </div>
+        </button>
       </div>
-    </button>
-    <button @click="backToComparison" class="transparentButton" style="margin-right: 10px; float: right">
-      <div class="tooltip">
-        <span class="tooltiptext" style="width: 160px; margin-left: -110px !important;">
-          Back to comparison pages.
-        </span>
-        <md-icon class="mdIcon">undo</md-icon>
-      </div>
-    </button>
+    </div>
+
     <div class="projectTable-container">
       <table class="project-table">
         <thead>
