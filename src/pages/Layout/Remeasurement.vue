@@ -3,9 +3,27 @@
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
         <md-card>
-          <a v-if="getMaxQuotation <= 2"
-            @click="deleteDescription()"><button type="button" class="btn-save" style="margin-right: 10px">Delete</button></a>
-          <md-card-content>
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;margin-top: 10px;">
+            <!-- Left Section (Back Button) -->
+            <div>
+              <a @click="backToComparison">
+                <div class="tooltip">
+                  <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+                    Back to comparison pages.
+                  </span>
+                  <md-icon class="mdIcon" style="margin-left: 17px !important;">arrow_back_ios</md-icon>
+                </div>
+              </a>
+            </div>
+
+            <!-- Right Section (Delete Button) -->
+            <div v-if="getMaxQuotation <= 2">
+              <a @click="deleteDescription()">
+                <button type="button" class="btn-save" style="margin-right: 10px;">Delete</button>
+              </a>
+            </div>
+          </div>
+          <md-card-content style="margin-top: -28px;">
             <div v-if="isLoading"><loading-modal /><br><br></div>
             <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
             <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
@@ -177,6 +195,14 @@ export default {
     this.getNewDescription(id);
   },
   methods: {
+     backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     EditMessage(message) {
       this.UpdateMessage = message; 
       setTimeout(() => {

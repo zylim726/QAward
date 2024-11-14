@@ -39,25 +39,48 @@
 
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px"> 
-          <button @click="openModal" class="transparentButton" style="margin-right: 10px; float: right">
-          <div class="tooltip" >
-            <span class="tooltiptext" style="bottom: -310% !important;">Select subcon and upload quotation excel.</span>
-            <md-icon class="mdIcon" >upload_file</md-icon></div>
-          <!-- <input type="file" multiple @change="importDataFromFiles" /> -->
-        </button>
-        <button @click="downloadExcelTemplate" class="transparentButton" style="margin-right: 10px; float: right">
-          <div class="tooltip" >
-            <span class="tooltiptext" style="bottom: -305% !important;">Download quotation template and field in rate data.</span>
-          <md-icon class="mdIcon">download_for_offline</md-icon></div>
-        </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <!-- Left Section (Undo Button) -->
+          <div>
+            <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+              <div class="tooltip">
+                <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+                  Back to comparison pages.
+                </span>
+                <md-icon class="mdIcon">arrow_back_ios</md-icon>
+              </div>
+            </button>
+          </div>
+
+          <!-- Right Section (Upload and Download Buttons) -->
+          <div style="display: flex; gap: 10px;">
+            <button @click="openModal" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext" style="bottom: -310% !important;">
+                  Select subcon and upload quotation excel.
+                </span>
+                <md-icon class="mdIcon">upload_file</md-icon>
+              </div>
+            </button>
+
+            <button @click="downloadExcelTemplate" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext" style="bottom: -305% !important;">
+                  Download quotation template and field in rate data.
+                </span>
+                <md-icon class="mdIcon">download_for_offline</md-icon>
+              </div>
+            </button>
+          </div>
+        </div>
         <md-card>
           <md-card-content>
             <div v-if="UpdateMessage" class="notification success">
-              {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
-            </div><br>
+              {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon><br>
+            </div>
             <div v-if="FailMessage" class="notification fail">
-              {{ FailMessage }} <md-icon>cancel</md-icon>
-            </div><br>
+              {{ FailMessage }} <md-icon>cancel</md-icon><br>
+            </div>
             <div class="table-container" style="margin-top: 0px !important;">
               <table class="nested-table" id="data-table" ref="dataTable">
                 <thead>
@@ -189,6 +212,14 @@ export default {
     }
   },
   methods: {
+    backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     blockNegativeInput(event) {
       if (event.key === '-' || event.key === 'Minus') {
         event.preventDefault();
