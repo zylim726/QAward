@@ -11,7 +11,7 @@
             <span class="tooltiptext" style="width: 160px; margin-left: -29px !important;">
               Back to comparison pages.
             </span>
-            <md-icon class="mdIcon">undo</md-icon>
+            <md-icon class="mdIcon">arrow_back_ios</md-icon>
           </div>
         </button>
       </div>

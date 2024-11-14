@@ -7,7 +7,12 @@
             <!-- Left Section (Back Button) -->
             <div>
               <a @click="backToComparison">
-                <button type="button" class="btn-save" style="margin-left: 10px;">Back</button>
+                <div class="tooltip">
+                  <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+                    Back to comparison pages.
+                  </span>
+                  <md-icon class="mdIcon" style="margin-left: 17px !important;">arrow_back_ios</md-icon>
+                </div>
               </a>
             </div>
 
