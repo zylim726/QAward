@@ -309,10 +309,12 @@ export default {
         
 
       //Check if Budget Rate is negative
-      if (object["Budget Rate"] < 0) {
-        this.$emit('fail-message', "Budget Rate cannot be negative.");
-        hasErrors = true;
-        return;
+      for (const key in getSubconValue) {
+        if (getSubconValue[key] < 0) {
+          this.$emit('fail-message', "Budget rate cannot have negative rate.");
+          hasErrors = true;
+          return;
+        }
       }
 
       // Check if any of the matched unit quantities are negative
