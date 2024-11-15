@@ -869,12 +869,6 @@ export default {
         firstRow.parentNode.removeChild(firstRow);
       }
 
-      // Ensure the first row of <tbody> is not removed
-      const firstBodyRow = clonedTable.querySelector('tbody tr');
-      if (firstBodyRow) {
-        firstBodyRow.parentNode.removeChild(firstBodyRow);
-      }
-
       // Preserve the <tfoot> section entirely
       const tfoot = clonedTable.querySelector('tfoot');
       if (tfoot) {
