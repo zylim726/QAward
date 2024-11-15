@@ -54,6 +54,15 @@
 
           <!-- Right Section (Upload and Download Buttons) -->
           <div style="display: flex; gap: 10px;">
+            <button @click="downloadExcelTemplate" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext" style="bottom: -305% !important;">
+                  Download quotation template and field in rate data.
+                </span>
+                <md-icon class="mdIcon">download_for_offline</md-icon>
+              </div>
+            </button>
+            
             <button @click="openModal" class="transparentButton">
               <div class="tooltip">
                 <span class="tooltiptext" style="bottom: -310% !important;">
@@ -63,14 +72,7 @@
               </div>
             </button>
 
-            <button @click="downloadExcelTemplate" class="transparentButton">
-              <div class="tooltip">
-                <span class="tooltiptext" style="bottom: -305% !important;">
-                  Download quotation template and field in rate data.
-                </span>
-                <md-icon class="mdIcon">download_for_offline</md-icon>
-              </div>
-            </button>
+            
           </div>
         </div>
         <md-card>
