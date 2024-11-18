@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div v-if="isModalVisible && CQunitType.length === 0 && callQuotation.length > 0" class="modal-overlay">
+    <div v-if="isModalVisible" class="modal-overlay">
       <div class="modal-content" style="max-height: 550px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
         <table class="project-table">
@@ -241,7 +241,7 @@ export default {
           this.isModalVisible = true;
         }
       } catch (error) {
-       
+        this.isModalVisible = true; 
       }
     },
     async getUTypes() {
