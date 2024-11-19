@@ -120,11 +120,14 @@ export default {
         if (unitType.adj_factor == 0 || unitType.adj_factor === '') {
           isValid = false;
         }
+        if (unitType.quantity == 0 || unitType.quantity === '') {
+          isValid = false;
+        }
       });
 
       if (!isValid) {
 
-        this.FailMessage = "Error: Unit Type is required, and Adj Factor cannot be 0 or empty. Please correct the values.";
+        this.FailMessage = "Error: Unit type is required. Quantity and Adj Factor cannot be zero or empty. Please correct the values.";
 
         Vue.nextTick(() => {
           const modalContent = document.querySelector('.modal-content');
