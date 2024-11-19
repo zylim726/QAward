@@ -4,6 +4,14 @@
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100">
         <md-card>
           <md-card-content>
+            <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+              <div class="tooltip">
+                <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+                  Back to comparison pages.
+                </span>
+                <md-icon class="mdIcon">arrow_back_ios</md-icon>
+              </div>
+            </button>
             <div class="table-container" style="margin-top: 0px !important;">
               <table class="nested-table" v-if="revision.length">
                 <thead>
@@ -60,6 +68,14 @@ export default {
     this.accessRevision();
   },
   methods: {
+    backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     formatDate(date) {
       const options = { day: '2-digit', month: 'short', year: 'numeric' };
       return new Date(date).toLocaleDateString('en-GB', options).replace(/ /g, '-');
