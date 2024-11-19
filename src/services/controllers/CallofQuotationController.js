@@ -93,7 +93,7 @@ const CallofQuotationController = {
             trade: updatedData.trade, 
             trade_location1: updatedData.trade_location1, 
             actual_calling_quotation_date: updatedData.actual_calling_quotation_date, 
-            awading_target_date: updatedData.awading_target_date, 
+            awarding_target_date: updatedData.awarding_target_date, 
             remarks: updatedData.remarks
           }, { headers })
         ]);
@@ -157,7 +157,7 @@ const CallofQuotationController = {
           trade: formData.trade,
           trade_location1: formData.location,
           actual_calling_quotation_date: formData.callingquotationDate,
-          awading_target_date: formData.awadingtaget,
+          awarding_target_date: formData.awadingtaget,
           remarks: formData.remarks,
           status: 'Pending',
           project_id: projectId

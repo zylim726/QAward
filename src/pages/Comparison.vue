@@ -65,7 +65,7 @@
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
               <h7>Awarding Target Data :</h7>
-              <h5 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h5>
+              <h5 class="titleHeader">{{ formatDate(callQuotation.awarding_target_date) ? formatDate(callQuotation.awarding_target_date) : '-' }}</h5>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
             <div class="tooltip">

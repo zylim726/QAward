@@ -667,10 +667,10 @@ export default {
                 unitQuantityTDs += `<td style="text-align:center;">${this.formatAccounting(cqUnit.adj_quantity)}</td>`;
               });
 
+              const getUnittype_isRemeas = this.Unittype[0];
               let remeasuremntQuantityTDs = '';
-              if (formData.remeasurement_quantity >= 0) {
-                remeasuremntQuantityTDs = `${!isHide ? `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>` : ''}`;
-               
+              if (formData.remeasurement_quantity >= 0 && getUnittype_isRemeas.is_remeasurement === true) {
+                  remeasuremntQuantityTDs = `${!isHide ? `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>` : ''}`;
               }
 
 
