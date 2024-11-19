@@ -7,7 +7,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
       
       <!-- Back to Comparison Button (Left) -->
-      <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+      <button @click="backToSummary" class="transparentButton" style="margin-left: 10px;">
         <div class="tooltip">
           <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
             Back to comparison pages.
@@ -85,12 +85,11 @@ export default {
     this.loadData();
   },
   methods: {
-    backToComparison() {
-      const id = this.$route.query.cqId;
+    backToSummary() {
       const storedProjectId = localStorage.getItem('projectId');
       this.$router.push({
-        path: '/comparison',
-        query: { cqID: id, projectID: storedProjectId }
+        path: '/callquotation',
+        query: { projectId: storedProjectId }
       });
     },
     async loadData() {
