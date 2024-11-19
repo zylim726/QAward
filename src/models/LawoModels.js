@@ -19,7 +19,7 @@ const LawoModels = {
         createdAt: config.createdAt,
         updatedAt: config.updatedAt,
         actuallDoneDate: config.actual_done_date,
-        awadingtargetdate: config.awading_target_date,
+        awadingtargetdate: config.awarding_target_date,
         remarks: config.remarks,
         budget_amount: config.budget_amount,
         adj_budget_amount: config.adj_budget_amount,

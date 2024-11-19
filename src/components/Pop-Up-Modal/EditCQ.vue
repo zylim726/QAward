@@ -48,7 +48,7 @@
             <p style="text-align: left;">Awarding Target Date : </p>
             <input
               type="text"
-              :value="formatDate(cquotationData.awading_target_date)"
+              :value="formatDate(cquotationData.awarding_target_date)"
               placeholder="Awarding Target Date"
               class="typeInput"
               readonly
