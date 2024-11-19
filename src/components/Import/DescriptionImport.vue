@@ -3,6 +3,7 @@
     <div v-if="isLoading">
       <loading-modal /><br><br>
     </div>
+    <div class="notification fail" v-if="allUnitTypesZero">Notice: The unit type quantity is currently 0.00. Upon saving, the description will be displayed as 'Head'.</div>
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
       <!-- Left Section -->
       <div style="float: left;">
@@ -130,6 +131,10 @@ export default {
   computed: {
     filteredColumns() {
       return this.columnTitles.filter((title) => !this.isBooleanColumn(title));
+    },
+    allUnitTypesZero() {
+      const result = this.Unittype.some((unit) => Number(unit.quantity) === 0.00);
+      return result;
     },
   },
   watch: {
