@@ -18,7 +18,7 @@
             <label for="coloration-low"  class="hidden-toggles__label"  @click="navigateTo('description')" >Add</label>
             <span class="hidden-toggles__label static-label">Description</span>
             <input name="coloration-level" type="radio" id="coloration-high" class="hidden-toggles__input" value="edit" v-model="selectedAction"/>
-            <label  for="coloration-high" class="hidden-toggles__label"  @click="navigateTo('remeasurement')">Edit</label>
+            <label  for="coloration-high" class="hidden-toggles__label"  @click="navigateTo('remeasurement')" v-if="processedData.length !== 0">Edit</label>
           </div>
         </form>
       </div>
