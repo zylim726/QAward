@@ -23,8 +23,10 @@
         </form>
       </div>
       <div class="filter-container" v-if="!isLoading">
-        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >
-          <md-icon style="color: antiquewhite;margin-right: 3px;">assignment_add</md-icon> Quotation</button></a>
+        <a :href="'quotation?cqId=' + cqId">
+          <button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending && QuotationName.length >= 2" >
+          <md-icon style="color: antiquewhite;margin-right: 3px;">assignment_add</md-icon> Quotation</button>
+        </a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" style="width: 178px !important;">
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
