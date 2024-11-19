@@ -268,9 +268,11 @@ export default {
         this.Description = processedData;
         const maxQuotationLength = Math.max(...processedData.map(item => item.quotation.length));
         
+         
         const isRemeasurementQuantityValid = 
-        !isNaN(this.Description[0]?.remeasurement_quantity) && 
-        this.Description[0]?.remeasurement_quantity !== 0.00;
+        this.Description[0]?.remeasurement_quantity !== undefined && 
+        !isNaN(Number(this.Description[0]?.remeasurement_quantity)) && 
+        Number(this.Description[0]?.remeasurement_quantity) !== 0.00;
 
         // Define getMaxQuotationLength based on the condition
         const getMaxQuotationLength = isRemeasurementQuantityValid ? maxQuotationLength - 1 : maxQuotationLength;
