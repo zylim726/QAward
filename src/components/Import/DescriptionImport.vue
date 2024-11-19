@@ -3,6 +3,7 @@
     <div v-if="isLoading">
       <loading-modal /><br><br>
     </div>
+    <div class="notification fail" v-if="someUnitTypesZero">Warning: One or more unit type quantities are currently set to 0. Please check before importing the BQ items.</div>
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
       <!-- Left Section -->
       <div style="float: left;">
@@ -130,6 +131,10 @@ export default {
   computed: {
     filteredColumns() {
       return this.columnTitles.filter((title) => !this.isBooleanColumn(title));
+    },
+    someUnitTypesZero() {
+      const result = this.Unittype.some((unit) => Number(unit.quantity) === 0.00);
+      return result;
     },
   },
   watch: {
