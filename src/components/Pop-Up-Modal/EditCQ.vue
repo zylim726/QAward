@@ -73,6 +73,16 @@
                 readonly
                 style="background-color: #fef4e4;"
               />
+              <p style="text-align: left;">ADJ Factor : </p>
+              <input
+                type="text"
+                v-model="unit.adj_factor"
+                placeholder="Unit Quantity"
+                class="typeInput"
+                readonly
+                style="background-color: #fef4e4;"
+              />
+
               <p style="text-align: left;">Unit Quantity : </p>
               <input
                 type="text"
@@ -82,6 +92,8 @@
                 readonly
                 style="background-color: #fef4e4;"
               />
+
+           
             </div>
           </div>
         </div>
@@ -150,6 +162,7 @@ export default {
 
         const getCQUnitData = await CallofQuotationController.getUnittype(id);
         this.unitResult = getCQUnitData.cqUnitTypes;
+        console.log('this.unitResult',this.unitResult);
 
       } catch (error) {
         const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;
