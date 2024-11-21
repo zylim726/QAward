@@ -271,6 +271,7 @@ export default {
          
         const isRemeasurementQuantityValid = 
         this.Description[0]?.remeasurement_quantity !== undefined ||
+        !isNaN(Number(this.Description[0]?.remeasurement_quantity)) || 
         Number(this.Description[0]?.remeasurement_quantity) !== 0.00;
 
         // Define getMaxQuotationLength based on the condition
