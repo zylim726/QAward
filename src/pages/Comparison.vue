@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div v-if="isModalVisible && CQunitType.length === 0" class="modal-overlay">
+    <div v-if="isModalVisible" class="modal-overlay">
       <div class="modal-content" style="max-height: 550px;">
         <h1 class="titleHeader">Select Unit Type</h1><br>
         <table class="project-table">
@@ -31,12 +31,12 @@
 
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -65px;">
-        <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
-        <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
+        <div v-if="UpdateMessage" class="notification success" style="margin-top: 65px;">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
+        <div v-if="FailMessage" class="notification fail" style="margin-top: 65px;">{{ FailMessage }} <md-icon>cancel</md-icon></div>
         <br>
         <md-card style="height: 65%">
           <div class="status">
-            <i class="material-icons">notifications_active</i>
+            <i class="material-icons" style="margin-top: 9px;">notifications_active</i>
             <h7>Status : <b class="titleHeader">{{ callQuotation.status }}</b></h7>
           </div>
           <div class="comparison-title">
@@ -65,18 +65,33 @@
             </div>
             <div class="md-layout-item md-medium-size-33 md-xsmall-size-100 md-size-11">
               <h7>Awarding Target Data :</h7>
-              <h5 class="titleHeader">{{ formatDate(callQuotation.awading_target_date) ? formatDate(callQuotation.awading_target_date) : '-' }}</h5>
+              <h5 class="titleHeader">{{ formatDate(callQuotation.awarding_target_date) ? formatDate(callQuotation.awarding_target_date) : '-' }}</h5>
             </div>
             <button class="transparentButton"  @click="editCallQuotation(callQuotation.id)" >
-                <div class="tooltip">
-                  <span class="tooltiptext">Edit Comparison Summary</span>
-                  <md-icon style="color: orange;">edit_square</md-icon></div></button>
-              <br>
-              <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
-                <div class="tooltip" v-if="callQuotation && callQuotation.status !== 'Waiting Approval' &&  callQuotation.status !== 'Approved' "  >
-                  <span class="tooltiptext">Delete Comparison Summary</span>
-                  <md-icon style="color: orange;">delete</md-icon></div></button>
+            <div class="tooltip">
+              <span class="tooltiptext">Edit Comparison Summary</span>
+              <md-icon style="color: orange;">edit_square</md-icon></div>
+            </button>
+            <br>
+            <button class="transparentButton" @click="deleteCallQuotation(callQuotation.id)" >
+            <div class="tooltip" v-if="callQuotation && callQuotation.status !== 'Waiting Approval' &&  callQuotation.status !== 'Approved' "  >
+              <span class="tooltiptext">Delete Comparison Summary</span>
+              <md-icon style="color: orange;">delete</md-icon></div>
+            </button>
+            <a :href="'revision?cqId=' + callQuotation.id" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext">Comparison Revision List</span>
+                <md-icon style="color: orange;">library_books</md-icon>
+              </div>
+          </a>
           </div>
+        </md-card>
+      </div>
+      <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -40px;">
+        <md-card style="min-height: 97%">
+          <md-card-content style="line-height: 16px !important;">
+            <workorder-table :cqId="cqId" ></workorder-table>
+          </md-card-content>
         </md-card>
       </div>
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="margin-top: -40px;">
@@ -93,13 +108,14 @@
 </template>
 
 <script>
-import { ComparisonTable } from "@/components";
+import { ComparisonTable, WorkorderTable } from "@/components";
 import CallofQuotationController from "@/services/controllers/CallofQuotationController.js";
 import { EditCQ,DeleteCQ }  from "@/components";
 
 export default {
   components: {
     ComparisonTable,
+    WorkorderTable,
     EditCQ,
     DeleteCQ,
   },
@@ -121,9 +137,6 @@ export default {
     };
   },
   mounted() {
-    const pId = this.$route.query.projectID;
-    localStorage.setItem('projectId', pId);
-    
     const Id = this.$route.query.cqID;
     this.cqId = Id;
     this.getDetailCQ(this.cqId);
@@ -188,23 +201,37 @@ export default {
     async getDetailCQ(Id) {
       try {
         const processedData = await CallofQuotationController.getDetailCQ(Id);
-
+       
         this.callQuotation = processedData[0];
+        const projectId = this.callQuotation.project_id;
         const projectName = this.callQuotation.project_code;
         localStorage.setItem('projectName', projectName);
+        localStorage.setItem('projectId', projectId);
+    
         if (processedData && processedData.data) {
           for (let i = 0; i < processedData.length; i++) {
             if (processedData[i]) {
-              this.callQuotation = processedData[i];
-              
+              this.callQuotation = processedData[i]; 
               await this.getProject(this.callQuotation.project_id);
               break;
             }
           }
         } 
       } catch (error) {
-        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
+        this.FailMessage = `${error.errorMessage || 'Unknown error'}`;
+        this.FailStatus = error.errorStatus || 'Unknown status';
+        this.goToCallQuotation();
+
       }
+    },
+    goToCallQuotation() {
+      this.$router.push({ 
+        name: 'Comparison Summary', 
+        query: { 
+          errorViewMessage: this.FailMessage, 
+          errorViewStatus: this.FailStatus 
+        } 
+      });
     },
     async getCQUnitType(Id) {
       try {
@@ -214,7 +241,7 @@ export default {
           this.isModalVisible = true;
         }
       } catch (error) {
-        this.FailMessage = `Error Message: ${error.message || 'Unknown error'}`;
+        this.isModalVisible = true; 
       }
     },
     async getUTypes() {

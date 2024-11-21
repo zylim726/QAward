@@ -3,23 +3,43 @@
     <div v-if="isLoading">
       <loading-modal /><br><br>
     </div>
-    <label
-      for="desciptionInput"
-      style="margin-right: 10px; float: right"
-      class="file-label"
-    >
-      <div class="tooltip">
-        <span class="tooltiptext">Upload your BQ Description.</span>
-        <md-icon class="mdIcon">upload_file</md-icon>
+    <div class="notification fail" v-if="someUnitTypesZero">Warning: One or more unit type quantities are currently set to 0. Please check before importing the BQ items.</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <!-- Left Section -->
+      <div style="float: left;">
+        <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -29px !important;">
+              Back to comparison pages.
+            </span>
+            <md-icon class="mdIcon">arrow_back_ios</md-icon>
+          </div>
+        </button>
       </div>
-      <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
-    </label>
-    <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px; float: right">
-      <div class="tooltip">
-        <span class="tooltiptext">Download BQ Template and field in data.</span>
-        <md-icon class="mdIcon">download_for_offline</md-icon>
+
+      <!-- Right Section -->
+      <div style="float: right;">
+        <label for="desciptionInput" style="margin-right: 10px;" class="file-label">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -127px;">
+              Upload your BQ Description.
+            </span>
+            <md-icon class="mdIcon">upload_file</md-icon>
+          </div>
+          <input id="desciptionInput" type="file" multiple @change="DescriptionUpload" />
+        </label>
+
+        <button @click="exportTableHeaders" class="transparentButton" style="margin-right: 10px;">
+          <div class="tooltip">
+            <span class="tooltiptext" style="width: 160px; margin-left: -110px !important;">
+              Download BQ Template and field in data.
+            </span>
+            <md-icon class="mdIcon">download_for_offline</md-icon>
+          </div>
+        </button>
       </div>
-    </button>
+    </div>
+
     <div class="projectTable-container">
       <table class="project-table">
         <thead>
@@ -41,30 +61,42 @@
             <th scope="col" v-for="(unitdata, index) in Unittype" :key="index">
               {{ unitdata.type }} ({{ unitdata.quantity }})
             </th>
-            <th scope="col">Budget Rate</th>
+            <th 
+              scope="col" 
+              v-for="(subcon, index) in SubconList.length > 0 ? SubconList : [{ Subcon: { name: 'Budget' } }]" 
+              :key="index"
+            >
+              {{ subcon.Subcon.name }} <span v-if="subcon.Subcon.name !== 'Budget' && subcon.name !== ''">({{ subcon.name }})</span>
+            </th>
+
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(row, index) in importedData"
-            :key="index"
-            :class="{ 'selected-row': row.selected }"
-          >
-            <td v-if="shouldDisplayCheckbox(row)">
-              <label class="control control--checkbox">
-                <input type="checkbox" v-model="row.selected" />
-              </label>
-            </td>
-            <td v-else></td>
-            <td v-for="column in filteredColumns" :key="column" class="td-max-width">
-              {{ 
-                (rowIndex > 4 && !isNaN(row[column])) 
-                  ? parseFloat(row[column]).toFixed(2) 
-                  : row[column] 
-              }}
-            </td>
-          </tr>
-        </tbody>
+  <tr
+    v-for="(row, rowIndex) in importedData"
+    :key="rowIndex"
+    :class="{ 'selected-row': row.selected }"
+  >
+    <td v-if="shouldDisplayCheckbox(row)">
+      <label class="control control--checkbox">
+        <input type="checkbox" v-model="row.selected" />
+      </label>
+    </td>
+    <td v-else></td>
+    <td
+      v-for="(column, colIndex) in filteredColumns"
+      :key="column"
+      class="td-max-width"
+    >
+      {{ 
+        (colIndex > 4 && !isNaN(row[column]) && row[column] !== "")
+          ? parseFloat(row[column]).toFixed(2)
+          : row[column]
+      }}
+    </td>
+  </tr>
+</tbody>
+
       </table>
     </div>
     <button type="submit" class="btn-save" @click="saveData">Save</button><br /><br />
@@ -90,6 +122,7 @@ export default {
     return {
       importedData: [],
       Unittype: [],
+      SubconList: [],
       columnTitles: [],
       selectAll: true,
       isLoading: false,
@@ -98,6 +131,10 @@ export default {
   computed: {
     filteredColumns() {
       return this.columnTitles.filter((title) => !this.isBooleanColumn(title));
+    },
+    someUnitTypesZero() {
+      const result = this.Unittype.some((unit) => Number(unit.quantity) === 0.00);
+      return result;
     },
   },
   watch: {
@@ -109,7 +146,9 @@ export default {
     async getUnittype(id) {
       try {
         const processedData = await CallofQuotationController.getUnittype(id);
-        this.Unittype = processedData;
+        this.Unittype = processedData.cqUnitTypes;
+        this.SubconList = processedData.subconLists;
+        console.log('this subconlist',this.SubconList);
       } catch (error) {
         const FailMessage = 'Error fetching Unittype: ' + error;
         this.$emit('fail-message', FailMessage);
@@ -176,6 +215,13 @@ export default {
     isBooleanColumn(key) {
       return this.importedData.some((row) => typeof row[key] === "boolean");
     },
+    backToComparison() {
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: this.cqId, projectID: storedProjectId }
+      });
+    },
     exportTableHeaders() {
       try {
         const headers = []; 
@@ -203,96 +249,142 @@ export default {
       }
     },
     async saveData() {
-  this.isLoading = true;
-  const cqId = this.cqId;
+      this.isLoading = true;
+      const cqId = this.cqId;
 
-  const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
-  const unittype = this.Unittype;
+      const selectImportData = this.importedData.filter(importedRow => importedRow.selected);
+      const unittype = this.Unittype;
+      const getSubconDetails = this.SubconList;
 
-  const validData = [];
-  let hasErrors = false;
+      const matchedData = [];
+      let hasErrors = false;
 
-  selectImportData.forEach(object => {
-    const matchedValues = {};
+      selectImportData.forEach(object => {
+        const matchedValues = {};
+        const getSubconValue = {};
 
-    unittype.forEach(unit => {
-  const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
-  console.log('combineObjects:', combineObjects);
+        unittype.forEach(unit => {
+          const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+          // Clean the object keys by removing extra spaces
+          const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+            acc[key.replace(/\s+/g, ' ').trim()] = object[key];
+            return acc;
+          }, {});
 
-  // Clean the object keys by removing extra spaces
-  const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
-    acc[key.replace(/\s+/g, ' ').trim()] = object[key];
-    return acc;
-  }, {});
+          // If the unit type exists in the sanitized import data 
+          if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
+            matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
+          }
+        });
+        let valueSubconDetails;
+        if (getSubconDetails.length === 0) {
+            getSubconValue[0] = object["Budget"];
+            valueSubconDetails = 1;
+          } else {
+            getSubconDetails.forEach(subcon => {
+                console.log('subcon:', subcon);  // Debug log to check what subcon object is in each iteration
+                valueSubconDetails = getSubconDetails.length;
+                let getSubconObject;
 
-  // If the unit type exists in the sanitized import data 
-  if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
-    matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
+                if (subcon.Subcon.name === 'Budget') {
+                    getSubconObject = `${subcon.Subcon.name}`;
+                    console.log('If Block - Budget:', getSubconObject);
+                } else if (subcon.name !== '') {
+                    getSubconObject = `${subcon.Subcon.name} (${subcon.name})`;
+                    console.log('Else If Block:', getSubconObject);
+                } else {
+                    getSubconObject = `${subcon.Subcon.name}`;
+                    console.log('Else Block:', getSubconObject);  // This should log for all the remaining cases
+                }
 
-  }
-});
+                // Clean the object keys by removing extra spaces
+                const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+                    acc[key.replace(/\s+/g, ' ').trim()] = object[key];
+                    return acc;
+                }, {});
+
+                if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
+                    console.log('Found key in object:', getSubconObject);  // Debug log to verify key existence
+                    getSubconValue[subcon.id] = `${sanitizedObjectKeys[getSubconObject]}`;
+                }
+            });
+        }
 
 
-    // Check if Budget Rate is negative
-    if (object["Budget Rate"] < 0) {
-      this.$emit('fail-message', "Budget Rate cannot be negative.");
-      hasErrors = true;
-      return;
-    }
+        
 
-    // Check if any of the matched unit quantities are negative
-    for (const key in matchedValues) {
-      if (matchedValues[key] < 0) {
-        this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
+      //Check if Budget Rate is negative
+      for (const key in getSubconValue) {
+        if (getSubconValue[key] < 0) {
+          this.$emit('fail-message', "Budget rate cannot have negative rate.");
+          hasErrors = true;
+          return;
+        }
+      }
+
+      // Check if any of the matched unit quantities are negative
+      for (const key in matchedValues) {
+        if (matchedValues[key] < 0) {
+          this.$emit('fail-message', "Unit type quantity cannot have negative rate.");
+          hasErrors = true;
+          return;
+        }
+      }
+
+      if (object["Unit"] !== "") {
+
+        getSubconDetails.forEach(subcon => {
+          let getSubconObject;
+       
+          if (subcon.Subcon.name === 'Budget') {
+              getSubconObject = `${subcon.Subcon.name}`;
+          } else if (subcon.name !== '') {
+              getSubconObject = `${subcon.Subcon.name}(${subcon.name})`;
+          } else {
+              getSubconObject = `${subcon.Subcon.name}`;
+          }
+
+
+          if (object.hasOwnProperty(getSubconObject) && (object[getSubconObject] === "" || object[getSubconObject] === undefined)) {
+            getSubconValue[subcon.id] = 0;
+          }
+        });
+
+        unittype.forEach(unit => {
+          const combineObjects = `${unit.type} (${unit.quantity})`;
+          if (object.hasOwnProperty(combineObjects) && (object[combineObjects] === "" || object[combineObjects] === undefined)) {
+            object[combineObjects] = 0; 
+          }
+        });
+      }
+
+      const hasMatches = 
+        (Object.keys(matchedValues).length === unittype.length) && 
+        (Object.keys(getSubconValue).length === valueSubconDetails);
+
+      if (!hasMatches) {
+        this.$emit('fail-message', "Error Message: The template is outdated. Please download it again.");
         hasErrors = true;
         return;
-      }
-    }
-
-    if (object["Unit"] !== "") {
-
-      if (object["Budget Rate"] === "" || object["Budget Rate"] === undefined) {
-        object["Budget Rate"] = 0; 
+        
       }
 
-      unittype.forEach(unit => {
-        const combineObjects = `${unit.type} (${unit.quantity})`;
-        if (object.hasOwnProperty(combineObjects) && (object[combineObjects] === "" || object[combineObjects] === undefined)) {
-          object[combineObjects] = 0; 
-        }
+      matchedData.push({
+        matchedValues,
+        element: object["Element"],
+        sub_element: object["Sub Element"],
+        description_sub_sub_element: object["Sub Sub Element"],
+        description_unit: object["Unit"],
+        description_item: object["Description"],
+        budget: getSubconValue,
       });
-    }
-
-    const hasMatches = Object.keys(matchedValues).length === unittype.length;
-
-    if (!hasMatches) {
-      this.$emit('fail-message', "Error Message: The template is outdated. Please download it again.");
-      hasErrors = true;
-      return;
-      
-    }
-
-    validData.push({
-      matchedValues,
-      element: object["Element"],
-      sub_element: object["Sub Element"],
-      description_sub_sub_element: object["Sub Sub Element"],
-      description_unit: object["Unit"],
-      description_item: object["Description"],
-      budget: object["Budget Rate"],
-    });
-
-
-
-    
   });
 
   if (!hasErrors) {
     try {
+      console.log('matchedData',matchedData);
 
-      console.log('validData',validData);
-
-      const successMessage = await DescriptionController.addDescription(cqId, validData);
+      const successMessage = await DescriptionController.addDescription(cqId, matchedData);
       const message = successMessage[0].split(',')[0].trim(); 
       this.$emit('message', message);
 

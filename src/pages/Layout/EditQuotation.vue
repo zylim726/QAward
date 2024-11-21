@@ -4,9 +4,19 @@
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px">
+        <div style="display: flex; justify-content: flex-start; width: 100%;">
+          <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+            <div class="tooltip">
+              <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+                Back to comparison pages.
+              </span>
+              <md-icon class="mdIcon">arrow_back_ios</md-icon>
+            </div>
+          </button>
+        </div>
         <md-card>
           <md-card-content>
-            <div class="table-container" style="margin-top: 10px !important;">
+            <div class="table-container" >
               <table class="nested-table" id="data-table">
                 <thead>
                   <tr>
@@ -37,7 +47,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-'+formIndex">
-                    <template v-if="formData.quotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === '')  ">
+                    <template v-if="formData.quotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00  ">
                       <td><b>{{ formIndex + 1 }}</b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
@@ -66,10 +76,16 @@
                 </tbody>
               </table>
             </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 17px;">
+              <div style="display: flex; align-items: center;">
+                <label for="qtName" style="width: 100%;margin-right: 3px;">Quotation Name:</label>
+                <input type="text" id="qtName" v-model="qtName" style="width: 157%;" />
+              </div>
+            </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 15px;">
               <div style="display: flex; align-items: center;">
                 <label for="discount" style="margin-right: 5px;">Discount:</label>
-                <input type="number" id="discount" v-model.number="discount" style="width: 94%;" @keydown="blockNegativeInput" />
+                <input type="number" id="discount" v-model.number="discount" style="width: 73%;" @keydown="blockNegativeInput" />
               </div>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 22px;">
@@ -83,7 +99,7 @@
 
               </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 6px;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 10px;margin-right: 16px;">
               <div>
                 <label for="documents" style="margin-right: 5px;">Documents:
                   <button v-if="QuotationName.length === 1 && QuotationName[0].document_api" 
@@ -111,6 +127,7 @@
 <script>
 import DescriptionController from "@/services/controllers/DescriptionController.js";
 import {  config } from "@/services";
+import Quotation from "./Quotation.vue";
 export default {
   data() {
     return {
@@ -121,6 +138,7 @@ export default {
       QuotationName: [],
       Description: [],
       discount: 0,
+      qtName: '',
       RateInput: {}, 
       remarks: '',
       documents: {},
@@ -132,6 +150,14 @@ export default {
     this.getNewDescription(id, subconListId);
   },
   methods: {
+    backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     async downloadDocument(url) {
       try {
         const apiHost = config.getHost();
@@ -187,12 +213,11 @@ export default {
           if (filteredQuotations.length > 0) {
             this.QuotationName = filteredQuotations;
 
-            console.log('Document Api',this.QuotationName[0].document_api);
-
             const QuotationRemark = this.QuotationName[0].Call_For_Quotation_Subcon_List;
-           
+   
             this.$set(this, 'remarks', QuotationRemark.remark || '');
             this.$set(this, 'discount', QuotationRemark.discount || '');
+            this.$set(this, 'qtName', QuotationRemark.name || '');
            
             filteredQuotations.forEach(quotation => {
               this.$set(this.RateInput, formData.id, quotation.quote_rate || '')
@@ -225,8 +250,9 @@ export default {
       
         const discount = this.discount;
         const remark = this.remarks;
+        const qtName = this.qtName;
         const Documents = this.documents;
-        const SuccessMessage = await DescriptionController.editQuotation(dataToSave,discount, remark,Documents);
+        const SuccessMessage = await DescriptionController.editQuotation(dataToSave,discount, remark,Documents,qtName);
         const concatenatedMessage = SuccessMessage.join(', ');
         const Message = concatenatedMessage.split(',')[0].trim();
         this.UpdateMessage = Message;

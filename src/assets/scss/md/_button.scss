@@ -252,3 +252,51 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
     margin-top: 3px;
     margin-left: 25px;
 }
+
+
+.wo_switchon {
+  position: relative;
+  display: inline-block;
+  width: 35px;
+  height: 20px;
+  margin-right: 10px;
+  margin-left: 8px;
+}
+
+.wo_switchon input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.wo_slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.wo_slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .wo_slider {
+  background-color: orange;
+}
+
+input:checked + .wo_slider:before {
+  transform: translateX(18px);
+}

@@ -2,7 +2,7 @@
   <div class="content">
     <!-- Modal -->
     <div v-if="isModalVisible" class="modal-overlay">
-      <div class="modal-content" style="max-height: 300px;">
+      <div class="modal-content" style="max-height: 400px;">
         <div class="modal-header">
           <h1 class="titleHeader">Select Subcon</h1>
           <span class="close-icon" @click="closeModal">&times;</span>
@@ -14,6 +14,11 @@
             <select class="dropdownSubcon" v-model="selectedOption" style="height: 32px;width: 278px;">
               <option v-for="(subconData, index) in filteredSubconData" :key="index" :value="subconData.name">{{ subconData.name }}</option>
             </select>
+          </div>
+
+          <div class="file-upload-container" v-if="selectedOption">
+            <label for="fileInput">Quotation Name: </label>
+            <input type="text" id="quotationName" v-model="quotationName" placeholder="Enter quotation name">
           </div>
           
           <!-- File input section -->
@@ -34,25 +39,50 @@
 
     <div class="md-layout">
       <div class="md-layout-item md-medium-size-100 md-xsmall-size-100 md-size-100" style="padding: 0px 17px"> 
-          <button @click="openModal" class="transparentButton" style="margin-right: 10px; float: right">
-          <div class="tooltip" >
-            <span class="tooltiptext" style="bottom: -310% !important;">Select subcon and upload quotation excel.</span>
-            <md-icon class="mdIcon" >upload_file</md-icon></div>
-          <!-- <input type="file" multiple @change="importDataFromFiles" /> -->
-        </button>
-        <button @click="downloadExcelTemplate" class="transparentButton" style="margin-right: 10px; float: right">
-          <div class="tooltip" >
-            <span class="tooltiptext" style="bottom: -305% !important;">Download quotation template and field in rate data.</span>
-          <md-icon class="mdIcon">download_for_offline</md-icon></div>
-        </button>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <!-- Left Section (Undo Button) -->
+          <div>
+            <button @click="backToComparison" class="transparentButton" style="margin-left: 10px;">
+              <div class="tooltip">
+                <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+                  Back to comparison pages.
+                </span>
+                <md-icon class="mdIcon">arrow_back_ios</md-icon>
+              </div>
+            </button>
+          </div>
+
+          <!-- Right Section (Upload and Download Buttons) -->
+          <div style="display: flex; gap: 10px;">
+            <button @click="downloadExcelTemplate" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext" style="bottom: -305% !important;">
+                  Download quotation template and field in rate data.
+                </span>
+                <md-icon class="mdIcon">download_for_offline</md-icon>
+              </div>
+            </button>
+            
+            <button @click="openModal" class="transparentButton">
+              <div class="tooltip">
+                <span class="tooltiptext" style="bottom: -310% !important;">
+                  Select subcon and upload quotation excel.
+                </span>
+                <md-icon class="mdIcon">upload_file</md-icon>
+              </div>
+            </button>
+
+            
+          </div>
+        </div>
         <md-card>
           <md-card-content>
             <div v-if="UpdateMessage" class="notification success">
-              {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon>
-            </div><br>
+              {{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon><br>
+            </div>
             <div v-if="FailMessage" class="notification fail">
-              {{ FailMessage }} <md-icon>cancel</md-icon>
-            </div><br>
+              {{ FailMessage }} <md-icon>cancel</md-icon><br>
+            </div>
             <div class="table-container" style="margin-top: 0px !important;">
               <table class="nested-table" id="data-table" ref="dataTable">
                 <thead>
@@ -81,7 +111,8 @@
                     {{ unitdata.cqUnitType.type }}({{ unitdata.cqUnitType.quantity }})
                     </th>
                     <th scope="col">Qty</th>
-                    <th style="text-align: center;">{{ selectedSubconName }}
+                    <th style="text-align: center;">
+                      {{ quotationName && selectedSubconName ? `${selectedSubconName} (${quotationName})` : `${selectedSubconName}` }}
                     </th>
                   </tr>
                   <tr>
@@ -146,9 +177,10 @@ export default {
       FailMessage: null,
       cqUnit: [],
       columnKTitle: [],
-      columnKData: [],
+      valueImportRate: [],
       selectedOption: null,
       selectedSubconName: '',
+      quotationName: '',
       searchTerm: '',
       QuotationDataArray: [],
       isModalVisible: false,
@@ -182,6 +214,14 @@ export default {
     }
   },
   methods: {
+    backToComparison() {
+      const id = this.$route.query.cqId;
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/comparison',
+        query: { cqID: id, projectID: storedProjectId }
+      });
+    },
     blockNegativeInput(event) {
       if (event.key === '-' || event.key === 'Minus') {
         event.preventDefault();
@@ -251,32 +291,47 @@ export default {
 
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
           const rateIndex = jsonData[1].indexOf('Rate');
+          const valueImportRate = jsonData.slice(2) // Skip the first two rows (headers)
+          .map((row, index) => {
+            const Importrate = row[rateIndex];
+            let numericValue;
 
-          const allValuesAtRateIndex = jsonData.map(row => row[rateIndex]);
-
-          const finalColumnKData = allValuesAtRateIndex.filter(value => {
-            return typeof value === 'number' || (typeof value === 'string' && /[0-9]/.test(value));
-          });
-
-          const columnKData = finalColumnKData.map(value => {
-            if (typeof value === 'string') {
-              const numericPart = value.match(/-?\d+(\.\d+)?/); 
-              return numericPart ? parseFloat(numericPart[0]) : NaN;
-            } else if (typeof value === 'number') {
-              return value; 
+            // Check if the rate is empty, null, or undefined
+            if (Importrate === '' || Importrate === null || Importrate === undefined) {
+              numericValue = 0; // Assign 0 if Importrate is empty or invalid
+            } else if (typeof Importrate === 'string') {
+              const numericPart = Importrate.match(/-?\d+(\.\d+)?/);
+              numericValue = numericPart ? parseFloat(numericPart[0]) : 0; // Return 0 if no valid numeric part
+            } else if (typeof Importrate === 'number') {
+              numericValue = Importrate;
             } else {
-              return NaN; 
+              numericValue = 0; // Default to 0 for any other case
             }
-          });
 
-          this.columnKData = columnKData;
-          this.generateTable(this.Description, this.$route.query.cqId, columnKData);
+            return numericValue; // Return the numeric value
+          })
+          .filter(value => !isNaN(value)); // Only keep valid numeric values
 
+          if (valueImportRate.length !== this.Description.length) {
+            this.FailMessage = "Error: Template format doesnt match the table view. Please re-download and upload again.";
+            setTimeout(() => {
+              this.UpdateMessage = '';
+              window.scrollTo(0, 0); 
+              window.location.reload();
+            }, 2500);
+            return;
+          } else {
+            this.valueImportRate = valueImportRate;
+            this.generateTable(this.Description, this.$route.query.cqId, valueImportRate);
+          }
+
+          
+        
         };
         reader.readAsArrayBuffer(file);
       });
     },
-    generateTable(data, id, columnKData) {
+    generateTable(data, id, valueImportRate) {
       const filteredFormData = data.filter(item => {
         if (item.quotation && item.quotation.length > 0) {
           if (item.quotation[0].total_quote_amount !== 0) {
@@ -285,9 +340,6 @@ export default {
         }
         return false;
       });
-
-      const count = filteredFormData.length;
-      const rateCount = columnKData ? columnKData.length : 0;
       const tableBody = document.querySelector('#data-table tbody');
       let head1Counter = 0;
       let head2Counter = 0;
@@ -295,18 +347,19 @@ export default {
       let prevHead2 = null;
       tableBody.innerHTML = '';
 
-      if (!Array.isArray(columnKData) || columnKData.length === 0) {
-        columnKData = new Array(data.length).fill('');
+      if (!Array.isArray(valueImportRate) || valueImportRate.length === 0) {
+        valueImportRate = new Array(data.length).fill('');
+       
       }
 
-      let columnKDataIndex = 0;
+      let valueImportRateIndex = 0;
 
       data.forEach((formData, dataIndex) => {
         const cqUnitType = formData.cqUnitType;
         const getQuotation = formData.quotation;
 
         
-        if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === "" ) ) {
+        if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
           head1Counter++;
           prevHead1 = formData.description_item;
 
@@ -316,7 +369,7 @@ export default {
             <td><b>${formData.element || ''}</b></td>
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
-            <td  class="td-max-width"><b>${formData.description_item}</b></td>
+            <td class="td-max-width"><b>${formData.description_item}</b></td>
             <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
@@ -333,6 +386,16 @@ export default {
           });
 
           const head2Row = document.createElement('tr');
+          const numberOfDescription = dataIndex;  
+          const numberOfSubcon = valueImportRate.map((value, index) => index);
+
+          // Default to an empty string
+          let rateValueTable = '';  
+
+          if (numberOfSubcon.includes(numberOfDescription)) {
+            rateValueTable = valueImportRate[numberOfDescription];  
+          }
+
           head2Row.innerHTML = ` 
             <td>${head1Counter}.${head2Counter}</td>
             <td>${formData.element || ''}</td>
@@ -343,30 +406,23 @@ export default {
             ${unitQuantityTDs}
             <td>${formData.adj_quantity}</td>
             <td style="text-align:center;">
-            ${columnKData[columnKDataIndex] !== undefined && columnKData[columnKDataIndex] !== null && columnKData[columnKDataIndex] !== '' 
-              ? parseFloat(columnKData[columnKDataIndex]).toFixed(2) 
-              : ''}
-          </td>
-
-
-
+              ${typeof rateValueTable === 'number' && !isNaN(rateValueTable) ? rateValueTable.toFixed(2) : ''}
+            </td>
           `;
           tableBody.appendChild(head2Row);
 
-          if (columnKData[columnKDataIndex] !== '') {
+          if (valueImportRate[valueImportRateIndex] !== '') {
             const existingEntry = this.QuotationDataArray.find(entry => entry.description_id === formData.id);
             if (!existingEntry) {
               this.QuotationDataArray.push({
                 description_id: formData.id,
-                countData: count,
-                rateData: rateCount,
-                rate: columnKData[columnKDataIndex],
+                rate: rateValueTable,
               });
             }
           }
 
 
-          columnKDataIndex++;
+          valueImportRateIndex++;
         }
       });
     },
@@ -383,11 +439,12 @@ export default {
             this.isLoading = true;
             window.scrollTo(0, 0);
             const SubConName = this.selectedSubconName;
+            const QuotationName = this.quotationName;
             const Discount = this.discount;
             const Remarks = this.remarks;
             const Documents = this.documents;
-            const hasNegativeRate = QuotationData.some(data => data.rate < 0);
-            if (hasNegativeRate) {
+            const hasInvalidRate = QuotationData.some(data => data.rate < 0);
+            if (hasInvalidRate) {
                 this.FailMessage = "Error: Rate data cannot have negative values.";
                 setTimeout(() => {
                     this.UpdateMessage = '';
@@ -396,9 +453,8 @@ export default {
                 }, 2000);
                 return;
             }
-            if (QuotationData.rateData === QuotationData.countData && QuotationData.rateData != 0) {
-              const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id);
-           
+          
+              const SuccessMessage = await QuotationController.addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id,QuotationName);
               const concatenatedMessage = SuccessMessage.join(', ');
               this.UpdateMessage = concatenatedMessage.split(',')[0].trim();
               window.scrollTo(0, 0); 
@@ -409,21 +465,12 @@ export default {
                   query: { cqID: this.$route.query.cqId, 
                     projectID: storedProjectId }
               });
-
              
-            } else {
-              this.FailMessage = "Error: Rate data is empty";
-              setTimeout(() => {
-                this.UpdateMessage = '';
-                window.location.reload();
-              }, 2000);
-            }
-
-
         } catch (error) {
             this.FailMessage = error.message;
             setTimeout(() => {
               this.UpdateMessage = '';
+              window.scrollTo(0, 0); 
               window.location.reload();
             }, 2000);
         } finally {
@@ -486,7 +533,7 @@ export default {
   text-align: center;
   width: 500px;
   overflow-y: clip;
-  height: 300px;
+  height: 350px;
   position: relative;
 }
 

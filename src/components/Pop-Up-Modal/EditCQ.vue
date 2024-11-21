@@ -48,7 +48,7 @@
             <p style="text-align: left;">Awarding Target Date : </p>
             <input
               type="text"
-              :value="formatDate(cquotationData.awading_target_date)"
+              :value="formatDate(cquotationData.awarding_target_date)"
               placeholder="Awarding Target Date"
               class="typeInput"
               readonly
@@ -73,6 +73,16 @@
                 readonly
                 style="background-color: #fef4e4;"
               />
+              <p style="text-align: left;">ADJ Factor : </p>
+              <input
+                type="text"
+                v-model="unit.adj_factor"
+                placeholder="Unit Quantity"
+                class="typeInput"
+                readonly
+                style="background-color: #fef4e4;"
+              />
+
               <p style="text-align: left;">Unit Quantity : </p>
               <input
                 type="text"
@@ -82,6 +92,8 @@
                 readonly
                 style="background-color: #fef4e4;"
               />
+
+           
             </div>
           </div>
         </div>
@@ -148,7 +160,9 @@ export default {
         });
         this.processElement();
 
-        this.unitResult = await CallofQuotationController.getUnittype(id);
+        const getCQUnitData = await CallofQuotationController.getUnittype(id);
+        this.unitResult = getCQUnitData.cqUnitTypes;
+        console.log('this.unitResult',this.unitResult);
 
       } catch (error) {
         const FailMessage =  `Error Message: ${error.message || 'Unknown Data.'}`;

@@ -7,11 +7,12 @@ const DescriptionController = {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-        
-        const descriptionResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/addBudget`, {
+
+        const descriptionResponse = await axios.post(`${apiHost}/call_for_quotation_subcon_list/addDescription`, {
           call_for_quotation_id: cqId,
           subcon_id: 1,
           matchedData: matchedData,
+          
       }, { headers });
 
       return descriptionResponse.data.message;
@@ -56,6 +57,31 @@ const DescriptionController = {
         throw { errorMessage };
     }
   },
+  async removeDescription(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken();
+  
+      // Convert the id object into an array of values
+      const idArray = Object.values(id);
+
+      const requestData = {
+        description_ids: idArray
+      };
+
+      const response = await axios.delete(`${apiHost}/description/remove`, {
+        headers,
+        data: requestData 
+      });   
+
+
+      return response.data.message; 
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+  
+      throw { errorMessage };
+    }
+  },  
   async getNewDescription(id) {
     try {
       const apiHost = config.getHost();
@@ -65,6 +91,26 @@ const DescriptionController = {
       });
 
       return response.data.data;
+
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      throw { errorMessage };
+      
+    }
+
+  },
+  async getFullDetails(id) {
+    try {
+      const apiHost = config.getHost();
+      const headers = config.getHeadersWithToken(); 
+
+
+      const response = await axios.get(`${apiHost}/call_for_quotation/comparisonTable/${id}`, {
+        headers,
+      });
+
+
+      return response.data;
 
     } catch (error) {
       const errorMessage = handleApiError(error);
@@ -89,7 +135,7 @@ const DescriptionController = {
       
     }
   },
-  async editQuotation(dataToSave,discount, remark,Documents) {
+  async editQuotation(dataToSave,discount, remark,Documents,qtName) {
     try {
       const apiHost = config.getHost();
       const headers = config.getHeadersWithToken(); 
@@ -123,7 +169,8 @@ const DescriptionController = {
       const CQListresponse = await axios.put(`${apiHost}/call_for_quotation_subcon_list/edit/${dataToSave[0].subconListId}`, 
       {
         discount : discount,
-        remark : remark
+        remark : remark,
+        name: qtName
       }, { headers, });
       
 
@@ -155,10 +202,12 @@ const DescriptionController = {
       const messageArray = [];
      
       for (const data of dataToSave){
-    
+
+
         const Quoteresponse = await axios.put(`${apiHost}/description_cq_unit_type_list/edit/${data.cqUnitTypeId}`, 
         {
           adj_quantity : data.adj_quantity,
+          quantity : data.bq_quantity,
           remeasurement_quantity : data.remeasurement_quantity,
 
         }, { headers, });

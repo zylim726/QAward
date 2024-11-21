@@ -3,20 +3,27 @@
     <div v-if="UpdateMessage" class="notification success">{{ UpdateMessage }} <md-icon style="color:green">check_circle_outline</md-icon></div>
     <div v-if="FailMessage" class="notification fail">{{ FailMessage }} <md-icon>cancel</md-icon></div>
     <div v-if="isLoading"><loading-modal /><br><br></div>
-    <div class="container">
-      <div class="search-container">
-        <form class="Searchbar">
-          <input
-            type="hidden"
-          />
-        </form>
-      </div>
-      <div class="filter-container" style="margin-right: -10px;margin-top: 4px;">
-        <button class="btn-save" @click="markAllAsRead" >
+    <!-- Flex container to align the buttons -->
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      
+      <!-- Back to Comparison Button (Left) -->
+      <button @click="backToSummary" class="transparentButton" style="margin-left: 10px;">
+        <div class="tooltip">
+          <span class="tooltiptext" style="width: 160px; margin-left: -29px !important; margin-bottom: -105px;">
+            Back to comparison pages.
+          </span>
+          <md-icon class="mdIcon">arrow_back_ios</md-icon>
+        </div>
+      </button>
+
+      <!-- Mark All as Read Button (Right) -->
+      <div class="filter-container" style="margin-right: -10px; margin-top: 4px;">
+        <button class="btn-save" @click="markAllAsRead">
           Mark All as Read
         </button>
-        </div>
+      </div>
     </div>
+  
     <div class="table-container" style="max-height: 700px; overflow-y: auto;margin-top: 10px;">
       <table class="nested-table">
         <thead>
@@ -78,6 +85,13 @@ export default {
     this.loadData();
   },
   methods: {
+    backToSummary() {
+      const storedProjectId = localStorage.getItem('projectId');
+      this.$router.push({
+        path: '/callquotation',
+        query: { projectId: storedProjectId }
+      });
+    },
     async loadData() {
       this.isLoading = true;
       try {

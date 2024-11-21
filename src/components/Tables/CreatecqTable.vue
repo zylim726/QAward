@@ -74,7 +74,7 @@ export default {
   methods: {
     addModule() {
       const formData = { ...this.modules[0], selected: true }; 
-      this.$emit('form-submitted', formData); 
+       this.$emit('form-submitted', formData); 
     }
    
   },

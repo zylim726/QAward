@@ -10,6 +10,7 @@
     "prettify": "prettier --write ."
   },
   "dependencies": {
+    "@mescius/wijmo.vue2.all": "5.20242.21-rc",
     "axios": "^1.7.2",
     "chartist": "0.11.4",
     "core-js": "^3.38.1",

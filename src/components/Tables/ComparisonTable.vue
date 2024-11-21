@@ -7,13 +7,26 @@
       <div class="search-container" v-if="!isLoading">
         <form class="Searchbar">
           <input type="text" v-model="searchQuery" @input="handleInputChange" placeholder="Search Description....." />
+          <a :href="'mygrid?cqId=' + cqId" target="_blank">
+            <div class="tooltip">
+              <span class="tooltiptext">Show a Full Detailed Comparison on New Pages</span>
+              <md-icon class="mdIcon" style="margin-left: 20px; font-size: 40px !important; margin-top: 10px;">fullscreen</md-icon>
+            </div>
+          </a>
+          <div class="hidden-toggles" style="margin-left: 10px;"  v-if="isPending" >
+            <input  name="coloration-level"  type="radio" id="coloration-low" class="hidden-toggles__input"  value="add" v-model="selectedAction" />
+            <label for="coloration-low"  class="hidden-toggles__label"  @click="navigateTo('description')" >Add</label>
+            <span class="hidden-toggles__label static-label">Description</span>
+            <input name="coloration-level" type="radio" id="coloration-high" class="hidden-toggles__input" value="edit" v-model="selectedAction"/>
+            <label  for="coloration-high" class="hidden-toggles__label"  @click="navigateTo('remeasurement')" v-if="processedData.length !== 0">Edit</label>
+          </div>
         </form>
       </div>
       <div class="filter-container" v-if="!isLoading">
-        <a :href="'revision?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px">Revision</button></a>
-        <a :href="'quotation?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Add Quotation</button></a>
-        <a :href="'remeasurement?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending" >Edit Qty</button></a>
-        <a :href="'description?cqId=' + cqId"><button type="button" class="btn-save" style="margin-right: 10px"  v-if="QuotationName.length <= 2">Add Description</button></a>
+        <a :href="'quotation?cqId=' + cqId">
+          <button type="button" class="btn-save" style="margin-right: 10px"   v-if="isPending && QuotationName.length >= 2" >
+          <md-icon style="color: antiquewhite;margin-right: 3px;">assignment_add</md-icon> Quotation</button>
+        </a>
         <button @click="toggleFilter" class="transparentButton" style="margin-right: 10px" >
           <div class="tooltip" style="width: 178px !important;">
             <span class="tooltiptext">Hide unit type information. Please click to open see details.</span>
@@ -34,7 +47,7 @@
           <tr class="header-row-1">
             <th></th>
             <th colspan="3" v-if="!isHide" ></th>
-            <th colspan="2"></th>
+            <th colspan="2"></th> 
             <template v-if="!isHide">
               <th scope="col" v-for="(unitdata, index) in Unittype" :key="index" style="text-align: center;"></th>
             </template>
@@ -111,14 +124,22 @@
               v-for="(quotationData, index) in QuotationName" 
               :key="index" 
               style="text-align: center; border: 1px solid #ddd !important; width: 200px; word-break: break-word; overflow-wrap: break-word;">
-              
-              {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+              <template v-if="!quotationData.Call_For_Quotation_Subcon_List.name || quotationData.Call_For_Quotation_Subcon_List.name === 'Budget'">
+                {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+              </template>
+
+              <template v-else>
+                {{ getDisplayName(quotationData.Call_For_Quotation_Subcon_List.Subcon.id, quotationData.Call_For_Quotation_Subcon_List.Subcon.name) }}
+                <br> ({{ quotationData.Call_For_Quotation_Subcon_List.name }})
+              </template>
+
 
             </th>
           </tr>
+          <!--Header row 4 is mean by when quotation fixed by budget rate and budget adj, Header row 3 is when quotation more than 2 -->
           <tr :class="{
-            'header-row-4': Unittype.length > 0 && QuotationName.length === 2, 
-            'header-row-3': Unittype.length > 0 && QuotationName.length > 2
+            'header-row-4': Unittype.length > 0 && QuotationName.length <= 3, 
+            'header-row-3': Unittype.length > 0 && QuotationName.length > 3
           }">
             <th ></th>
             <th colspan="3" v-if="!isHide"  ></th>
@@ -150,13 +171,6 @@
         </div>
       </template>
       <template v-if="(project.status !== 'Pending') && QuotationName.length > 0 ">
-        <div class="confirmation-message" >
-          <p>It this a work order.</p> 
-          <label >
-            <input type="checkbox" :checked="isPermissionChecked" @change="handleCheckboxChange"  >
-            Yes
-          </label>
-        </div>
         <div class="cqapprovalBox-container">
           <template>
             <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
@@ -173,7 +187,10 @@
                     </div>
                     <h6>Recommend Award To:</h6>
                     <h6 class="approvalSelection">
-                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }}
+                      {{ cmapproval.Call_For_Quotation_Subcon_List?.Subcon?.name || '' }} <br>
+                      <span v-if="cmapproval.Call_For_Quotation_Subcon_List.name">
+                        ({{ cmapproval.Call_For_Quotation_Subcon_List.name }})
+                      </span>
                     </h6>
                     <h6>Date:</h6>
                     <h6 class="approvalSelection">
@@ -194,6 +211,9 @@
                         <option value=""> </option>
                         <option v-for="(selectSubconListId, qIndex) in SubconListId" :key="qIndex" :value="selectSubconListId.id">
                           {{ selectSubconListId.Subcon.name }}
+                          <span v-if="selectSubconListId.name">
+                            ({{ selectSubconListId.name }})
+                          </span>
                         </option>
                       </select>
                       <p>Remarks:</p>
@@ -278,7 +298,6 @@ export default {
       this.getCQApproval(newValue);
       this.getProject(newValue);
       this.checkPermission();
-      this.handleCheckboxChange();
     },
   },
   computed: {
@@ -290,10 +309,7 @@ export default {
       }
       return false;
     },
-    isPermissionChecked() {
-      const isChecked = this.Unittype[0].Cq_Unit_Type.Call_For_Quotation.is_work_order === true;
-      return isChecked;
-    },
+
 
     generatedHeaders() {
       const headers = [];
@@ -316,6 +332,10 @@ export default {
     },
   },
   methods: {
+    navigateTo(page) {
+      const url = `${page}?cqId=${this.cqId}`;
+      window.location.href = url; // Redirect to the URL
+    },
     getCardStyle() {
   const windowWidth = window.innerWidth; // Get the current window width
   let width;
@@ -386,16 +406,6 @@ export default {
             window.location.reload();
          }, 1000);
       }
-    },
-    async handleCheckboxChange() {
-       if (event && event.target) {
-        const isChecked = event.target.checked; 
-        try {
-          const SuccessMessage = await QuotationController.updateWorkOrder(isChecked,this.cqId);
-        } catch (error) {
-          
-        }
-       }
     },
     getDisplayName(budgetId, name) {
       budgetId = parseFloat(budgetId);
@@ -597,28 +607,49 @@ export default {
 
           let maxLength = 0;
           let maxQuotation = [];
+
+          let count = 0; 
+          let notifyNewBlockDescription = '';
+          let previousCreateTime = null; // Track the previous createdAt time
           for (const formData of processedData) {
             const getQuotation = formData.quotation;
-            
+
+           
             this.Unittype = formData.cqUnitType;
 
-            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00 && formData.description_unit.trim() === "" ) ) {
+             const currentCreateTime = new Date(formData.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (previousCreateTime && currentCreateTime !== previousCreateTime) {
+                count++; // Increment count for each valid update
+                notifyNewBlockDescription = `<span title="${count} times import: ${formData.createdAt} ">&#128308;</span>`;
+            } else {
+                notifyNewBlockDescription = '';
+            }
+
+            // Update previousCreateTime for the next iteration
+            previousCreateTime = currentCreateTime;
+
+            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00) ) {
               head1Counter++;
             
               const head1Row = document.createElement('tr');
               head1Row.innerHTML = `
-                <td ><b><u>${head1Counter}</u></b></td>
+                <td ><b>${notifyNewBlockDescription} ${head1Counter}</b></td>
                 ${!isHide ? `<td><b><u>${formData.element || ''}</u></b></td>` : ''}
                 ${!isHide ? `<td><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
                 ${!isHide ? `<td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
                 <td style="padding-left:10px !important" class="td-max-width"><b><u>${formData.description_item}</u></b></td>
+                <td><b>${formData.description_unit || ''}</b></td>
               `;
               tableBody.appendChild(head1Row);
 
               head2Counter = 0;
 
-              
             }else {
+
+              if (head1Counter === 0) {
+                head1Counter = 1;
+              }
          
               head2Counter++;
               if (getQuotation.length > maxLength) {
@@ -638,10 +669,10 @@ export default {
                 unitQuantityTDs += `<td style="text-align:center;">${this.formatAccounting(cqUnit.adj_quantity)}</td>`;
               });
 
+              const getUnittype_isRemeas = this.Unittype[0];
               let remeasuremntQuantityTDs = '';
-              if (formData.remeasurement_quantity >= 0) {
-                remeasuremntQuantityTDs = `${!isHide ? `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>` : ''}`;
-               
+              if (formData.remeasurement_quantity >= 0 && getUnittype_isRemeas.is_remeasurement === true) {
+                  remeasuremntQuantityTDs = `${!isHide ? `<td>${this.formatAccounting(formData.remeasurement_quantity)}</td>` : ''}`;
               }
 
 
@@ -651,7 +682,7 @@ export default {
               const head2Row = document.createElement('tr');
               head2Row.innerHTML = `
 
-                <td class="sticky-col" >${head1Counter}.${head2Counter}</td>
+                <td class="sticky-col" >${notifyNewBlockDescription} ${head1Counter}.${head2Counter}</td>
                 ${!isHide ? `<td>${formData.element || ''}</td>` : ''}
                 ${!isHide ? `<td>${formData.sub_element || ''}</td>` : ''}
                 ${!isHide ? `<td>${formData.description_sub_sub_element || ''}</td>` : ''}
@@ -814,12 +845,10 @@ export default {
         this.cqApprovalData = response.data;
         const getCallForQuotationSubconList = response.callForQuotationSubconLists;
         // Filter out items where subcon_id is 1
+        console.log('response cqApproval',response);
         const filteredSubconList = getCallForQuotationSubconList.filter(item => item.subcon_id !== 1);
         this.SubconListId = filteredSubconList;
 
-        console.log('this cqApprovalData',response.data);
-        console.log('this getSubconList',response.callForQuotationSubconLists);
-        console.log('this subconlistid',this.SubconListId);
       } catch (error) {
         console.log('Error fetching CQ approvals:', error);
       }
@@ -840,12 +869,6 @@ export default {
       const firstRow = clonedTable.querySelector('thead tr');
       if (firstRow) {
         firstRow.parentNode.removeChild(firstRow);
-      }
-
-      // Ensure the first row of <tbody> is not removed
-      const firstBodyRow = clonedTable.querySelector('tbody tr');
-      if (firstBodyRow) {
-        firstBodyRow.parentNode.removeChild(firstBodyRow);
       }
 
       // Preserve the <tfoot> section entirely
@@ -989,13 +1012,13 @@ export default {
 
 .header-row-2 th {
   position: sticky;
-  top: 55px;
-  height: 48px;
+  top: 53px;
+  height: 100px;
 }
 
 .header-row-3 th {
   position: sticky;
-  top: 104px;
+  top: 125px;
   z-index: 11; 
 }
 
@@ -1040,5 +1063,31 @@ export default {
   }
 }
 
+
+.hidden-toggles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 0px 0px 8px;
+}
+
+.hidden-toggles__input {
+  display: none; /* Hide the radio inputs */
+}
+
+.hidden-toggles__label {
+  padding: 7px 12px;
+  background-color: orange; 
+  color: white;
+  border-radius: 10px;
+}
+
+
+.hidden-toggles__label.static-label {
+  background-color: transparent; 
+  color: #333; 
+  margin:0 ;
+  font-weight: bold; 
+}
 
 </style>

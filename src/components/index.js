@@ -8,6 +8,7 @@ import GetcallquotationTable from "./Tables/GetcallquotationTable.vue";
 import SubconTable from "./Tables/SubconTable.vue";
 import ProjectTable from "./Tables/ProjectTable.vue";
 import NotificationTable from "./Tables/NotificationTable.vue";
+import WorkorderTable from "./Tables/WoTable.vue";
 
 // MODAL
 import Modal from "./Pop-Up-Modal/Modal.vue";
@@ -22,12 +23,20 @@ import Createproject from "./Pop-Up-Modal/Createproject.vue";
 import EditProject from "./Pop-Up-Modal/EditProject.vue";
 import DelSubcon from "./Pop-Up-Modal/DelSubcon.vue";
 import LoadingModal from  "./Pop-Up-Modal/LoadingModal.vue";
+import EditDescription from "./Pop-Up-Modal/EditDescription.vue";
+import DeleteDescription from "./Pop-Up-Modal/DeleteDescription.vue";
+import ErrorviewModal from "./Pop-Up-Modal/ErrorviewModal.vue";
+
 // IMPORT
 import CQImport from "./Import/CQImport.vue";
 import DescriptionImport from "./Import/DescriptionImport.vue";
 
 export {
   ComparisonTable,
+  WorkorderTable,
+  EditDescription,
+  DeleteDescription,
+  ErrorviewModal,
   CQImport,
   Modal,
   CreatecqTable,

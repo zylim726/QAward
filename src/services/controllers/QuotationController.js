@@ -4,11 +4,12 @@ import { handleApiError } from "@/services/axios/handleApiError.js";
 
 
 const QuotationController = {
-  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id) {
+  async addQuotation(QuotationData,SubConName,Discount,Remarks,Documents,id,QuotationName) {
     try {
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
         const token = localStorage.getItem('token');
+
         const getSubcon = await axios.get(`${apiHost}/subcon/showByName/${SubConName}`, {
             headers,
         });
@@ -26,7 +27,8 @@ const QuotationController = {
                 discount: Discount,
                 remark: Remarks,
                 call_for_quotation_id: id,
-                subcon_id: SubconId 
+                subcon_id: SubconId,
+                name: QuotationName,
             }, { headers });
 
             SubconListId = cqSubconResponse.data.data.id;
@@ -303,19 +305,16 @@ const QuotationController = {
 
         const apiHost = config.getHost();
         const headers = config.getHeadersWithToken();
-      
-        if(checked === true) {
-            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-                is_work_order : 1
-            }, { headers });
-        }else {
-            const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
-                is_work_order : 0
-            }, { headers });
-        }
+
+        const response = await axios.put(`${apiHost}/call_for_quotation/edit/${cqId}`, {
+            is_work_order: checked ? 1 : 0 // Use a ternary operator to set is_work_order
+        }, { headers });
+
+        return response.data.message;
+
     
         
-        return response.data.message;
+       
     } catch (error) {
         const errorMessage = handleApiError(error);
         throw errorMessage;
