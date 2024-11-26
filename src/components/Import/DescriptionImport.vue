@@ -273,9 +273,8 @@ export default {
 
           // If the unit type exists in the sanitized import data 
           if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
-            matchedValues[unit.id] = parseFloat(sanitizedObjectKeys[combineObjects].replace(/,/g, ''));
+            matchedValues[unit.id] = `${sanitizedObjectKeys[combineObjects]}`;
           }
-
         });
         let valueSubconDetails;
         if (getSubconDetails.length === 0) {
@@ -306,7 +305,7 @@ export default {
 
                 if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
                     console.log('Found key in object:', getSubconObject);  // Debug log to verify key existence
-                    getSubconValue[subcon.id] = parseFloat(sanitizedObjectKeys[getSubconObject].replace(/,/g, '')); 
+                    getSubconValue[subcon.id] = `${sanitizedObjectKeys[getSubconObject]}`;
                 }
             });
         }
