@@ -264,22 +264,22 @@ export default {
         const getSubconValue = {};
 
         unittype.forEach(unit => {
-          const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+          const unitTypeunitQuantity = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
           // Clean the object keys by removing extra spaces
-          const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+          const proceseedUnitKeys = Object.keys(object).reduce((acc, key) => {
             acc[key.replace(/\s+/g, ' ').trim()] = object[key];
             return acc;
           }, {});
 
           // If the unit type exists in the sanitized import data 
-          if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
-              let parsedValue = parseFloat(sanitizedObjectKeys[combineObjects].replace(/,/g, ''));
+          if (proceseedUnitKeys.hasOwnProperty(unitTypeunitQuantity)) {
+              let cleanUnitKeys = parseFloat(proceseedUnitKeys[unitTypeunitQuantity].replace(/,/g, ''));
 
               // Check if parsed value is a valid number
-              if (isNaN(parsedValue) || parsedValue == null || parsedValue <= 0) {
-                  matchedValues[unit.id] = '';  // Set as empty if no valid number or non-positive number
+              if (isNaN(cleanUnitKeys) || cleanUnitKeys == null || cleanUnitKeys <= 0) {
+                  matchedValues[unit.id] = '';  // Set as empty if no valid number or non-positive numbe
               } else {
-                  matchedValues[unit.id] = parsedValue <= 3 ? parsedValue.toString() : '3';  // Cap the value to 3
+                  matchedValues[unit.id] =   cleanUnitKeys;  
               }
           }
 
@@ -308,21 +308,21 @@ export default {
 
 
                 // Clean the object keys by removing extra spaces
-                const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+                const proceseedUnitKeys = Object.keys(object).reduce((acc, key) => {
                     acc[key.replace(/\s+/g, ' ').trim()] = object[key];
                     return acc;
                 }, {});
 
-                if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
+                if (proceseedUnitKeys.hasOwnProperty(getSubconObject)) {
                     console.log('Found key in object:', getSubconObject);  // Debug log to verify key existence
                     
-                    let parsedValue = parseFloat(sanitizedObjectKeys[getSubconObject].replace(/,/g, ''));
+                    let cleanUnitKeys = parseFloat(proceseedUnitKeys[getSubconObject].replace(/,/g, ''));
 
                     // Check if parsed value is a valid number
-                    if (isNaN(parsedValue) || parsedValue == null || parsedValue <= 0) {
-                        getSubconValue[subcon.id] = '';  // Set as empty if no valid number or non-positive number
+                    if (isNaN(cleanUnitKeys) || cleanUnitKeys == null ) {
+                        getSubconValue[subcon.id] = '';  // Set as empty if no valid number
                     } else {
-                        getSubconValue[subcon.id] = parsedValue <= 3 ? parsedValue.toString() : '3';  // Cap the value to 3
+                        getSubconValue[subcon.id] = cleanUnitKeys;  
                     }
                 }
 
