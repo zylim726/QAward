@@ -66,7 +66,7 @@
               v-for="(subcon, index) in SubconList.length > 0 ? SubconList : [{ Subcon: { name: 'Budget' } }]" 
               :key="index"
             >
-              {{ subcon.Subcon.name }} <span v-if="subcon.Subcon.name !== 'Budget' && subcon.name !== ''">({{ subcon.name }})</span>
+              {{ subcon.Subcon.name }} <span v-if="subcon.name && subcon.name !== 'Budget'">({{ subcon.name }})</span>
             </th>
 
           </tr>
