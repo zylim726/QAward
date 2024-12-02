@@ -66,7 +66,7 @@
               v-for="(subcon, index) in SubconList.length > 0 ? SubconList : [{ Subcon: { name: 'Budget' } }]" 
               :key="index"
             >
-              {{ subcon.Subcon.name }} <span v-if="subcon.name && subcon.name !== 'Budget'">({{ subcon.name }})</span>
+              {{ subcon.Subcon.name }} <span v-if="subcon.name && subcon.Subcon.name !== 'Budget'">({{ subcon.name }})</span>
             </th>
 
           </tr>
@@ -264,17 +264,25 @@ export default {
         const getSubconValue = {};
 
         unittype.forEach(unit => {
-          const combineObjects = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+          const unitTypeunitQuantity = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
           // Clean the object keys by removing extra spaces
-          const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+          const proceseedUnitKeys = Object.keys(object).reduce((acc, key) => {
             acc[key.replace(/\s+/g, ' ').trim()] = object[key];
             return acc;
           }, {});
 
           // If the unit type exists in the sanitized import data 
-          if (sanitizedObjectKeys.hasOwnProperty(combineObjects)) {
-            matchedValues[unit.id] = parseFloat(sanitizedObjectKeys[combineObjects].replace(/,/g, ''));
+          if (proceseedUnitKeys.hasOwnProperty(unitTypeunitQuantity)) {
+              let cleanUnitKeys = parseFloat(proceseedUnitKeys[unitTypeunitQuantity].replace(/,/g, ''));
+
+              // Check if parsed value is a valid number
+              if (isNaN(cleanUnitKeys) || cleanUnitKeys == null || cleanUnitKeys <= 0) {
+                  matchedValues[unit.id] = '';  // Set as empty if no valid number or non-positive numbe
+              } else {
+                  matchedValues[unit.id] =   cleanUnitKeys;  
+              }
           }
+
 
         });
         let valueSubconDetails;
@@ -283,14 +291,14 @@ export default {
             valueSubconDetails = 1;
           } else {
             getSubconDetails.forEach(subcon => {
-                console.log('subcon:', subcon);  // Debug log to check what subcon object is in each iteration
+             
                 valueSubconDetails = getSubconDetails.length;
                 let getSubconObject;
 
                 if (subcon.Subcon.name === 'Budget') {
                     getSubconObject = `${subcon.Subcon.name}`;
                     console.log('If Block - Budget:', getSubconObject);
-                } else if (subcon.name !== '') {
+                } else if (subcon.name && subcon.Subcon.name !== 'Budget') {
                     getSubconObject = `${subcon.Subcon.name} (${subcon.name})`;
                     console.log('Else If Block:', getSubconObject);
                 } else {
@@ -298,16 +306,26 @@ export default {
                     console.log('Else Block:', getSubconObject);  // This should log for all the remaining cases
                 }
 
+
                 // Clean the object keys by removing extra spaces
-                const sanitizedObjectKeys = Object.keys(object).reduce((acc, key) => {
+                const proceseedUnitKeys = Object.keys(object).reduce((acc, key) => {
                     acc[key.replace(/\s+/g, ' ').trim()] = object[key];
                     return acc;
                 }, {});
 
-                if (sanitizedObjectKeys.hasOwnProperty(getSubconObject)) {
+                if (proceseedUnitKeys.hasOwnProperty(getSubconObject)) {
                     console.log('Found key in object:', getSubconObject);  // Debug log to verify key existence
-                    getSubconValue[subcon.id] = parseFloat(sanitizedObjectKeys[getSubconObject].replace(/,/g, '')); 
+                    
+                    let cleanUnitKeys = parseFloat(proceseedUnitKeys[getSubconObject].replace(/,/g, ''));
+
+                    // Check if parsed value is a valid number
+                    if (isNaN(cleanUnitKeys) || cleanUnitKeys == null ) {
+                        getSubconValue[subcon.id] = '';  // Set as empty if no valid number
+                    } else {
+                        getSubconValue[subcon.id] = cleanUnitKeys;  
+                    }
                 }
+
             });
         }
 
@@ -334,29 +352,18 @@ export default {
 
       if (object["Unit"] !== "") {
 
-        getSubconDetails.forEach(subcon => {
-          let getSubconObject;
-       
-          if (subcon.Subcon.name === 'Budget') {
-              getSubconObject = `${subcon.Subcon.name}`;
-          } else if (subcon.name !== '') {
-              getSubconObject = `${subcon.Subcon.name}(${subcon.name})`;
-          } else {
-              getSubconObject = `${subcon.Subcon.name}`;
-          }
+        for (const key in getSubconValue) {
+            // Check if the value is undefined, empty string, or NaN
+            if (getSubconValue[key] === '' || getSubconValue[key] === undefined || isNaN(getSubconValue[key])) {
+                getSubconValue[key] = 0.00;  // Set to 0.00 if any condition matches
+            }
+        }
 
-
-          if (object.hasOwnProperty(getSubconObject) && (object[getSubconObject] === "" || object[getSubconObject] === undefined)) {
-            getSubconValue[subcon.id] = 0;
+        for (const key in matchedValues) {
+            if (matchedValues[key] === '' || matchedValues[key] === undefined || isNaN(matchedValues[key])) {
+              matchedValues[key] = 0.00;  // Set to 0.00 if any condition matches
           }
-        });
-
-        unittype.forEach(unit => {
-          const combineObjects = `${unit.type} (${unit.quantity})`;
-          if (object.hasOwnProperty(combineObjects) && (object[combineObjects] === "" || object[combineObjects] === undefined)) {
-            object[combineObjects] = 0; 
-          }
-        });
+        }
       }
 
       const hasMatches = 
@@ -396,7 +403,7 @@ export default {
        });
     } catch (error) {
       
-      this.$emit('fail-message', `Error Message: ` + error.errorMessage);
+       this.$emit('fail-message', `Error Message: ` + error.errorMessage);
       
     } finally {
       this.isLoading = false;
