@@ -359,7 +359,7 @@ export default {
         const getQuotation = formData.quotation;
 
         
-        if (getQuotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00 ) {
+        if (!formData.description_unit) {
           head1Counter++;
           prevHead1 = formData.description_item;
 
@@ -370,7 +370,6 @@ export default {
             <td><b>${formData.sub_element || ''}</b></td>
             <td><b>${formData.description_sub_sub_element || ''}</b></td>
             <td class="td-max-width"><b>${formData.description_item}</b></td>
-            <td><b>${formData.description_unit || ''}</b></td>
           `;
           tableBody.appendChild(head1Row);
 
