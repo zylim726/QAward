@@ -36,17 +36,13 @@
           placeholder="Description Item"
           class="typeInput"
         />
-
-        <div v-if="processedData.description_unit">
-          <p>Unit:</p>
-          <input
-            type="text"
-            v-model="processedData.description_unit"
-            placeholder="Unit"
-            class="typeInput"
-          />
-        </div>
-
+        <p>Unit : </p>
+        <input
+          type="text"
+          v-model="processedData.description_unit"
+          placeholder="Unit"
+          class="typeInput"
+        />
       </div>
       <button class="btn-save" aria-label="close" @click.stop="closeEditModal">Close</button>
       <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal()">Save</button>
