@@ -47,8 +47,6 @@
             @blur="handleEmptyUnit"
           />
         </div>
-
-
       </div>
       <button class="btn-save" aria-label="close" @click.stop="closeEditModal">Close</button>
       <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal()">Save</button>
