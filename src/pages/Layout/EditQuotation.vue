@@ -47,14 +47,13 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-'+formIndex">
-                    <template v-if="formData.quotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00  ">
+                    <template v-if="!formData.description_unit">
                       <td><b>{{ formIndex + 1 }}</b></td>
                       <td><b>{{ formData.element || '' }}</b></td>
                       <td><b>{{ formData.sub_element || '' }}</b></td>
                       <td><b>{{ formData.description_sub_sub_element || '' }}</b></td>
                       <td class="td-max-width"><b>{{ formData.description_item }}</b></td>
-                      <td><b>{{ formData.description_unit || '' }}</b></td>
-                      <td colspan="8"></td>
+                      <td colspan="9"></td>
                     </template>
                     <template v-else>
                       <td>{{ formIndex + 1 }}</td>

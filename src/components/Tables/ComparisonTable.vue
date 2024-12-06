@@ -629,7 +629,9 @@ export default {
             // Update previousCreateTime for the next iteration
             previousCreateTime = currentCreateTime;
 
-            if (getQuotation.length <= 0 || (parseFloat(formData.adj_quantity) === 0.00) ) {
+            console.log('formData',formData.description_unit);
+
+            if (!formData.description_unit) {
               head1Counter++;
             
               const head1Row = document.createElement('tr');
@@ -639,7 +641,6 @@ export default {
                 ${!isHide ? `<td><b><u>${formData.sub_element || ''}</u></b></td>` : ''}
                 ${!isHide ? `<td><b><u>${formData.description_sub_sub_element || ''}</u></b></td>` : ''}
                 <td style="padding-left:10px !important" class="td-max-width"><b><u>${formData.description_item}</u></b></td>
-                <td><b>${formData.description_unit || ''}</b></td>
               `;
               tableBody.appendChild(head1Row);
 
