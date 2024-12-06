@@ -30,41 +30,46 @@ const router = new VueRouter({
   linkExactActiveClass: "nav-item active",
 });
 
-let maintenanceMessage = null; // Initialize maintenance state
+let getIsMaintenance = null; // Initialize maintenance state
 
-// Function to perform maintenance check
-async function checkMaintenance() {
+// Function to set up router guard and perform maintenance checks
+async function setupRouterGuard() {
   try {
-    // Fetch the maintenance state from the controller
-    maintenanceMessage = await MaintenanceController.checkMaintenance();
-    if (router.currentRoute.path === '/nofound') {
-      router.push('/projectlist');
-    }
+    // Fetch maintenance state
+    getIsMaintenance = await MaintenanceController.checkMaintenance();
   } catch (fetchError) {
-    console.error("Error during maintenance check:", fetchError);
-    // Redirect to '/nofound' if maintenance check fails
-    if (router.currentRoute.path !== "/nofound") {
-      router.push("/nofound");
-    }
+    console.error("Error fetching maintenance state:", fetchError);
+    router.push("/nofound");
+    return;
   }
-}
 
-// Function to set up the router guard
-function setupRouterGuard() {
   router.beforeEach((to, from, next) => {
+
+    console.log('getIsMaintenance',getIsMaintenance.isMaintenance);
+
     // Always allow access to the maintenance page
     if (to.path === "/maintenance") {
-      next();
+      if(getIsMaintenance.isMaintenance === 0){
+        next("/projectlist");
+        return;
+      }else {
+        next();
+        return;
+      }
+    }
+
+    // Redirect based on maintenance status
+    if (getIsMaintenance?.isMaintenance === 1) {
+      next({
+        path: "/maintenance",
+        query: { end: getIsMaintenance.end },
+      });
       return;
     }
 
-    // Redirect to '/maintenance' if maintenance is active
-    if (maintenanceMessage?.isMaintenance === 1) {
-      console.log("Redirecting to maintenance:", maintenanceMessage);
-      next({
-        path: "/maintenance",
-        query: { end: maintenanceMessage.end },
-      });
+    // Handle navigation after maintenance ends
+    if (getIsMaintenance?.isMaintenance === 0 && to.path === "/nofound") {
+      next("/projectlist");
       return;
     }
 
@@ -81,8 +86,7 @@ function setupRouterGuard() {
 
 // Initialize the app
 async function initializeApp() {
-  await checkMaintenance(); // Perform the maintenance check
-  setupRouterGuard(); // Set up the router guard
+  await setupRouterGuard(); // Perform maintenance check and set up router guard
 
   // Start Vue instance
   new Vue({
