@@ -15,49 +15,52 @@ import Modal from "./models/plugin/modal";
 import WijmoPlugin from "./models/plugin/wijmo";
 import Chartist from "chartist";
 
-console.log('Backend Host:', process.env.VUE_APP_QAWARD_BACKEND_HOST);
+console.log("Backend Host:", process.env.VUE_APP_QAWARD_BACKEND_HOST);
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
-    ...routes,  
+    ...routes,
     {
-      path: "*", 
-      component: () => import('@/pages/Nolink.vue'), 
+      path: "*", // Catch-all route
+      component: () => import("@/pages/Nolink.vue"),
     },
   ],
   linkExactActiveClass: "nav-item active",
 });
 
-let maintenanceMessage;
+let maintenanceMessage = null; // Initialize maintenance state
 
 // Function to perform maintenance check
 async function checkMaintenance() {
   try {
+    // Fetch the maintenance state from the controller
     maintenanceMessage = await MaintenanceController.checkMaintenance();
     if (router.currentRoute.path === '/nofound') {
       router.push('/projectlist');
     }
   } catch (fetchError) {
-    if (router.currentRoute.path !== '/nofound') {
-      router.push('/nofound');
+    console.error("Error during maintenance check:", fetchError);
+    // Redirect to '/nofound' if maintenance check fails
+    if (router.currentRoute.path !== "/nofound") {
+      router.push("/nofound");
     }
-    throw new Error('Server down or maintenance check failed');
   }
 }
 
-// Run the maintenance check once at startup
-checkMaintenance().then(() => {
-  // Setup router guard after maintenance check
+// Function to set up the router guard
+function setupRouterGuard() {
   router.beforeEach((to, from, next) => {
+    // Always allow access to the maintenance page
     if (to.path === "/maintenance") {
       next();
       return;
     }
 
-    console.log('Checking maintenance status:', maintenanceMessage);
-    if (maintenanceMessage.isMaintenance === 1) {
+    // Redirect to '/maintenance' if maintenance is active
+    if (maintenanceMessage?.isMaintenance === 1) {
+      console.log("Redirecting to maintenance:", maintenanceMessage);
       next({
         path: "/maintenance",
         query: { end: maintenanceMessage.end },
@@ -65,6 +68,7 @@ checkMaintenance().then(() => {
       return;
     }
 
+    // Authentication guard
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
     const isAuthenticated = store.state.token !== null;
     if (requiresAuth && !isAuthenticated) {
@@ -73,11 +77,30 @@ checkMaintenance().then(() => {
       next();
     }
   });
-}).catch((error) => {
-  if (router.currentRoute.path !== '/nofound') {
-    router.push('/nofound');
-  }
-});
+}
+
+// Initialize the app
+async function initializeApp() {
+  await checkMaintenance(); // Perform the maintenance check
+  setupRouterGuard(); // Set up the router guard
+
+  // Start Vue instance
+  new Vue({
+    store,
+    el: "#app",
+    render: (h) => h(App),
+    router,
+    data: {
+      Chartist: Chartist,
+    },
+    created() {
+      this.$config = config;
+    },
+  });
+}
+
+// Start the initialization process
+initializeApp();
 
 Vue.prototype.$Chartist = Chartist;
 
@@ -86,16 +109,3 @@ Vue.use(Dashboard);
 Vue.use(GlobalComponents);
 Vue.use(Modal);
 Vue.use(WijmoPlugin);
-
-new Vue({
-  store,
-  el: "#app",
-  render: (h) => h(App),
-  router,
-  data: {
-    Chartist: Chartist,
-  },
-  created() {
-    this.$config = config;
-  },
-});
