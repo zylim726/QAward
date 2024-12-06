@@ -36,7 +36,6 @@
           placeholder="Description Item"
           class="typeInput"
         />
-
         <div v-if="processedData.description_unit">
           <p>Unit:</p>
           <input
