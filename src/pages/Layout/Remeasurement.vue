@@ -51,7 +51,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(formData, formIndex) in Description" :key="'form-' + formIndex">
-                    <template v-if="formData.quotation.length <= 0 || parseFloat(formData.adj_quantity) === 0.00  ">
+                    <template v-if="!formData.description_unit">
                       <td v-if="getMaxQuotation <= 2"> 
                         <input  
                           type="checkbox" 
@@ -73,7 +73,6 @@
                       <td><b>{{ formData.sub_element || '' }}</b></td>
                       <td><b>{{ formData.description_sub_sub_element || '' }}</b></td>
                       <td class="td-max-width"><b>{{ formData.description_item }}</b></td>
-                      <td><b>{{ formData.description_unit || '' }}</b></td>
                     </template>
                     <template v-else>
                       <td  v-if="getMaxQuotation <= 2">

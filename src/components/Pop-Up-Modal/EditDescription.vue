@@ -36,13 +36,16 @@
           placeholder="Description Item"
           class="typeInput"
         />
-        <p>Unit : </p>
-        <input
-          type="text"
-          v-model="processedData.description_unit"
-          placeholder="Unit"
-          class="typeInput"
-        />
+        <div v-if="processedData.description_unit">
+          <p>Unit:</p>
+          <input
+            type="text"
+            v-model="processedData.description_unit"
+            placeholder="Unit"
+            class="typeInput"
+            @blur="handleEmptyUnit"
+          />
+        </div>
       </div>
       <button class="btn-save" aria-label="close" @click.stop="closeEditModal">Close</button>
       <button class="btn-save" aria-label="close" @click.stop="saveAndCloseModal()">Save</button>
@@ -75,6 +78,11 @@ export default {
     }
   },
   methods: {
+    handleEmptyUnit() {
+      if (!this.processedData.description_unit.trim()) {
+        this.processedData.description_unit = '-';
+      }
+    },
     closeEditModal() {
       this.$emit("close");
     },
