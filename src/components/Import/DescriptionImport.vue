@@ -256,15 +256,21 @@ export default {
       const unittype = this.Unittype;
       const getSubconDetails = this.SubconList;
 
+
       const matchedData = [];
       let hasErrors = false;
 
       selectImportData.forEach(object => {
         const matchedValues = {};
         const getSubconValue = {};
-
+        let checkDuplicateUnit = [];
         unittype.forEach(unit => {
-          const unitTypeunitQuantity = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+          let unitTypeunitQuantity = `${unit.type} (${unit.quantity})`.replace(/\s+/g, ' ').trim();
+          checkDuplicateUnit.push(unitTypeunitQuantity);
+          // If unitTypeunitQuantity already exists, increment the count
+          if(checkDuplicateUnit.filter(item => item === unitTypeunitQuantity).length > 1){
+            unitTypeunitQuantity = unitTypeunitQuantity + "_" + (checkDuplicateUnit.filter(item => item === unitTypeunitQuantity).length - 1)
+          } 
           // Clean the object keys by removing extra spaces
           const proceseedUnitKeys = Object.keys(object).reduce((acc, key) => {
             acc[key.replace(/\s+/g, ' ').trim()] = object[key];
@@ -296,13 +302,14 @@ export default {
                 let getSubconObject;
 
                 if (subcon.Subcon.name === 'Budget') {
-                    getSubconObject = `${subcon.Subcon.name}`;
+                   getSubconObject = subcon.Subcon.name;
                     console.log('If Block - Budget:', getSubconObject);
                 } else if (subcon.name && subcon.Subcon.name !== 'Budget') {
-                    getSubconObject = `${subcon.Subcon.name} (${subcon.name})`;
+                  getSubconObject = subcon.Subcon.name + ' (' + subcon.name + ')';
+
                     console.log('Else If Block:', getSubconObject);
                 } else {
-                    getSubconObject = `${subcon.Subcon.name}`;
+                  getSubconObject = subcon.Subcon.name;
                     console.log('Else Block:', getSubconObject);  // This should log for all the remaining cases
                 }
 
