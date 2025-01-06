@@ -22,6 +22,7 @@ import EditQuotation from "@/pages/Layout/EditQuotation.vue";
 import Description from "@/pages/Layout/Description.vue";
 import Remeasurement from "@/pages/Layout/Remeasurement.vue";
 import Notification from "@/pages/Layout/Notification.vue";
+import Features from "@/pages/Layout/Features.vue";
 import Nofound from "@/pages/Nofound.vue";
 import Nolink from "@/pages/Nolink.vue";
 import Mygrid from "@/pages/Layout/Mygrid.vue";
@@ -92,6 +93,13 @@ const routes = [
         path: "notification",
         name: "Notification",
         component: Notification,
+        meta: { requiresAuth: true },
+      },
+
+      {
+        path: "features",
+        name: "Features Update",
+        component: Features,
         meta: { requiresAuth: true },
       },
       
