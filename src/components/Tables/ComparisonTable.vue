@@ -1025,7 +1025,7 @@ export default {
 
 .header-row-4 th {
   position: sticky;
-  top: 88px;
+  top: 94px;
   z-index: 11; 
 }
 
